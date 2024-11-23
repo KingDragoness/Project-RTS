@@ -19,3 +19,18 @@ MonoBehaviour:
   MaxHP: 60
   HasEnergy: 0
   AllUnitTags: 00000000020000000a000000
+  port_Importance: -100
+  port_Idles:
+  - {fileID: 32900000, guid: 450bc40e438d783478324664c4de4888, type: 3}
+  port_Talkings:
+  - {fileID: 32900000, guid: a8af8be4d1960734abb4a626448deb52, type: 3}
+  voiceline_Ready:
+  - {fileID: 8300000, guid: 2e836b90686fba54c9d58366185d3113, type: 3}
+  - {fileID: 8300000, guid: c1b09f283f6255544a55e8aa27b109dc, type: 3}
+  - {fileID: 8300000, guid: e60e419746b2d634f8f0d1e5719b3a7a, type: 3}
+  - {fileID: 8300000, guid: 05b436f01cb827d4c872f063a698c352, type: 3}
+  voiceline_Move:
+  - {fileID: 8300000, guid: 2e836b90686fba54c9d58366185d3113, type: 3}
+  - {fileID: 8300000, guid: c1b09f283f6255544a55e8aa27b109dc, type: 3}
+  - {fileID: 8300000, guid: e60e419746b2d634f8f0d1e5719b3a7a, type: 3}
+  - {fileID: 8300000, guid: 05b436f01cb827d4c872f063a698c352, type: 3}

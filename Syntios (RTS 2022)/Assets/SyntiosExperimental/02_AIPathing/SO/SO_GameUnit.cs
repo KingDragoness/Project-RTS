@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using UnityEngine.Video;
 
 namespace ProtoRTS
 {
@@ -22,6 +23,16 @@ namespace ProtoRTS
 		public bool HasEnergy = false;
 
 		public List<Unit.Tag> AllUnitTags = new List<Unit.Tag>();
+
+		[FoldoutGroup("Portraits")]
+		[SerializeField]
+		[Tooltip("<= 0 for non-hero units. > 0 for hero units.")]
+		internal int port_Importance = -9000;
+
+		[FoldoutGroup("Portraits")] [SerializeField] internal VideoClip[] port_Idles;
+		[FoldoutGroup("Portraits")] [SerializeField] internal VideoClip[] port_Talkings;
+		[FoldoutGroup("Portraits")] [SerializeField] internal AudioClip[] voiceline_Ready;
+		[FoldoutGroup("Portraits")] [SerializeField] internal AudioClip[] voiceline_Move;
 
 	}
 }

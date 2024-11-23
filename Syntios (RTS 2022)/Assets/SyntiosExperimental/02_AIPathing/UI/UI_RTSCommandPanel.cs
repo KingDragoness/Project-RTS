@@ -15,7 +15,7 @@ namespace ProtoRTS
 
         public void RefreshUI()
 		{
-			if (RTSController.Instance.allSelectedUnits.Count == 1)
+			if (RTS.Selection.AllSelectedUnits.Count == 1)
             {
 				//display stats
 				UI.UnitStats.panel.SetActive(true);

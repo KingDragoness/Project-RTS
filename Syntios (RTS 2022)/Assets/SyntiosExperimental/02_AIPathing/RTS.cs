@@ -10,6 +10,7 @@ namespace ProtoRTS
         [SerializeField] private Camera mainCamera;
         [SerializeField] private RTSCamera rtsCamera;
         [SerializeField] private RTSController controller;
+        [SerializeField] private Selection selection;
 
         public static RTS instance;
 
@@ -21,6 +22,7 @@ namespace ProtoRTS
         public static Camera MainCamera { get { return instance.mainCamera; } }
         public static RTSCamera RTSCamera { get { return instance.rtsCamera; } }
         public static RTSController Controller { get { return instance.controller; } }
+        public static Selection Selection { get { return instance.selection; } }
 
     }
 }

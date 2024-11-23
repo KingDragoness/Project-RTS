@@ -23,8 +23,8 @@ namespace ProtoRTS
 		//constantly refresh in later update
 		public void RefreshUI()
 		{
-			if (RTSController.Instance.allSelectedUnits.Count != 1) return;
-			var unit = RTSController.Instance.allSelectedUnits[0]; if (unit == null) return;
+			if (RTS.Selection.AllSelectedUnits.Count != 1) return;
+			var unit = RTS.Selection.AllSelectedUnits[0]; if (unit == null) return;
 			var SOunit = unit.Class;
 
 			label_UnitName.text = SOunit.NameDisplay;

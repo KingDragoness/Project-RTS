@@ -62,7 +62,7 @@ namespace ProtoRTS
                     }
                     else
                     {
-                        RTSController.Instance.DeselectAllUnit();
+                        RTS.Selection.DeselectAllUnit();
                         startPosition = GetRaycastWorldClick();
 
                         // For selection the Units
@@ -204,7 +204,7 @@ namespace ProtoRTS
             {
                 if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
                 {
-                    RTSController.Instance.DragSelect(unit);
+                    RTS.Selection.DragSelect(unit);
                     unit.SelectedUnit(circleOutline_Green.transform);
                 }
             }

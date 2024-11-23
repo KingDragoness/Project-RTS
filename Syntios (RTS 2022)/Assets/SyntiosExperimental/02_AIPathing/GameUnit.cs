@@ -14,12 +14,14 @@ namespace ProtoRTS
 		[FoldoutGroup("References")] public RVOController rvoController; //change to modular
 		[FoldoutGroup("References")] public AIPath ai; //change to modular
 
-		[Header("Stats")]
+		[Header("Game Stats")]
 		[SerializeField] internal int stat_KillCount;
 		[SerializeField] internal int stat_HP = 25;
 		[SerializeField] internal int stat_Energy = 0;
 		[SerializeField] internal Unit.Player stat_faction;
 		[SerializeField] private SO_GameUnit _class; //temporary system
+
+
 
 		public SO_GameUnit Class { get => _class; }
 
@@ -34,6 +36,11 @@ namespace ProtoRTS
             }
         }
 
+
+        private void Start()
+        {
+			SetUnitStat();
+        }
 
         void OnEnable()
 		{
@@ -68,7 +75,7 @@ namespace ProtoRTS
 
 		public void SetUnitStat()
         {
-
+			stat_HP = _class.MaxHP;
         }
 
 		public void SelectedUnit(Transform prefab)
