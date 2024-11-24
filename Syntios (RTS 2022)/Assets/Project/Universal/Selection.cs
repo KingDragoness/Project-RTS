@@ -157,7 +157,8 @@ namespace ProtoRTS
 			if (PortraitedUnit != null)
             {
 				var unit = PortraitedUnit;
-				//UI.UnitSelection.PlayTalkingPortrait(unit, false);
+				SyntiosEvents.UI_OrderMove?.Invoke(unit);
+
 			}
 		}
 
@@ -175,8 +176,8 @@ namespace ProtoRTS
 			}
 
 			_instance.allSelectedUnits.Clear();
-			//UI.CommandPanel.RefreshUI();
-			//UI.UnitSelection.SwitchedIdlePortrait(null);
+			SyntiosEvents.UI_DeselectAll?.Invoke();
+
 		}
 
 		internal static void DragSelect(GameUnit unit)
@@ -190,8 +191,8 @@ namespace ProtoRTS
 			{
 				var unit1 = _instance.PortraitedUnit;
 
-				//UI.UnitSelection.SwitchedIdlePortrait(unit1);
-				//UI.UnitSelection.PlayTalkingPortrait(unit1, true, noChecks: true);
+				SyntiosEvents.UI_NewSelection?.Invoke(unit1);
+	
 			}
 
 		}

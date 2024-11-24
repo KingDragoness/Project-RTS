@@ -6,7 +6,7 @@ using UnityEngine.Video;
 using Sirenix.OdinInspector;
 using ToolBox.Pools;
 
-namespace ProtoRTS
+namespace ProtoRTS.Game
 {
 	public class UI_UnitSelector : MonoBehaviour
 	{
@@ -27,6 +27,9 @@ namespace ProtoRTS
 
         private void Awake()
         {
+            SyntiosEvents.UI_NewSelection += event_UI_NewSelection;
+            SyntiosEvents.UI_DeselectAll += event_UI_DeselectAll;
+            SyntiosEvents.UI_OrderMove += event_UI_OrderMove;
         }
 
         private void Start()
@@ -34,6 +37,28 @@ namespace ProtoRTS
             prefab.gameObject.Populate(24);
 
         }
+
+        #region Wrapper events
+
+        private void event_UI_NewSelection(GameUnit gameunit)
+        {
+            SwitchedIdlePortrait(gameunit);
+            PlayTalkingPortrait(gameunit, true, noChecks: true);
+            UI.CommandPanel.RefreshUI();
+
+        }
+
+        private void event_UI_DeselectAll()
+        {
+            UI.CommandPanel.RefreshUI();
+            SwitchedIdlePortrait(null);
+        }
+
+        private void event_UI_OrderMove(GameUnit gameunit)
+        {
+            PlayTalkingPortrait(gameunit, false);
+        }
+        #endregion
 
         private void Update()
         {

@@ -253,8 +253,34 @@ namespace ProtoRTS
 
             result.x += offset.x;
             result.z += offset.y;
+            result = ClampPosition(result);
 
             return result;
+        }
+
+        public Vector3 ClampPosition (Vector3 pos)
+        {
+            if (pos.x > Map.MapSize.x * 2f)
+            {
+                pos.x = Map.MapSize.x * 2f;
+            }
+
+            if (pos.x < 0)
+            {
+                pos.x = 0;
+            }
+
+            if (pos.z > Map.MapSize.y * 2f)
+            {
+                pos.z = Map.MapSize.y * 2f;
+            }
+
+            if (pos.z < -10)
+            {
+                pos.z = -10;
+            }
+
+            return pos;
         }
     }
 }

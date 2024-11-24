@@ -167,9 +167,9 @@ namespace ProtoRTS
                 pos.z = Map.MapSize.y * 2f;
             }
 
-            if (pos.z < 0)
+            if (pos.z < -10)
             {
-                pos.z = 0;
+                pos.z = -10;
             }
 
             transform.position = pos;

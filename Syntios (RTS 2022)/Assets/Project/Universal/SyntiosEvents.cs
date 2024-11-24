@@ -7,49 +7,31 @@ namespace ProtoRTS
 {
 	public class SyntiosEvents : MonoBehaviour
 	{
-		public enum Type
+
+        public static System.Action<GameUnit> UI_NewSelection;
+        public static System.Action UI_DeselectAll;
+        public static System.Action<GameUnit> UI_OrderMove;
+
+
+
+        private void OnEnable()
         {
-            nullEvent = 0,
-			OnGamePause = 1,
 
-            //100-300 UI
-		    PlayerDeselectAllUnits = 100,
-			PlayerSelectUnit,
-			PlayerOrderingUnit,
-
-            //special game condition
-            Victory = 2500,
-            Defeat
         }
 
-
-
-        public class EventClass
+        private void OnDisable()
         {
-            public Type eventType;
-            public System.Action action;
-
-            public EventClass(Type eventType)
-            {
-                this.eventType = eventType;
-            }
+            UI_NewSelection = null;
+            UI_DeselectAll = null;
+            UI_OrderMove = null;
         }
-
-        private List<EventClass> allEvents = new List<EventClass>();
 
         private void Awake()
         {
-            foreach(var enum1 in System.Enum.GetValues(typeof(Type)))
-            {
-                //new event
-                allEvents.Add(new EventClass((Type)enum1));
-            }
+           
         }
 
-        public static void SendUIEvents(SyntiosEvents.Type eventType)
-        {
-
-        }
+      
 
 	}
 }
