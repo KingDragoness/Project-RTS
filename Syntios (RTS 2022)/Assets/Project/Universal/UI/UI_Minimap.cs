@@ -13,9 +13,11 @@ namespace ProtoRTS
         public Vector2 offset = new Vector2(15, 15);
         public RectTransform ui_Map;
         public RectTransform ui_OriginMinimap;
+        public float MinimapRefreshRate = 2f;
 
 
         public LineRenderer line_Viewport;
+        public RawImage mapTexture_Unit;
         public Image testImg_LD;
         public Image testImg_RD;
         public Image testImg_LU;
@@ -23,11 +25,18 @@ namespace ProtoRTS
 
         private bool allowDrag = false;
         private Canvas myCanvas;
+        private Texture minimap_Terrain;
+        private Texture2D minimap_Units;
+
+        private float cooldown_MinimapRefresh = 2f;
+
 
         private void Start()
         {
             myCanvas = GetComponentInParent<Canvas>();
             RefreshMapData();
+            minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
+
         }
 
         private void RefreshMapData()
@@ -94,6 +103,7 @@ namespace ProtoRTS
             }
         }
 
+
         private void Update()
         {
             Update_Viewport();
@@ -104,6 +114,16 @@ namespace ProtoRTS
             }
 
             if (allowDrag) Update_MoveCam();
+
+            if (cooldown_MinimapRefresh > 0f)
+            {
+                cooldown_MinimapRefresh -= Time.deltaTime;
+            }
+            else
+            {
+                Update_Minimap();
+                cooldown_MinimapRefresh = MinimapRefreshRate;
+            }
         }
 
         private void Update_Viewport()
@@ -199,6 +219,19 @@ namespace ProtoRTS
 
         private string debug_sPos = "";
 
+        public Vector2 GetMousePosInMinimap()
+        {
+            var parent = ui_OriginMinimap.transform.parent;
+            ui_OriginMinimap.SetParent(myCanvas.transform);
+            Vector2 originMap = ui_OriginMinimap.anchoredPosition;
+            Vector2 mousePosition = Input.mousePosition;
+
+            var result = _getMousePositionInMinimap(mousePosition - originMap);
+            ui_OriginMinimap.SetParent(parent);
+
+            return result;
+        }
+
         private void Update_MoveCam()
         {
             var parent = ui_OriginMinimap.transform.parent;
@@ -207,7 +240,7 @@ namespace ProtoRTS
             Vector2 mousePosition = Input.mousePosition;
 
 
-            var mouseposOnMinimap = GetMousePositionInMinimap(mousePosition - originMap);
+            var mouseposOnMinimap = _getMousePositionInMinimap(mousePosition - originMap);
 
             var newPosition = ConvertMinimapPosToCameraPos(mouseposOnMinimap);
 
@@ -217,13 +250,58 @@ namespace ProtoRTS
 
         }
 
+        private void Update_Minimap()
+        {
+            if (minimap_Units != null) Destroy(minimap_Units);
+
+            minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
+            minimap_Units.filterMode = FilterMode.Point;
+            var fillColorArray = minimap_Units.GetPixels();
+
+            Color transparentColor = new Color(0f, 0f, 0f, 0f);
+
+            for (var i = 0; i < fillColorArray.Length; ++i)
+            {
+                fillColorArray[i] = transparentColor;
+            }
+            minimap_Units.SetPixels(fillColorArray);
+
+            foreach (var gameUnit in SyntiosEngine.Instance.ListedGameUnits)
+            {
+                Vector2Int posCenter = ConvertWorldPosToMinimapPos(gameUnit.transform.position);
+                Color c = Unit.GetColor(gameUnit.stat_faction);
+                int radius = RadiusUnitInMiniMap(gameUnit.Class.Radius);
+                if (radius <= 2) radius = 2;
+                int r2 = radius * radius;
+
+                for(int x = 0; x < r2; x++)
+                {
+                    int pixelX = Mathf.FloorToInt(x % radius);
+                    int pixelY = Mathf.FloorToInt(x / radius);
+                    int mid = radius / 2;
+
+                    Vector2Int currPixel = posCenter;
+                    currPixel.x -= mid;
+                    currPixel.y -= mid;
+                    currPixel.x += pixelX;
+                    currPixel.y += pixelY;
+
+                    minimap_Units.SetPixel(currPixel.x, currPixel.y, c);
+
+                }
+            }
+
+            minimap_Units.Apply();
+            mapTexture_Unit.texture = minimap_Units;
+        }
+
 
         public void InitiateDrag()
         {
             allowDrag = true;
         }
 
-        public Vector2 GetMousePositionInMinimap(Vector2 pos1)
+        public Vector2 _getMousePositionInMinimap(Vector2 pos1)
         {
             if (pos1.x > ui_Map.sizeDelta.x)
             {
@@ -257,6 +335,38 @@ namespace ProtoRTS
 
             return result;
         }
+
+        public Vector3 ConvertMinimapPosToWorldPos(Vector2 minimapPos)
+        {
+            float mapLongestPixelAxis = Map.MapSize.x;
+
+            if (Map.MapSize.y > Map.MapSize.x) mapLongestPixelAxis = Map.MapSize.y;
+            float lerp_x = minimapPos.x / ui_Map.sizeDelta.x;
+            float lerp_y = minimapPos.y / ui_Map.sizeDelta.y;
+
+            Vector3 result = new Vector3();
+            result.x = Mathf.Lerp(0, Map.MapSize.x, lerp_x) * 2f;
+            result.y = 0f;
+            result.z = Mathf.Lerp(0, Map.MapSize.y, lerp_y) * 2f;
+
+
+            return result;
+        }
+
+
+        public Vector2Int ConvertWorldPosToMinimapPos(Vector3 worldPosition)
+        {
+            Vector2Int result = new Vector2Int();
+            result.x = Mathf.Lerp(0, ui_Map.sizeDelta.x, (worldPosition.x / Map.MapSize.x /2f)).ToInt();
+            result.y = Mathf.Lerp(0, ui_Map.sizeDelta.y, (worldPosition.z / Map.MapSize.y /2f)).ToInt();
+
+            return result;
+        }
+
+        public int RadiusUnitInMiniMap(float realRadius)
+        {
+            return (( (realRadius + 1f) / (Map.MapSize.x + Map.MapSize.y)) * defaultMinimapLength).ToInt();
+        }    
 
         public Vector3 ClampPosition (Vector3 pos)
         {

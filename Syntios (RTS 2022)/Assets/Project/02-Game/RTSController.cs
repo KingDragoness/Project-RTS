@@ -14,9 +14,6 @@ namespace ProtoRTS.Game
 	{
 
 
-
-
-
 		public static RTSController Instance;
 
         private void Awake()

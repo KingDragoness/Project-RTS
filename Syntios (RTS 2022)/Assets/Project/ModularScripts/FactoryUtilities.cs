@@ -326,4 +326,10 @@ public static class FactoryUtilities
         Vector2 size = Vector2.Scale(transform.rect.size, transform.lossyScale);
         return new Rect((Vector2)transform.position - (size * 0.5f), size);
     }
+
+    public static int ToInt (this float f)
+    {
+        return Mathf.RoundToInt(f);
+    }
+
 }

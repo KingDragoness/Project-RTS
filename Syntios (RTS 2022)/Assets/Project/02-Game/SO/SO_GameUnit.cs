@@ -18,9 +18,11 @@ namespace ProtoRTS
 		public string ID = "Seaver";
 		public string NameDisplay = "Seaver";
 		public string Rank = "";
+		public float Radius = 2;
 		public Sprite spriteWireframe;
 		public int MaxHP = 40;
 		public bool HasEnergy = false;
+		public bool IsUntouchable = false; //for scarab or missiles
 
 		public List<Unit.Tag> AllUnitTags = new List<Unit.Tag>();
 

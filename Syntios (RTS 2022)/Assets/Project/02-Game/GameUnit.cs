@@ -7,25 +7,17 @@ using Sirenix.OdinInspector;
 
 namespace ProtoRTS
 {
-	public class GameUnit : MonoBehaviour
+
+	public class GameUnit : AbstractUnit
 	{
 		public Vector3 target;
 		[FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
 		[FoldoutGroup("References")] public RVOController rvoController; //change to modular
 		[FoldoutGroup("References")] public AIPath ai; //change to modular
 
-		[Header("Game Stats")]
-		[SerializeField] internal int stat_KillCount;
-		[SerializeField] internal int stat_HP = 25;
-		[SerializeField] internal int stat_Energy = 0;
-		[SerializeField] internal Unit.Player stat_faction;
-		[SerializeField] private SO_GameUnit _class; //temporary system
 
 
 
-		public SO_GameUnit Class { get => _class; }
-
-		private Transform circleOutline;
 
 		public float Radius
         {
@@ -38,11 +30,12 @@ namespace ProtoRTS
 
 
         private void Start()
-        {
+		{
+			SyntiosEngine.Instance.ListedGameUnits.Add(this);
 			SetUnitStat();
-        }
+		}
 
-        void OnEnable()
+		void OnEnable()
 		{
 			target = transform.position;
 
@@ -62,7 +55,12 @@ namespace ProtoRTS
 
 		}
 
-		void Update()
+        private void OnDestroy()
+        {
+			SyntiosEngine.Instance.ListedGameUnits.Remove(this);
+        }
+
+        void Update()
 		{
 			if (followerEntity != null)
 			{
@@ -78,22 +76,7 @@ namespace ProtoRTS
 			stat_HP = _class.MaxHP;
         }
 
-		public void SelectedUnit(Transform prefab)
-        {
-			if (circleOutline != null) Destroy(circleOutline.gameObject);
 
-			Transform t1 = Instantiate(prefab, transform, false);
-			t1.transform.localPosition = Vector3.zero + new Vector3(0f, 0.2f,0f);
-			t1.transform.localScale = Vector3.one * Radius * 2.1f;
-			t1.gameObject.SetActive(true);
-			circleOutline = t1;
-		}
-
-		public void DeselectUnit()
-		{
-			if (circleOutline != null) Destroy(circleOutline.gameObject);
-
-		}
 
 
 	}

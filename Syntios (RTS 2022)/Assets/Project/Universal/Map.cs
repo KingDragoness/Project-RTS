@@ -10,6 +10,8 @@ namespace ProtoRTS
 
 		[SerializeField] private SyntiosTerrainData _terrainData;
 
+
+
 		public static Vector2 MapSize
         {
             get

@@ -8,19 +8,14 @@ namespace ProtoRTS
 	public class SyntiosEngine : MonoBehaviour
 	{
 
-		private void Start()
-		{
-			
-		}
+		public List<GameUnit> ListedGameUnits = new List<GameUnit>();
 
-		private void Update()
-		{
-			
-		}
-		
-		private void OnEnable()
-		{
-			
-		}
-	}
+		public static SyntiosEngine Instance;
+
+        private void Awake()
+        {
+            Instance = this;
+        }
+
+    }
 }

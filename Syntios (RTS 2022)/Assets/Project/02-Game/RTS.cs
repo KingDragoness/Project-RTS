@@ -7,10 +7,7 @@ namespace ProtoRTS.Game
 {
 	public class RTS : MonoBehaviour
 	{
-        [SerializeField] private Camera mainCamera;
-        [SerializeField] private RTSCamera rtsCamera;
-        [SerializeField] private RTSController controller;
-        [SerializeField] private Selection selection;
+   
 
         public static RTS instance;
 
@@ -19,10 +16,10 @@ namespace ProtoRTS.Game
             instance = this;
         }
 
-        public static Camera MainCamera { get { return instance.mainCamera; } }
-        public static RTSCamera RTSCamera { get { return instance.rtsCamera; } }
-        public static RTSController Controller { get { return instance.controller; } }
-        public static Selection Selection { get { return instance.selection; } }
+        public static bool Exists
+        {
+            get { return instance != null ? true : false; }
 
+        }
     }
 }

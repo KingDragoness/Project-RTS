@@ -204,11 +204,19 @@ namespace ProtoRTS
             {
                 if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
                 {
-                    Selection.DragSelect(unit);
+                    Selection.SelectUnit(unit);
                     unit.SelectedUnit(circleOutline_Green.transform);
                 }
             }
 
+
+            if (Selection.GetPortraitedUnit != null)
+            {
+                var unit1 = Selection.GetPortraitedUnit;
+
+                SyntiosEvents.UI_NewSelection?.Invoke(unit1);
+
+            }
 
             //UI.CommandPanel.RefreshUI();
 
