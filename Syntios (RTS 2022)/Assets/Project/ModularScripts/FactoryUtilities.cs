@@ -77,6 +77,21 @@ public static class FactoryUtilities
 
         return false;
     }
+    //public static T GetComponentFromEveryParent<T>(this GameObject origin, GameObject parent)
+    //{
+    //    Transform t = origin.transform;
+
+    //    while (t.parent != null)
+    //    {
+    //        t = t.parent;
+
+    //        if (t.gameObject.GetComponent<T>() != null) return t.gameObject.GetComponent<T>();
+    //    }
+
+
+    //    return default(T);
+    //}
+
 
     public static Vector3 RandomizedOffset(this Vector3 pos, Vector3 range)
     {

@@ -5,28 +5,28 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Proto-MainMenu.unity
     guid: 1d1f4d3611cd1bb499f06529e3a819a9
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/_Cutscenes/Cutscene-OP.unity
     guid: 4e2c6008eb6c25148871673715b71d2f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Proto-DieScreen.unity
     guid: 61eb0d2bfc8d32543b3ca0aac3af88ce
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level0-Tutorial.unity
     guid: 85677ca0001318b4ea32dcf73b7de625
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Level0-Credits.unity
     guid: 04294b3b0bb56ef4c9c834d03ac585dc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Proto-StorySelection.unity
     guid: 9a88f8d8424683f4a92c6b0573b258fa
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Aldrich/Level1 - Beginnings.unity
     guid: 6d079a9db9df57c47a8d794b74f4760a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Aldrich/Level1 - Sewers.unity
     guid: 39070d99df912c44d808667a82702ee1
   - enabled: 1

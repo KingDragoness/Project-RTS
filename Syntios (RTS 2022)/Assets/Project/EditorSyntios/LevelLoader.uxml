@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Project/EditorSyntios/StandardUSS.uss?fileID=7433441132597879392&amp;guid=c17bae3a2bcf96e4f99cae65400633eb&amp;type=3#StandardUSS" />
+    <ui:Label tabindex="-1" text="Syntios Level Loader" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Title" style="font-size: 24px; -unity-font-style: bold; margin-right: 12px; margin-left: 12px; height: 40px; -unity-text-align: upper-center; width: auto; background-color: rgba(0, 0, 0, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px; border-bottom-left-radius: 5px;" />
+    <ui:Button text="Load Game" parse-escape-sequences="true" display-tooltip-when-elided="true" name="button_Game" style="height: 28px; width: auto;" />
+    <ui:Button text="Load Map Editor" parse-escape-sequences="true" display-tooltip-when-elided="true" name="button_MapEditor" style="height: 28px; width: auto;" />
+</ui:UXML>

@@ -4,17 +4,7 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Weapon
   - Enemy
-  - bomb
-  - laser
-  - spider
-  - b0mb
-  - GunHolder
-  - CameraHolder
-  - SpawnIndicator
-  - Interactable
-  - FxTemporaire
   layers:
   - Default
   - TransparentFX
