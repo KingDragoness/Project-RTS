@@ -3,6 +3,7 @@
     Properties
     {
         _SplatMap("Splatmap (RGB)", 2D) = "black" {}
+        _FOWMap("Fog of War (Grayscale)", 2D) = "black" {}
         _GroundTexture("Ground Texture", 2D) = "white" {}
         _TextureA("Layer 1", 2D) = "white" {}
         _TextureB("Layer 2", 2D) = "white" {}
@@ -14,6 +15,7 @@
         _TextureH("Layer 8", 2D) = "white" {}
         _TextureScale("TextureScale", Range(0.01,10)) = 0.25
         _SplatmapScale("SplatmapScale", Range(0.01,2)) = 0.5
+        _FOWSampleRadiusBlur("FOW Blur Radius", Range(0.0,0.05)) = 0.005
         _PrioGround("Prio Ground", Range(0.01, 2.0)) = 1
         _PrioA("Prio layer1", Range(0.01, 2.0)) = 1
         _PrioB("Prio layer2", Range(0.01, 2.0)) = 1
@@ -44,6 +46,7 @@
             #include "AutoLight.cginc"
  
             sampler2D _SplatMap;
+            sampler2D _FOWMap;
             sampler2D _GroundTexture;
             sampler2D _TextureA;
             sampler2D _TextureB;
@@ -51,6 +54,7 @@
             sampler2D _TextureD;
             fixed _TextureScale;
             fixed _SplatmapScale;
+            half _FOWSampleRadiusBlur;
 
             fixed _PrioGround;
             fixed _PrioA;
@@ -74,6 +78,7 @@
                 float2 uvSplat : TEXCOORD0;
                 float2 uvMaterial : TEXCOORD1;
                 fixed4 materialPrios : TEXCOORD2;
+
                 // put shadows data into TEXCOORD3
                 SHADOW_COORDS(3)
                 fixed4 color : COLOR0;
@@ -86,7 +91,7 @@
                 v2f OUT;
                 OUT.pos = UnityObjectToClipPos(v.vertex);
                 //OUT.uvSplat = v.uv.xy;
-                OUT.uvSplat = mul(unity_ObjectToWorld, v.vertex).xz * _SplatmapScale * 0.1; //replaced with global
+                OUT.uvSplat = mul(unity_ObjectToWorld, v.vertex).xz * _SplatmapScale * 0.01; //replaced with global
 
 
                 // uvs of the rendered materials are based on world position
@@ -121,7 +126,9 @@
                 materialHeights = max(0.0001, materialHeights);
  
                 // get material amounts from splatmap
+                //fixed4 materialAmounts = tex2D(_SplatMap, IN.uvSplat).argb;
                 fixed4 materialAmounts = tex2D(_SplatMap, IN.uvSplat).argb;
+                
                 // the ground amount takes up all unused space
                 fixed groundAmount = 1.0 - min(1.0, materialAmounts.r + materialAmounts.g + materialAmounts.b + materialAmounts.a);
                  
@@ -164,7 +171,22 @@
                 fixed3 lighting = IN.diff * shadow + IN.ambient;
  
                 col.rgb *= IN.diff * SHADOW_ATTENUATION(IN) + IN.ambient;
- 
+                
+                //fow
+                //only radius 2 (test only)
+                fixed3 sum = fixed3(0,0,0);
+                sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y - 4.0 * _FOWSampleRadiusBlur)) * 0.05;
+				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y - 3.0 * _FOWSampleRadiusBlur)) * 0.09;
+				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y - 2.0 * _FOWSampleRadiusBlur)) * 0.12;
+				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y - _FOWSampleRadiusBlur)) * 0.15;
+				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y)) * 0.16;
+				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y + _FOWSampleRadiusBlur)) * 0.15;
+				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y + 2.0 * _FOWSampleRadiusBlur)) * 0.12;
+				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y + 3.0 * _FOWSampleRadiusBlur)) * 0.09;
+				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y + 4.0 * _FOWSampleRadiusBlur)) * 0.05;
+
+                col.rgb *= sum;
+
                 return col;
             }
             ENDCG

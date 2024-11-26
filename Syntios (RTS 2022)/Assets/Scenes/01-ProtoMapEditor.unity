@@ -735,7 +735,7 @@ PrefabInstance:
     - target: {fileID: 2237934321989723776, guid: e63aa5f347c3e3445a6db1e41d174463,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6660548080639663875, guid: e63aa5f347c3e3445a6db1e41d174463,
         type: 3}
@@ -1027,6 +1027,12 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: dd572b939d375c54bb881e99702abcda, type: 2}
+--- !u!23 &898126505 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 6660548080639663875, guid: e63aa5f347c3e3445a6db1e41d174463,
+    type: 3}
+  m_PrefabInstance: {fileID: 488061970}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1192320694
 GameObject:
   m_ObjectHideFlags: 0
@@ -1208,6 +1214,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseRTSEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
+        type: 3}
+      propertyPath: DEBUG_MeshTerrain
+      value: 
+      objectReference: {fileID: 898126505}
     - target: {fileID: 6072066624927534290, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: m_LocalPosition.x

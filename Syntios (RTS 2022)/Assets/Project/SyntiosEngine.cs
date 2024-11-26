@@ -9,6 +9,7 @@ namespace ProtoRTS
 	{
 
 		public List<GameUnit> ListedGameUnits = new List<GameUnit>();
+        public Unit.Player CurrentFaction;
 
 		public static SyntiosEngine Instance;
 

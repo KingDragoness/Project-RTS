@@ -93,7 +93,7 @@ namespace ProtoRTS
                 // When Releasing
                 if (Input.GetMouseButtonUp(0))
                 {
-                    SelectUnits();
+                    if (_invalidDrag == false) SelectUnits();
                     _invalidDrag = false;
 
                     startPosition = Vector2.zero;

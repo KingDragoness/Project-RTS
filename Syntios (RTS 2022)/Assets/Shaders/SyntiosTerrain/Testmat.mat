@@ -43,6 +43,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _FOWMap:
+        m_Texture: {fileID: 2800000, guid: 41a61ce3430307840881788e51899ce3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _GroundTexture:
         m_Texture: {fileID: 2800000, guid: 30d94d1c61f26394d849c78cf1f0be4a, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -64,7 +68,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SplatMap:
-        m_Texture: {fileID: 2800000, guid: 88fd481f7ac74b040983b8695e4c83ed, type: 3}
+        m_Texture: {fileID: 2800000, guid: eca6ae5d0331e9344b178c18a543a2eb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureA:
@@ -83,13 +87,30 @@ Material:
         m_Texture: {fileID: 2800000, guid: bbbfdf12c7fa43c48b5fecfde5ed821d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _TextureE:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureF:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureG:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureH:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _Depth: 0.5
+    - _Depth: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _FOWSampleRadiusBlur: 0.005
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
@@ -104,7 +125,7 @@ Material:
     - _PrioGround: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SplatmapScale: 0.078
+    - _SplatmapScale: 0.195
     - _SrcBlend: 1
     - _TextureScale: 0.1
     - _UVSec: 0

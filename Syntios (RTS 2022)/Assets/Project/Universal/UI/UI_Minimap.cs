@@ -26,7 +26,7 @@ namespace ProtoRTS
         private bool allowDrag = false;
         private Canvas myCanvas;
         private Texture minimap_Terrain;
-        private Texture2D minimap_Units;
+        private Texture2D texture_minimap_Units;
 
         private float cooldown_MinimapRefresh = 2f;
 
@@ -35,7 +35,7 @@ namespace ProtoRTS
         {
             myCanvas = GetComponentInParent<Canvas>();
             RefreshMapData();
-            minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
+            texture_minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
 
         }
 
@@ -252,11 +252,11 @@ namespace ProtoRTS
 
         private void Update_Minimap()
         {
-            if (minimap_Units != null) Destroy(minimap_Units);
+            //if (minimap_Units != null) Destroy(minimap_Units);
 
-            minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
-            minimap_Units.filterMode = FilterMode.Point;
-            var fillColorArray = minimap_Units.GetPixels();
+            //minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
+            texture_minimap_Units.filterMode = FilterMode.Point;
+            var fillColorArray = texture_minimap_Units.GetPixels();
 
             Color transparentColor = new Color(0f, 0f, 0f, 0f);
 
@@ -264,7 +264,7 @@ namespace ProtoRTS
             {
                 fillColorArray[i] = transparentColor;
             }
-            minimap_Units.SetPixels(fillColorArray);
+            texture_minimap_Units.SetPixels(fillColorArray);
 
             foreach (var gameUnit in SyntiosEngine.Instance.ListedGameUnits)
             {
@@ -286,13 +286,13 @@ namespace ProtoRTS
                     currPixel.x += pixelX;
                     currPixel.y += pixelY;
 
-                    minimap_Units.SetPixel(currPixel.x, currPixel.y, c);
+                    texture_minimap_Units.SetPixel(currPixel.x, currPixel.y, c);
 
                 }
             }
 
-            minimap_Units.Apply();
-            mapTexture_Unit.texture = minimap_Units;
+            texture_minimap_Units.Apply();
+            mapTexture_Unit.texture = texture_minimap_Units;
         }
 
 
