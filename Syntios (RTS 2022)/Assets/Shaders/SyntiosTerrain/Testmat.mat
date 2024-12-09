@@ -27,6 +27,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _CloudFog:
+        m_Texture: {fileID: 2800000, guid: 8273c361ecfa4dc429cf51b87e7fd24b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -44,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FOWMap:
-        m_Texture: {fileID: 2800000, guid: f9341bc41c771e042a5a244c397ebb9d, type: 3}
+        m_Texture: {fileID: 2800000, guid: 335bc67babb85a44896fffb414b6205a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GroundTexture:
@@ -59,6 +63,22 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _NormalMapA:
+        m_Texture: {fileID: 2800000, guid: a4414ab975e6f5d41bded65f82390a5d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMapB:
+        m_Texture: {fileID: 2800000, guid: eba4487076480c845beecb3d9cff44a6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMapC:
+        m_Texture: {fileID: 2800000, guid: 3392e9a97a2312f4b9445557a395a6ed, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMapD:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -67,12 +87,16 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SpecularMap:
+        m_Texture: {fileID: 2800000, guid: 2b787c5d4338cc242bfc178489e6ccd8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SplatMap:
-        m_Texture: {fileID: 2800000, guid: eca6ae5d0331e9344b178c18a543a2eb, type: 3}
+        m_Texture: {fileID: 2800000, guid: a8ca96011ff6757418fd01535d4f78b4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureA:
-        m_Texture: {fileID: 2800000, guid: 6ec76ac714077a24c82031ab94fd72f6, type: 3}
+        m_Texture: {fileID: 2800000, guid: aa5b6799afb1cea4e96edb378a0fe66e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureB:
@@ -106,8 +130,9 @@ Material:
     m_Ints: []
     m_Floats:
     - _BumpScale: 1
+    - _ContrastCloud: 0.3
     - _Cutoff: 0.5
-    - _Depth: 1
+    - _Depth: 0.55
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _FOWSampleRadiusBlur: 0.0012
@@ -119,20 +144,23 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _PrioA: 1
+    - _PrioA: 0.5
     - _PrioB: 1
     - _PrioC: 1
     - _PrioD: 1
     - _PrioGround: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SplatmapScale: 0.195
+    - _SplatmapScale: 0.194
     - _SrcBlend: 1
-    - _TextureScale: 0.1
+    - _TextureScale: 0.08
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
     - _BaseScale: {r: 1, g: 1, b: 1, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _LightColor: {r: 1, g: 1, b: 1, a: 1}
+    - _MainLightPosition: {r: 512, g: 1, b: 512, a: 0}
+    - _UnexploredFog: {r: 0.047169805, g: 0.047169805, b: 0.047169805, a: 1}
   m_BuildTextureStacks: []
