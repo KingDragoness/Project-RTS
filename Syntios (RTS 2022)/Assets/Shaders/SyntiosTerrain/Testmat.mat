@@ -68,15 +68,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapB:
-        m_Texture: {fileID: 2800000, guid: eba4487076480c845beecb3d9cff44a6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6d67ae73de4a64a4980cbdf42c6defa4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapC:
-        m_Texture: {fileID: 2800000, guid: 3392e9a97a2312f4b9445557a395a6ed, type: 3}
+        m_Texture: {fileID: 2800000, guid: ff951a2ed66d6e248a8fb27f4b343842, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMapD:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 6162ad0e8e30ec6488a5f3fe2cbb0d01, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
@@ -129,6 +129,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AlbedoPower: 3
+    - _BumpDepth: 0.58
     - _BumpScale: 1
     - _ContrastCloud: 0.3
     - _Cutoff: 0.5
@@ -149,9 +151,11 @@ Material:
     - _PrioC: 1
     - _PrioD: 1
     - _PrioGround: 1
+    - _RimPower: 5
+    - _Shininess: 15
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SplatmapScale: 0.194
+    - _SplatmapScale: 0.1959
     - _SrcBlend: 1
     - _TextureScale: 0.08
     - _UVSec: 0
@@ -162,5 +166,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _LightColor: {r: 1, g: 1, b: 1, a: 1}
     - _MainLightPosition: {r: 512, g: 1, b: 512, a: 0}
+    - _RimColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
+    - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
     - _UnexploredFog: {r: 0.047169805, g: 0.047169805, b: 0.047169805, a: 1}
   m_BuildTextureStacks: []

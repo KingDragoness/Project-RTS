@@ -47,7 +47,7 @@ Shader "Custom/Test7 Normal Map"
 			};
 			struct vertexOutput {
 				float4 pos: SV_POSITION;
-				float4 tex: TEXCOORD0;
+				float4 tex: TEXCOORD0; //this uv
 				float4 posWorld: TEXCOORD1;
 				float3 normalWorld: TEXCOORD2;
 				float3 tangentWorld: TEXCOORD3;
@@ -81,7 +81,8 @@ Shader "Custom/Test7 Normal Map"
 					atten = 1.0;
 					lightDirection = normalize(_WorldSpaceLightPos0.xyz);
 				}
-				 else {
+				else 
+				{
 				  float3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - i.posWorld.xyz;
 				  float distance = length(fragmentToLightSource);
 				  float atten = 1 / distance;

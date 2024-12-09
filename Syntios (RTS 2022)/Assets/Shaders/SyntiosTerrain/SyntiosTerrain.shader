@@ -11,7 +11,7 @@ Shader "Custom/SyntiosTerrain"
         _GroundTexture("Ground Texture", 2D) = "white" {}
         _CloudFog("Cloud Fog Pattern", 2D) = "black" {}
         _UnexploredFog("Unexplored Fog Color", Color) = (0.1,0.1,0.1,1)
-        _SpecularMap("SpecularMap (RGB)", 2D) = "white" {}
+        _BumpDepth("Bump Depth", Range(-2.0, 2.0)) = 1
 
         _TextureA("Layer 1", 2D) = "white" {}
         _NormalMapA("NormalMap 1", 2D) = "white" {}
@@ -40,8 +40,13 @@ Shader "Custom/SyntiosTerrain"
         _PrioD("Prio layer4", Range(0.01, 2.0)) = 1
         _ContrastCloud("Cloud Contrast", Range(0.001, 1.0)) = 0.01
         _Depth("Depth", Range(0.01,1.0)) = 0.2
-        _MainLightPosition("MainLightPosition", Vector) = (0,0,0,0)
-        _LightColor("LightColor", Color) = (1,1,1,1)
+
+        _SpecColor("Specular Color", Color) = (1.0, 1.0, 1.0, 1.0)
+        _Shininess("Shininess", float) = 10
+        _RimColor("Rim Color", Color) = (1.0, 1.0, 1.0, 1.0)
+        _RimPower("Rim Power", Range(0.1, 10.0)) = 3.0
+        _AlbedoPower("Albedo Power", Range(1, 10.0)) = 1
+
     }
  
     SubShader
@@ -77,7 +82,6 @@ Shader "Custom/SyntiosTerrain"
             sampler2D _FOWMap;
             sampler2D _GroundTexture;
             sampler2D _CloudFog;
-            sampler2D _SpecularMap;
             uniform float4 _UnexploredFog;
             sampler2D _TextureA;
             sampler2D _TextureB;
@@ -93,8 +97,11 @@ Shader "Custom/SyntiosTerrain"
             fixed _FOWmapScale;
             half _FOWSampleRadiusBlur;
 
-            uniform float3 _MainLightPosition;
-            uniform float4 _LightColor;
+            uniform float _BumpDepth;
+            uniform float _Shininess;
+            uniform float4 _RimColor;
+            uniform float _RimPower;
+            uniform float _AlbedoPower;
 
             fixed _PrioGround;
             fixed _PrioA;
@@ -121,11 +128,11 @@ Shader "Custom/SyntiosTerrain"
                 float2 uvMaterial : TEXCOORD1;
                 fixed4 materialPrios : TEXCOORD2;
                 float2 uvFOW : TEXCOORD4;
-                float3 lightdir : TEXCOORD5;
-                float3 viewdir : TEXCOORD6;
-                float3 T : TEXCOORD7;
-                float3 B : TEXCOORD8;
-                float3 N : TEXCOORD9;
+
+                float4 posWorld: TEXCOORD5;
+                float3 normalWorld: TEXCOORD6;
+                float3 tangentWorld: TEXCOORD7;
+                float3 binormalWorld: TEXCOORD8;
 
                 // put shadows data into TEXCOORD3
                 SHADOW_COORDS(3)
@@ -144,28 +151,11 @@ Shader "Custom/SyntiosTerrain"
 
                 //for normalmap
                 {
-                    float4 worldPosition = mul(unity_ObjectToWorld, v.vertex);
-                    float3 lightDir = worldPosition.xyz - _MainLightPosition.xyz;
-                    OUT.lightdir = normalize(lightDir);
-
-                    // calc viewDir vector 
-                    float3 viewDir = normalize(worldPosition.xyz - _WorldSpaceCameraPos.xyz);
-                    OUT.viewdir = viewDir;
-
-                    // calc Normal, Binormal, Tangent vector in world space
-                    // cast 1st arg to 'float3x3' (type of input.normal is 'float3')
-                    float3 worldNormal = mul((float3x3)unity_ObjectToWorld, v.normal);
-                    float3 worldTangent = mul((float3x3)unity_ObjectToWorld, v.tangent);
-
-                    float3 binormal = cross(v.normal, v.tangent.xyz); // *input.tangent.w;
-                    float3 worldBinormal = mul((float3x3)unity_ObjectToWorld, binormal);
-
-                    // and, set them
-                    OUT.N = normalize(worldNormal);
-                    OUT.T = normalize(worldTangent);
-                    OUT.B = normalize(worldBinormal);
+                    OUT.normalWorld = normalize(mul(float4(v.normal, 0.0), unity_WorldToObject).xyz);
+                    OUT.tangentWorld = normalize(mul(unity_ObjectToWorld, v.tangent).xyz);
+                    OUT.binormalWorld = normalize(cross(OUT.normalWorld, OUT.tangentWorld));
+                    OUT.posWorld = mul(unity_ObjectToWorld, v.vertex);
                 }
-
 
                 // uvs of the rendered materials are based on world position
                 OUT.uvMaterial = mul(unity_ObjectToWorld, v.vertex).xz * _TextureScale;
@@ -221,10 +211,7 @@ Shader "Custom/SyntiosTerrain"
  
             fixed4 frag(v2f IN) : SV_Target
             {
-                float3 tangentNormalA = tex2D(_NormalMapA, IN.uvMaterial).xyz;
-                float3 tangentNormalB = tex2D(_NormalMapB, IN.uvMaterial).xyz;
-                float3 tangentNormalC = tex2D(_NormalMapC, IN.uvMaterial).xyz;
-                float3 tangentNormalD = tex2D(_NormalMapD, IN.uvMaterial).xyz;
+
 
 
                 fixed4 groundColor = tex2DStochastic(_GroundTexture, IN.uvMaterial);
@@ -328,17 +315,24 @@ Shader "Custom/SyntiosTerrain"
                     //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - 3.0 * _FOWSampleRadiusBlur, IN.uvFOW.y + 3.0 * _FOWSampleRadiusBlur));
                     //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - 4.0 * _FOWSampleRadiusBlur, IN.uvFOW.y + 4.0 * _FOWSampleRadiusBlur));
 
-                    float2 fogFOW = IN.uvFOW * 11;
-                    float2 fogFOW_1 = IN.uvFOW * 4.44;
-                    fogFOW.x += _Time * 1;
-                    fogFOW.y += _Time * 0.8;
-                    fogFOW_1.x += _Time * 1.3;
-                    fogFOW_1.y += _Time * -0.9;
+       
 
                     sum /= (totalSample+4);
                     sum.r = clamp(sum.r, _UnexploredFog.r, 1);
-                    sum.r += tex2DStochastic(_CloudFog, fogFOW).r * _ContrastCloud * 0.5;
-                    sum.r += tex2DStochastic(_CloudFog, fogFOW_1).r * _ContrastCloud * 0.6;
+
+                    fixed3 fogReveal = tex2D(_FOWMap, half2(IN.uvFOW.x, IN.uvFOW.y));
+
+                    if (fogReveal.r < 1)
+                    {
+                        float2 fogFOW = IN.uvFOW * 11;
+                        float2 fogFOW_1 = IN.uvFOW * 4.44;
+                        fogFOW.x += _Time * 1;
+                        fogFOW.y += _Time * 0.8;
+                        fogFOW_1.x += _Time * 1.3;
+                        fogFOW_1.y += _Time * -0.9;
+                        sum.r += tex2DStochastic(_CloudFog, fogFOW).r * _ContrastCloud * 0.5;
+                        sum.r += tex2DStochastic(_CloudFog, fogFOW_1).r * _ContrastCloud * 0.6;
+                    }
 
                     sum.g = sum.r; //forcing greyscale
                     sum.b = sum.r;
@@ -346,56 +340,60 @@ Shader "Custom/SyntiosTerrain"
                     col.rgb *= sum;
                 }
 
-
-
-
-                //NORMAL MAP and Light
+                //normalmap
                 {
-                    tangentNormalA = normalize(tangentNormalA * 2 - 1);
-                    tangentNormalB = normalize(tangentNormalB * 2 - 1);
-                    tangentNormalC = normalize(tangentNormalC * 2 - 1);
-                    tangentNormalD = normalize(tangentNormalD * 2 - 1);
-
-                    fixed3 normalCol = (
-                        tangentNormalA * b1 +
-                        tangentNormalB * b2 +
-                        tangentNormalC * b3 +
-                        tangentNormalD * b4
-                        ) / 4;
-
-
-                    // 'TBN' transforms the world space into a tangent space
-                    // we need its inverse matrix
-                    // Tip : An inverse matrix of orthogonal matrix is its transpose matrix
-                    float3x3 TBN = float3x3(normalize(IN.T), normalize(IN.B), normalize(IN.N));
-                    TBN = transpose(TBN);
-
-                    // finally we got a normal vector from the normal map
-                    float3 worldNormal = mul(TBN, normalCol);
-          
-                    float3 lightDir = normalize(IN.lightdir);
-                    // calc diffuse, as we did in pixel shader
-                    float3 diffuse = saturate(dot(worldNormal, -lightDir));
-                    diffuse = _LightColor * col * diffuse;
-
-                    // Specular here
-                    float3 specular = 0;
-                    if (diffuse.x > 0) {
-                        float3 reflection = reflect(lightDir, worldNormal);
-                        float3 viewDir = normalize(IN.viewdir);
-
-                        specular = saturate(dot(reflection, -viewDir));
-                        specular = pow(specular, 20.0f);
-
-                        float4 specularIntensity = tex2D(_SpecularMap, IN.uvMaterial);
-                        specular *= _LightColor * specularIntensity * 0.1;
+                    float3 viewDirection = normalize(_WorldSpaceCameraPos.xyz - IN.posWorld.xyz);
+                    float3 lightDirection;
+                    float atten;
+                    
+                    if (_WorldSpaceLightPos0.w == 0.0) 
+                    { // Directional Light
+                        atten = 1.0;
+                        lightDirection = normalize(_WorldSpaceLightPos0.xyz);
+                    }
+                    else
+                    {
+                        float3 fragmentToLightSource = _WorldSpaceLightPos0.xyz - IN.posWorld.xyz;
+                        float distance = length(fragmentToLightSource);
+                        float atten = 1 / distance;
+                        lightDirection = normalize(fragmentToLightSource);
                     }
 
-                    // make some ambient,
-                    float3 ambient = float3(0.1f, 0.1f, 0.1f) * 10 * col;
+                    float4 tex = col;
+                    //float4 texN = tex2DStochastic(_NormalMapA, IN.uvMaterial);
 
-                    return float4(ambient + diffuse + specular, 1);
+                    float4 texN = (
+                        tex2DStochastic(_NormalMapA, IN.uvMaterial) * b1 +
+                        tex2DStochastic(_NormalMapB, IN.uvMaterial) * b2 +
+                        tex2DStochastic(_NormalMapC, IN.uvMaterial) * b3 +
+                        tex2DStochastic(_NormalMapD, IN.uvMaterial) * b4
+                        );
 
+                    texN *= IN.color;
+
+                    float3 localCoords = float3(2.0 * texN.ag - float2(1.0, 1.0), 0.0);
+                    localCoords.z = _BumpDepth;
+
+                    // Normal Transpose Matrix
+                    float3x3 local2WorldTranspose = float3x3(
+                        IN.tangentWorld,
+                        IN.binormalWorld,
+                        IN.normalWorld
+                    );
+
+                    // Calculate Normal Direction
+                    float3 normalDirection = normalize(mul(localCoords, local2WorldTranspose));
+
+                    // Lighting
+                    float3 diffuseReflection = atten * _LightColor0.rgb * saturate(dot(normalDirection, lightDirection));
+                    float3 specularReflection = diffuseReflection * _SpecColor.rgb * pow(saturate(dot(reflect(-lightDirection, normalDirection), viewDirection)), _Shininess);
+
+                    // Rim Lighting
+                    float rim = 1 - saturate(dot(viewDirection, normalDirection));
+                    float3 rimLighting = saturate(pow(rim, _RimPower) * _RimColor.rgb * diffuseReflection);
+                    float3 lightFinal = diffuseReflection + specularReflection + rimLighting + UNITY_LIGHTMODEL_AMBIENT.rgb;
+
+                    return float4(col * lightFinal * _AlbedoPower, 1.0);
                 }
 
 
