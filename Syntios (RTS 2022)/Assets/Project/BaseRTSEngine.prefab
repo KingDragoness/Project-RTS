@@ -375,6 +375,7 @@ MonoBehaviour:
     size_y: 64
     cliffLevel: 
     heightVariation: 
+    fogOfWar: 
     manmadeCliffs: 
     terrain_layer1: 
     terrain_layer2: 
@@ -388,7 +389,7 @@ MonoBehaviour:
   texture_FOWDefault: {fileID: 2800000, guid: aa82bc4166f58c04083cb8f1a3f5f6b9, type: 3}
   terrainShader: {fileID: 4800000, guid: 8d01aaa0e84667140b6470d5d74cf8ee, type: 3}
   _sourceTerrainMat: {fileID: 2100000, guid: 6c37bb0f6fc9968499f258b364830549, type: 2}
-  UpdateFOWTimer: 0.1
+  UpdateFOWTimer: 0.18
   generatedTerrainMaterial: {fileID: 0}
 --- !u!1 &3481285380138300693
 GameObject:
@@ -442,6 +443,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ListedGameUnits: []
   CurrentFaction: 0
+  FogOfWar: {fileID: 0}
 --- !u!1 &3745240602089535829
 GameObject:
   m_ObjectHideFlags: 0

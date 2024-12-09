@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
 using Sirenix.OdinInspector;
 
 namespace ProtoRTS
@@ -62,6 +63,7 @@ namespace ProtoRTS
             }
         }
 
+
         private void InitializeMap()
         {
             GenerateBlankFOW();
@@ -69,13 +71,6 @@ namespace ProtoRTS
             DEBUG_MeshTerrain.material = generatedTerrainMaterial;
         }
 
-        private void GenerateBlankFOW()
-        {
-            texture_FogOfWar = new Texture2D(texture_FOWDefault.width, texture_FOWDefault.height);
-            texture_FogOfWar.SetPixels(texture_FOWDefault.GetPixels());
-            texture_FogOfWar.Apply();
-
-        }
 
         private void GenerateMaterial()
         {
@@ -96,68 +91,78 @@ namespace ProtoRTS
             generatedTerrainMaterial.SetTexture("_TextureH", MyPreset.layer8);
             generatedTerrainMaterial.SetFloat("_TextureScale", 0.1f);
             generatedTerrainMaterial.SetFloat("_SplatmapScale", 0.195f);
-            generatedTerrainMaterial.SetFloat("_FOWSampleRadiusBlur", 0.005f);
+            generatedTerrainMaterial.SetFloat("_FOWSampleRadiusBlur", 0.0008f);
             generatedTerrainMaterial.SetFloat("_Depth", float_depth);
+
+        }
+
+
+        private void GenerateBlankFOW()
+        {
+            texture_FogOfWar = new Texture2D(texture_FOWDefault.width, texture_FOWDefault.height);
+            texture_FogOfWar.SetPixels(texture_FOWDefault.GetPixels());
+
+            texture_FogOfWar.Apply();
 
         }
 
         [FoldoutGroup("DEBUG")] [Button("Test Reveal Map")]
         public void UpdateFOW(Unit.Player faction)
         {
-            texture_FogOfWar.SetPixels(texture_FOWDefault.GetPixels());
+            var myFactionUnits = SyntiosEngine.Instance.ListedGameUnits.FindAll(x => x.stat_faction == faction);
 
-            foreach (var gameUnit in SyntiosEngine.Instance.ListedGameUnits)
+            foreach (var gameUnit in myFactionUnits)
             {
-                if (gameUnit.stat_faction != faction) continue;
 
-                Vector2Int posCenter = ConvertWorldPosToFOWPos(gameUnit.transform.position);
-                Color c = new Color(1f, 1f, 1f, 1f);
-                Color grey = new Color(0.5f, 0.5f, 0.5f);
-                int radius = (gameUnit.Class.LineOfSight) * 2;
-                if (radius <= 2) radius = 2;
-                int r2 = radius * radius;
-
-                Color[] colorArray = new Color[r2];
-                int mid = radius / 2;
-
-                for (int x = 0; x < r2; x++)
-                {
-                    int pixelX = Mathf.FloorToInt(x % radius);
-                    int pixelY = Mathf.FloorToInt(x / radius);
-                    Vector2Int currPixel = posCenter;
-                    currPixel.x -= mid;
-                    currPixel.y -= mid;
-                    currPixel.x += pixelX;
-                    currPixel.y += pixelY;
-
-                    if (Vector2.Distance(currPixel, posCenter) > radius / 2)
-                    {
-                        colorArray[x] = texture_FogOfWar.GetPixel(currPixel.x, currPixel.y);
-                        continue;
-                    }
-                    colorArray[x] = c;
-                }
-                texture_FogOfWar.SetPixels(posCenter.x - mid, posCenter.y - mid, radius, radius, colorArray);
-
-
-                    //for (int x = 0; x < r2; x++)
-                    //{
-                    //    int pixelX = Mathf.FloorToInt(x % radius);
-                    //    int pixelY = Mathf.FloorToInt(x / radius);
-                    //    int mid = radius / 2;
-
-                //    Vector2Int currPixel = posCenter;
-                //    currPixel.x -= mid;
-                //    currPixel.y -= mid;
-                //    currPixel.x += pixelX;
-                //    currPixel.y += pixelY;
-
-                //    texture_FogOfWar.SetPixel(currPixel.x, currPixel.y, c);
-
-                //}
             }
 
-            texture_FogOfWar.Apply();
+            //texture_FogOfWar.SetPixels(texture_FOWDefault.GetPixels());
+
+            //Color color_Revealed = new Color(1, 1, 1, 1);
+            //Color color_Unexplored = new Color(0.5f, 0.5f, 0.5f, 1f);
+
+            //List<Vector2Int> positionToModify = new List<Vector2Int>();
+
+            //foreach (var gameUnit in myFactionUnits)
+            //{
+            //    if (gameUnit.stat_faction != faction) continue;
+
+            //    Vector2Int posCenter = ConvertWorldPosToFOWPos(gameUnit.transform.position);
+
+            //    int radius = (gameUnit.Class.LineOfSight) * 4;
+            //    if (radius <= 2) radius = 2;
+            //    int r2 = radius * radius;
+
+            //    int mid = radius / 2;
+            //    Color[] allColors = new Color[r2];
+
+            //    for (int z1 = 0; z1 < allColors.Length; z1++)
+            //    {
+            //        int pixelX = Mathf.FloorToInt(z1 % radius);
+            //        int pixelY = Mathf.FloorToInt(z1 / radius);
+            //        Vector2Int currPixel = posCenter;
+            //        currPixel.x -= mid;
+            //        currPixel.y -= mid;
+            //        currPixel.x += pixelX;
+            //        currPixel.y += pixelY;
+
+            //        if (Vector2.Distance(currPixel, posCenter) > radius / 2)
+            //        {
+            //            //allColors[z1] = texture_FogOfWar.GetPixel(currPixel.x, currPixel.y);
+            //            continue;
+            //        }
+
+            //        positionToModify.Add(currPixel);
+            //        //allColors[z1] = color_Revealed;
+            //    }
+            //}
+
+            //foreach(var p in positionToModify)
+            //{
+            //    texture_FogOfWar.SetPixel(p.x, p.y, color_Revealed);
+            //}
+
+            //texture_FogOfWar.Apply();
         }
 
         private void Update()
@@ -177,15 +182,25 @@ namespace ProtoRTS
 
         }
 
+
+        //1024 = pixel of FOW
         public Vector2Int ConvertWorldPosToFOWPos(Vector3 worldPosition)
         {
             Vector2Int result = new Vector2Int();
-            result.x = Mathf.Lerp(0, 256f, (worldPosition.x / 256f / 2f)).ToInt();
-            result.y = Mathf.Lerp(0, 256f, (worldPosition.z / 256f / 2f)).ToInt();
+            result.x = Mathf.Lerp(0, 1024f, (worldPosition.x / 256f / 2f)).ToInt();
+            result.y = Mathf.Lerp(0, 1024f, (worldPosition.z / 256f / 2f)).ToInt();
 
             return result;
         }
 
+
+        public int ConvertPixelPosToColorArrayIndex(Vector2Int pixelPos)
+        {
+            int width = texture_FogOfWar.width;
+            int height = texture_FogOfWar.height;
+
+            return (width * pixelPos.y) + pixelPos.x;
+        }
    
 
     }

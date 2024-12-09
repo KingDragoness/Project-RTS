@@ -31,7 +31,7 @@ namespace ProtoRTS
 
         private void Start()
 		{
-			SyntiosEngine.Instance.ListedGameUnits.Add(this);
+			SyntiosEngine.Instance.AddNewUnit(this);
 			SetUnitStat();
 		}
 
@@ -75,8 +75,6 @@ namespace ProtoRTS
         {
 			stat_HP = _class.MaxHP;
         }
-
-
 
 
 	}

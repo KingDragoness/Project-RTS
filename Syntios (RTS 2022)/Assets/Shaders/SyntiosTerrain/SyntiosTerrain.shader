@@ -3,8 +3,9 @@
     Properties
     {
         _SplatMap("Splatmap (RGB)", 2D) = "black" {}
-        _FOWMap("Fog of War (Grayscale)", 2D) = "black" {}
+        _FOWMap("Fog of War (Ever Explored)", 2D) = "black" {}
         _GroundTexture("Ground Texture", 2D) = "white" {}
+        _UnexploredFog("Unexplored Fog Color", Color) = (0.1,0.1,0.1,1)
         _TextureA("Layer 1", 2D) = "white" {}
         _TextureB("Layer 2", 2D) = "white" {}
         _TextureC("Layer 3", 2D) = "white" {}
@@ -15,6 +16,7 @@
         _TextureH("Layer 8", 2D) = "white" {}
         _TextureScale("TextureScale", Range(0.01,10)) = 0.25
         _SplatmapScale("SplatmapScale", Range(0.01,2)) = 0.5
+        _FOWmapScale("FOWScale", Range(0.1,4)) = 1
         _FOWSampleRadiusBlur("FOW Blur Radius", Range(0.0,0.05)) = 0.005
         _PrioGround("Prio Ground", Range(0.01, 2.0)) = 1
         _PrioA("Prio layer1", Range(0.01, 2.0)) = 1
@@ -48,12 +50,14 @@
             sampler2D _SplatMap;
             sampler2D _FOWMap;
             sampler2D _GroundTexture;
+            uniform float4 _UnexploredFog;
             sampler2D _TextureA;
             sampler2D _TextureB;
             sampler2D _TextureC;
             sampler2D _TextureD;
             fixed _TextureScale;
             fixed _SplatmapScale;
+            fixed _FOWmapScale;
             half _FOWSampleRadiusBlur;
 
             fixed _PrioGround;
@@ -78,6 +82,7 @@
                 float2 uvSplat : TEXCOORD0;
                 float2 uvMaterial : TEXCOORD1;
                 fixed4 materialPrios : TEXCOORD2;
+                float2 uvFOW : TEXCOORD4;
 
                 // put shadows data into TEXCOORD3
                 SHADOW_COORDS(3)
@@ -92,6 +97,7 @@
                 OUT.pos = UnityObjectToClipPos(v.vertex);
                 //OUT.uvSplat = v.uv.xy;
                 OUT.uvSplat = mul(unity_ObjectToWorld, v.vertex).xz * _SplatmapScale * 0.01; //replaced with global
+                OUT.uvFOW = mul(unity_ObjectToWorld, v.vertex).xz * _FOWmapScale * _SplatmapScale * 0.01; //replaced with global
 
 
                 // uvs of the rendered materials are based on world position
@@ -175,15 +181,51 @@
                 //fow
                 //only radius 2 (test only)
                 fixed3 sum = fixed3(0,0,0);
-                sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y - 4.0 * _FOWSampleRadiusBlur)) * 0.05;
-				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y - 3.0 * _FOWSampleRadiusBlur)) * 0.09;
-				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y - 2.0 * _FOWSampleRadiusBlur)) * 0.12;
-				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y - _FOWSampleRadiusBlur)) * 0.15;
-				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y)) * 0.16;
-				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y + _FOWSampleRadiusBlur)) * 0.15;
-				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y + 2.0 * _FOWSampleRadiusBlur)) * 0.12;
-				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y + 3.0 * _FOWSampleRadiusBlur)) * 0.09;
-				sum += tex2D(_FOWMap, half2(IN.uvSplat.x, IN.uvSplat.y + 4.0 * _FOWSampleRadiusBlur)) * 0.05;
+
+                { //16 samples (4*4)
+                    sum += tex2D(_FOWMap, half2(IN.uvFOW.x, IN.uvFOW.y)) * 1;
+
+                    int totalLength = 2;
+                    int totalSample = (totalLength * totalLength) * (totalLength * totalLength);
+                    for (int x = -(totalSample / totalLength / totalLength); x < (totalSample / totalLength / totalLength); x++)
+                    {
+                        sum += tex2D(_FOWMap, half2(IN.uvFOW.x - x * _FOWSampleRadiusBlur, IN.uvFOW.y + x * _FOWSampleRadiusBlur));
+                    }
+                    for (int x = -(totalSample / totalLength / totalLength); x < (totalSample / totalLength / totalLength); x++)
+                    {
+                        sum += tex2D(_FOWMap, half2(IN.uvFOW.x - x * _FOWSampleRadiusBlur, IN.uvFOW.y - x * _FOWSampleRadiusBlur));
+                    }
+
+                    sum += tex2D(_FOWMap, half2(IN.uvFOW.x, IN.uvFOW.y - _FOWSampleRadiusBlur));
+                    sum += tex2D(_FOWMap, half2(IN.uvFOW.x, IN.uvFOW.y + _FOWSampleRadiusBlur));
+
+                    sum += tex2D(_FOWMap, half2(IN.uvFOW.x - _FOWSampleRadiusBlur, IN.uvFOW.y));
+                    sum += tex2D(_FOWMap, half2(IN.uvFOW.x + _FOWSampleRadiusBlur, IN.uvFOW.y));
+                    
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - 4.0 * _FOWSampleRadiusBlur, IN.uvFOW.y - 4.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - 3.0 * _FOWSampleRadiusBlur, IN.uvFOW.y - 3.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - 2.0 * _FOWSampleRadiusBlur, IN.uvFOW.y - 2.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - _FOWSampleRadiusBlur, IN.uvFOW.y - _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x + _FOWSampleRadiusBlur, IN.uvFOW.y + _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x + 2.0 * _FOWSampleRadiusBlur, IN.uvFOW.y + 2.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x + 3.0 * _FOWSampleRadiusBlur, IN.uvFOW.y + 3.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x + 4.0 * _FOWSampleRadiusBlur, IN.uvFOW.y + 4.0 * _FOWSampleRadiusBlur));
+
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x + 4.0 * _FOWSampleRadiusBlur, IN.uvFOW.y - 4.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x + 3.0 * _FOWSampleRadiusBlur, IN.uvFOW.y - 3.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x + 2.0 * _FOWSampleRadiusBlur, IN.uvFOW.y - 2.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x + _FOWSampleRadiusBlur, IN.uvFOW.y - _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - _FOWSampleRadiusBlur, IN.uvFOW.y + _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - 2.0 * _FOWSampleRadiusBlur, IN.uvFOW.y + 2.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - 3.0 * _FOWSampleRadiusBlur, IN.uvFOW.y + 3.0 * _FOWSampleRadiusBlur));
+                    //sum += tex2D(_FOWMap, half2(IN.uvFOW.x - 4.0 * _FOWSampleRadiusBlur, IN.uvFOW.y + 4.0 * _FOWSampleRadiusBlur));
+
+                    sum /= (totalSample+4);
+                    sum.r = clamp(sum.r, _UnexploredFog.r, 1);
+                    sum.g = clamp(sum.g, _UnexploredFog.g, 1);
+                    sum.b = clamp(sum.b, _UnexploredFog.b, 1);
+
+                }
 
                 col.rgb *= sum;
 

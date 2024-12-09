@@ -18,5 +18,12 @@ namespace ProtoRTS
             Instance = this;
         }
 
+        public void AddNewUnit(GameUnit unit)
+        {
+            ListedGameUnits.Add(unit);
+
+        }
+
+
     }
 }

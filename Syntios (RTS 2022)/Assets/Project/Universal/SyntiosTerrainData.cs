@@ -16,6 +16,7 @@ namespace ProtoRTS
 		[Range(32, 256)] public int size_y = 64;
 		public sbyte[] cliffLevel; //-128 to 128 (only -8 to 8 used)
         public byte[] heightVariation; //0 to 255
+		public byte[] fogOfWar;
 		public bool[] manmadeCliffs;
 		public byte[] terrain_layer1;
 		public byte[] terrain_layer2;
@@ -63,6 +64,7 @@ namespace ProtoRTS
         {
 			cliffLevel = new sbyte[TotalLength];
 			heightVariation = new byte[TotalLength];
+			fogOfWar = new byte[TotalLength * 4];
 			manmadeCliffs = new bool[TotalLength];
 			terrain_layer1 = new byte[TotalLength];
 			terrain_layer2 = new byte[TotalLength];
