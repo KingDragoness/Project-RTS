@@ -19,7 +19,7 @@ namespace ProtoRTS
 		public string NameDisplay = "Seaver";
 		public string Rank = "";
 		public float Radius = 2;
-		public int LineOfSight = 7;
+		[Range(2,16)] public int LineOfSight = 7;
 		public Sprite spriteWireframe;
 		public int MaxHP = 40;
 		public bool HasEnergy = false;

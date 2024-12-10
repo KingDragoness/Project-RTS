@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: TestWorld
   m_EditorClassIdentifier: 
   PresetID: Earth
-  ground: {fileID: 2800000, guid: 30d94d1c61f26394d849c78cf1f0be4a, type: 3}
-  layer1: {fileID: 2800000, guid: 0d9823b57c108444c8663e25d18cc64e, type: 3}
-  layer2: {fileID: 2800000, guid: 6ec76ac714077a24c82031ab94fd72f6, type: 3}
-  layer3: {fileID: 2800000, guid: 30d94d1c61f26394d849c78cf1f0be4a, type: 3}
-  layer4: {fileID: 2800000, guid: 851e7f835c3184c4d9ff5cb9db163b2e, type: 3}
+  ground: {fileID: 2800000, guid: aa5b6799afb1cea4e96edb378a0fe66e, type: 3}
+  layer1: {fileID: 2800000, guid: aa5b6799afb1cea4e96edb378a0fe66e, type: 3}
+  layer2: {fileID: 2800000, guid: 968362dc66366964db02ae47eb3ff2e4, type: 3}
+  layer3: {fileID: 2800000, guid: ad1037f98a3fa6f42bec3d4d8cefe9b8, type: 3}
+  layer4: {fileID: 2800000, guid: 18e9c198c5669db418fb56f344aaea2d, type: 3}
   layer5: {fileID: 0}
   layer6: {fileID: 0}
   layer7: {fileID: 0}

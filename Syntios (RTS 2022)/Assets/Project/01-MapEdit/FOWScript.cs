@@ -14,7 +14,7 @@ namespace ProtoRTS
         public string ID = "";
         [Range(2, 16)] public int LineOfSight = 2;
         public List<Vector2Int> coordToDraw = new List<Vector2Int>();
-        [HideInEditorMode] public int[] coordToDraw_256px = new int[1];
+        public int[] coordToDraw_256px = new int[1];
 
 
         public int[] ConvertCoordToDrawToIndexes()
@@ -85,7 +85,11 @@ namespace ProtoRTS
                 if (myIndex < 0) continue;
                 //int x = myIndex % 256;
                 //int y = myIndex / 256;
-                if (FOWScript.GetHeightmap[myIndex] - 128 > (unitYpos * 4)) continue; //-128 for sbyte
+                if (Map.TerrainData.cliffLevel.Length > myIndex)
+                {
+                    if (FOWScript.GetHeightmap[myIndex] - 128 > (unitYpos * 4)) continue; //-128 for sbyte
+                }
+
                 indexes[c] = myIndex;
             }
 
@@ -247,7 +251,6 @@ namespace ProtoRTS
         [Space]
         [Header("References")]
         public List<FOWMap> allFOWMaps = new List<FOWMap>();
-        public Material terrainMaterial;
         public int UpdateTexturePerSecond = 30;
 
         [FoldoutGroup("DEBUG Perf")] public int Simulate_units = 100;
@@ -267,6 +270,12 @@ namespace ProtoRTS
         private void Awake()
         {
             Instance = this;
+            _timerCooldown = 1f / UpdateTexturePerSecond;
+
+        }
+
+        private void Start()
+        {
             allFOWMaps.Add(new FOWMap(Unit.Player.Player1, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player2, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player3, new bool[256, 256], new bool[256, 256]));
@@ -276,7 +285,6 @@ namespace ProtoRTS
             allFOWMaps.Add(new FOWMap(Unit.Player.Player7, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player8, new bool[256, 256], new bool[256, 256]));
 
-            _timerCooldown = 1f / UpdateTexturePerSecond;
             SetTerrainTexture(allFOWMaps[0]);
         }
 
@@ -450,7 +458,7 @@ namespace ProtoRTS
 
         public void SetTerrainTexture(FOWMap fowMapTarget)
         {
-            terrainMaterial.SetTexture("_FOWMap", fowMapTarget.nextTargetTexture);
+            Map.instance.Material.SetTexture("_FOWMap", fowMapTarget.nextTargetTexture);
         }
 
         public Vector2Int WorldPosToMapPixel(Vector3 worldPos)

@@ -322,7 +322,11 @@ Shader "Custom/SyntiosTerrain"
 
                     fixed3 fogReveal = tex2D(_FOWMap, half2(IN.uvFOW.x, IN.uvFOW.y));
 
-                    if (fogReveal.r < 1)
+                    
+
+                    float powReveal = 1; //fogReveal.r;
+
+                    //if (fogReveal.r < 0.94)
                     {
                         float2 fogFOW = IN.uvFOW * 11;
                         float2 fogFOW_1 = IN.uvFOW * 4.44;
@@ -330,9 +334,12 @@ Shader "Custom/SyntiosTerrain"
                         fogFOW.y += _Time * 0.8;
                         fogFOW_1.x += _Time * 1.3;
                         fogFOW_1.y += _Time * -0.9;
-                        sum.r += tex2DStochastic(_CloudFog, fogFOW).r * _ContrastCloud * 0.5;
-                        sum.r += tex2DStochastic(_CloudFog, fogFOW_1).r * _ContrastCloud * 0.6;
+                        sum.r += tex2DStochastic(_CloudFog, fogFOW).r * _ContrastCloud * 0.55 * powReveal;
+                        sum.r += tex2DStochastic(_CloudFog, fogFOW_1).r * _ContrastCloud * 0.45 * powReveal;
+
                     }
+                    
+
 
                     sum.g = sum.r; //forcing greyscale
                     sum.b = sum.r;

@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FOWMap:
-        m_Texture: {fileID: 2800000, guid: 335bc67babb85a44896fffb414b6205a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 0c3219526e3e8a047ab60307434f770c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GroundTexture:
@@ -132,12 +132,12 @@ Material:
     - _AlbedoPower: 3
     - _BumpDepth: 0.58
     - _BumpScale: 1
-    - _ContrastCloud: 0.3
+    - _ContrastCloud: 0.25
     - _Cutoff: 0.5
     - _Depth: 0.55
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FOWSampleRadiusBlur: 0.0012
+    - _FOWSampleRadiusBlur: 0.001
     - _FOWmapScale: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
