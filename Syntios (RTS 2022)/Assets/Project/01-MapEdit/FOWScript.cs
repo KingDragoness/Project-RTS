@@ -16,6 +16,8 @@ namespace ProtoRTS
         public List<Vector2Int> coordToDraw = new List<Vector2Int>();
         public int[] coordToDraw_256px = new int[1];
 
+        internal Map _map; //this is because cross memory!
+
 
         public int[] ConvertCoordToDrawToIndexes()
         {
@@ -32,32 +34,39 @@ namespace ProtoRTS
             return ctd_intList;
         }
 
+        //11/12/2024
+        //Rather than creating new int array, directly write in the int[] indexes in the GetIndexes function
+        //
+
         //if circle is 7x7 and loc origin is at 4,4
         //retrieve all indexes between 4,4 and 7,7
         public int[] GetLocalIndexes(Vector2Int localOrigin, Vector2Int sizeDraw)
         {
-            int[] indexes = new int[sizeDraw.x * sizeDraw.y];
+            int[] indexes = new int[sizeDraw.x * sizeDraw.y]; 
             int PixelLOS = LineOfSight * 2;
-            Vector2Int start = localOrigin;
-            Vector2Int end = new Vector2Int(PixelLOS, PixelLOS);
+
+            int start_x = localOrigin.x;
+            int start_y = localOrigin.y;
+            int end_x = PixelLOS;
+            int end_y = PixelLOS;
 
             if (localOrigin.x + sizeDraw.x < PixelLOS)
             {
-                end.x = localOrigin.x + sizeDraw.x;
+                end_x = localOrigin.x + sizeDraw.x;
             }
             if (localOrigin.y + sizeDraw.y < PixelLOS)
             {
-                end.y = localOrigin.y + sizeDraw.y;
+                end_y = localOrigin.y + sizeDraw.y;
             }
 
             int _id = 0;
             foreach (var ctd in coordToDraw_256px)
             {
-                int y = (ctd / 256);
-                int x = (ctd % 256);
+                int y = FOWScript.X_table_indexes[ctd]; //(ctd / 256);
+                int x = FOWScript.Y_table_indexes[ctd];//(ctd % 256);
                 int myIndex = x + (y * 256);
 
-                if (x > start.x && y > start.y && x < end.x && y < end.y)
+                if (x > start_x && y > start_y && x < end_x && y < end_y)
                 {
                     indexes[_id] = myIndex;
                     _id++;
@@ -67,16 +76,16 @@ namespace ProtoRTS
             return indexes;
         }
 
-        public int[] GetIndexes(Vector2Int originDraw, Vector2Int localOrigin, Vector2Int sizeDraw, float unitYpos, int textureDimension = 256)
+        public int[] GetIndexes(Vector2Int originDraw, Vector2Int localOrigin, Vector2Int sizeDraw, int textureDimension = 256)
         {
             //every y, store indexes what X to draw. [2 * 256: + 0,1,2,3,4,5] [0 * 256: + 2,3,4]
             //IDEA only
 
             int[] indexes = new int[sizeDraw.x * sizeDraw.y];
-            Vector2Int[] coordToDraw2 = new Vector2Int[sizeDraw.x * sizeDraw.y];
-
             int startIndex = originDraw.x + (originDraw.y * 256);
+
             var localIndexes = GetLocalIndexes(localOrigin, sizeDraw);
+
 
             for (int c = 0; c < localIndexes.Length; c++)
             {
@@ -85,10 +94,12 @@ namespace ProtoRTS
                 if (myIndex < 0) continue;
                 //int x = myIndex % 256;
                 //int y = myIndex / 256;
-                if (Map.TerrainData.cliffLevel.Length > myIndex)
-                {
-                    if (FOWScript.GetHeightmap[myIndex] - 128 > (unitYpos * 4)) continue; //-128 for sbyte
-                }
+
+                //DO NOT HEIGHTMAP CHECK HERE! 147k calls if there is ~500 units! More than 65336!
+                //if (Map.TerrainData.cliffLevel.Length > myIndex)
+                //{
+                //    if (FOWScript.GetHeightmap[myIndex] - 128 > (unitYpos * 4)) continue; //-128 for sbyte 
+                //}
 
                 indexes[c] = myIndex;
             }
@@ -124,6 +135,7 @@ namespace ProtoRTS
                 //    indexes[i] = myIndex;
                 //}
             }
+
             return indexes;
         }
     }
@@ -200,6 +212,7 @@ namespace ProtoRTS
                         activePoints[x, y] = false; //always reset
                     }
                 }
+
                 rawDataTexture.SetPixels32(allColors, 0);
                 nextTargetTexture.SetPixels32(allColors_1, 0);
                 rawDataTexture.Apply();
@@ -214,14 +227,28 @@ namespace ProtoRTS
             }
 
             [Button("Explore this point")]
-            public void ExplorePoint(int _index)
+            public void ExplorePoint(int _index, System.Int16 unitPosY)
             {
-                int x = _index % 256;
-                int y = _index / 256;
+                //check unit height
+                if (Map.TerrainData.cliffLevel.Length > _index)
+                {
+                    if (FOWScript.GetHeightmap[_index] - 128 > (unitPosY * 4)) return; //-128 for sbyte 
+                }
+
+                int x = FOWScript.X_table_indexes[_index]; //_index % 256;
+                int y = FOWScript.Y_table_indexes[_index]; //_index / 256;
                 activePoints[x, y] = true;
                 exploredPoints[x, y] = true;
 
                 //Debug.Log($"Explore: ({x}, {y})");
+            }
+
+            public bool IsPointActive(int _index)
+            {
+                int x = FOWScript.X_table_indexes[_index]; //_index % 256;
+                int y = FOWScript.Y_table_indexes[_index]; //_index / 256;
+
+                return activePoints[x, y];
             }
 
             [Button("DEBUG explore some area")]
@@ -267,6 +294,13 @@ namespace ProtoRTS
             }
         }
 
+        [FoldoutGroup("FIXED Reference")] [SerializeField] public int[] x_table_indexes;
+        [FoldoutGroup("FIXED Reference")] [SerializeField] public int[] y_table_indexes;
+
+        public static int[] X_table_indexes { get => Instance.x_table_indexes; }
+        public static int[] Y_table_indexes { get => Instance.y_table_indexes; }
+
+
         private void Awake()
         {
             Instance = this;
@@ -284,6 +318,11 @@ namespace ProtoRTS
             allFOWMaps.Add(new FOWMap(Unit.Player.Player6, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player7, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player8, new bool[256, 256], new bool[256, 256]));
+
+            foreach(var circle in FixedPatternCircles)
+            {
+                circle._map = map;
+            }
 
             SetTerrainTexture(allFOWMaps[0]);
         }
@@ -377,11 +416,12 @@ namespace ProtoRTS
             //Debug.Log($"Rect: ({points_rect[0]} < {points_rect[3]} | {points_rect[1]} < {points_rect[2]}) = Draw: ({xDrawLength}, {yDrawLength}) | Origin pattern: ({startDrawCircle_x}, {startDrawCircle_y})");
             int _index = 0;
 
-            var indexesToDraw = myCirclePattern.GetIndexes(originPos, new Vector2Int(startDrawCircle_x, startDrawCircle_y), new Vector2Int(xDrawLength, yDrawLength), unit.transform.position.y);
+            var indexesToDraw = myCirclePattern.GetIndexes(originPos, new Vector2Int(startDrawCircle_x, startDrawCircle_y), new Vector2Int(xDrawLength, yDrawLength));
 
             foreach (var pxToDraw in indexesToDraw)
             {
-                fowMap.ExplorePoint(pxToDraw);
+                if (fowMap.IsPointActive(pxToDraw) == true) continue;
+                fowMap.ExplorePoint(pxToDraw, unitPosY: (short)unit.transform.position.y);
             }
 
             {
@@ -437,24 +477,27 @@ namespace ProtoRTS
         }
 
         [FoldoutGroup("DEBUG")]
-        [Button("Convert texture heightmap to array")]
-        public void DEBUG_ConvertHeightmapToArray()
+        [Button("Create indexer table")]
+        public void DEBUG_CreateTableIndex()
         {
-            //REMOVED
-            //_heightmap = new int[DEBUG_ref_heightMap.width * DEBUG_ref_heightMap.height];
+            x_table_indexes = new int[65536];
+            y_table_indexes = new int[65536];
 
-            //for (int x = 0; x < DEBUG_ref_heightMap.width; x++)
-            //{
-            //    for (int y = 0; y < DEBUG_ref_heightMap.height; y++)
-            //    {
-            //        int myIndex = x + (y * 256);
+            for (int x = 0; x < 255; x++)
+            {
+                for (int y = 0; y < 255; y++)
+                {
+                    int index = x + (y * 256);
 
-            //        _heightmap[myIndex] = Mathf.RoundToInt(DEBUG_ref_heightMap.GetPixel(x, y).r * 256f);
+                    x_table_indexes[index] = x;
+                    y_table_indexes[index] = y;
 
-            //    }
-            //}
+                }
+            }
 
+            Debug.Log($"{x_table_indexes.GetLength(0)} | {y_table_indexes[64004]}");
         }
+
 
         public void SetTerrainTexture(FOWMap fowMapTarget)
         {
