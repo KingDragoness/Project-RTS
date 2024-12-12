@@ -2,7 +2,7 @@
 // Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Custom/Test7 Normal Map"
+Shader "Syntios/Test7 Normal Map"
 {
 	Properties{
 		_Color("Color Tint", Color) = (1.0, 1.0, 1.0, 1.0)

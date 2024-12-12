@@ -132,7 +132,7 @@ Material:
     - _AlbedoPower: 3
     - _BumpDepth: 0.58
     - _BumpScale: 1
-    - _ContrastCloud: 0.25
+    - _ContrastCloud: 0.35
     - _Cutoff: 0.5
     - _Depth: 0.55
     - _DetailNormalMapScale: 1
@@ -168,5 +168,5 @@ Material:
     - _MainLightPosition: {r: 512, g: 1, b: 512, a: 0}
     - _RimColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
-    - _UnexploredFog: {r: 0.047169805, g: 0.047169805, b: 0.047169805, a: 1}
+    - _UnexploredFog: {r: 0.08627451, g: 0.08627451, b: 0.08627451, a: 1}
   m_BuildTextureStacks: []

@@ -16,6 +16,10 @@ namespace ProtoRTS
         public List<Vector2Int> coordToDraw = new List<Vector2Int>();
         public int[] coordToDraw_256px = new int[1];
 
+        //X = 4 | {1,2,3,4,5}
+        //X = 5 | {2,3,4}
+        public bool[,] coordInstructions;
+
         internal Map _map; //this is because cross memory!
 
 
@@ -34,36 +38,44 @@ namespace ProtoRTS
             return ctd_intList;
         }
 
-        //11/12/2024
-        //Rather than creating new int array, directly write in the int[] indexes in the GetIndexes function
-        //
+        public bool[,] DEBUG_CreateCoordInstructions() 
+        {
+            bool[,] new_coordInstructions = new bool[LineOfSight * LineOfSight, LineOfSight * LineOfSight];
+
+            foreach(var coord in coordToDraw)
+            {
+                new_coordInstructions[coord.x, coord.y] = true;
+            }
+
+            return new_coordInstructions;
+        }
 
         //if circle is 7x7 and loc origin is at 4,4
         //retrieve all indexes between 4,4 and 7,7
-        public int[] GetLocalIndexes(Vector2Int localOrigin, Vector2Int sizeDraw)
+        public int[] GetLocalIndexes(Vector2Int localOffset, Vector2Int sizeDraw)
         {
-            int[] indexes = new int[sizeDraw.x * sizeDraw.y]; 
             int PixelLOS = LineOfSight * 2;
+            int[] indexes = new int[sizeDraw.x * sizeDraw.y];
 
-            int start_x = localOrigin.x;
-            int start_y = localOrigin.y;
+            int start_x = localOffset.x;
+            int start_y = localOffset.y;
             int end_x = PixelLOS;
             int end_y = PixelLOS;
 
-            if (localOrigin.x + sizeDraw.x < PixelLOS)
+            if (localOffset.x + sizeDraw.x < PixelLOS)
             {
-                end_x = localOrigin.x + sizeDraw.x;
+                end_x = localOffset.x + sizeDraw.x;
             }
-            if (localOrigin.y + sizeDraw.y < PixelLOS)
+            if (localOffset.y + sizeDraw.y < PixelLOS)
             {
-                end_y = localOrigin.y + sizeDraw.y;
+                end_y = localOffset.y + sizeDraw.y;
             }
 
             int _id = 0;
             foreach (var ctd in coordToDraw_256px)
             {
-                int y = FOWScript.X_table_indexes[ctd]; //(ctd / 256);
-                int x = FOWScript.Y_table_indexes[ctd];//(ctd % 256);
+                int y = FOWScript.Y_table_indexes[ctd]; //(ctd / 256);
+                int x = FOWScript.X_table_indexes[ctd];//(ctd % 256);
                 int myIndex = x + (y * 256);
 
                 if (x > start_x && y > start_y && x < end_x && y < end_y)
@@ -76,68 +88,6 @@ namespace ProtoRTS
             return indexes;
         }
 
-        public int[] GetIndexes(Vector2Int originDraw, Vector2Int localOrigin, Vector2Int sizeDraw, int textureDimension = 256)
-        {
-            //every y, store indexes what X to draw. [2 * 256: + 0,1,2,3,4,5] [0 * 256: + 2,3,4]
-            //IDEA only
-
-            int[] indexes = new int[sizeDraw.x * sizeDraw.y];
-            int startIndex = originDraw.x + (originDraw.y * 256);
-
-            var localIndexes = GetLocalIndexes(localOrigin, sizeDraw);
-
-
-            for (int c = 0; c < localIndexes.Length; c++)
-            {
-                int myIndex = startIndex + localIndexes[c];
-                if (localIndexes[c] == 0) continue;
-                if (myIndex < 0) continue;
-                //int x = myIndex % 256;
-                //int y = myIndex / 256;
-
-                //DO NOT HEIGHTMAP CHECK HERE! 147k calls if there is ~500 units! More than 65336!
-                //if (Map.TerrainData.cliffLevel.Length > myIndex)
-                //{
-                //    if (FOWScript.GetHeightmap[myIndex] - 128 > (unitYpos * 4)) continue; //-128 for sbyte 
-                //}
-
-                indexes[c] = myIndex;
-            }
-
-            {
-                //        int indexCTD = 0;
-
-                //for (int x = localOrigin.x; x < localOrigin.x + sizeDraw.x; x++)
-                //{
-                //    for (int y = localOrigin.y; y < localOrigin.y + sizeDraw.y; y++)
-                //    {
-                //        coordToDraw2[indexCTD].x = x;
-                //        coordToDraw2[indexCTD].y = y;
-                //        indexCTD++;
-                //    }
-                //}
-
-                //foreach (var crd in coordToDraw2)
-                //{
-                //    //Debug.Log($"{crd}");
-                //}
-
-                //int startIndex = originDraw.x + (originDraw.y * 256);
-
-                //for (int i = 0; i < indexes.Length; i++)
-                //{
-                //    if (coordToDraw.Contains(coordToDraw2[i]) == false) continue;
-
-                //    int loc_x = originDraw.x + coordToDraw2[i].x;
-                //    int loc_y = originDraw.y + coordToDraw2[i].y;
-                //    int myIndex = loc_x + (loc_y * 256);
-
-                //    indexes[i] = myIndex;
-                //}
-            }
-
-            return indexes;
-        }
     }
 
     public static class SomeFunctionForMap
@@ -170,6 +120,7 @@ namespace ProtoRTS
                 this.activePoints = activePoints;
                 this.exploredPoints = exploredPoints;
                 rawDataTexture = new Texture2D(256, 256, TextureFormat.R8, false);
+                rawDataTexture.filterMode = FilterMode.Point;
                 rawDataTexture.name = $"RawFOW-{faction.ToString()}";
                 nextTargetTexture = new Texture2D(256, 256, TextureFormat.R8, false);
                 nextTargetTexture.name = $"ForTerrain_FOW-{faction.ToString()}";
@@ -185,27 +136,65 @@ namespace ProtoRTS
             public void GenerateTexture()
             {
                 int speedDeltaChangeTexture = 32;
+                byte fowCol_Explored = 45;
+                byte byte_Delta = 19;
 
                 for (int x = 0; x < 255; x++)
                 {
                     for (int y = 0; y < 255; y++)
                     {
+                        byte_Delta = 19;
                         int index = x + (y * 256);
 
                         if (activePoints[x, y])
                         {
-                            allColors[index] = new Color32(255, 255, 255, 255);
-                            allColors_1[index].r = (byte)Mathf.RoundToInt(Mathf.MoveTowards(allColors_1[index].r, 255, speedDeltaChangeTexture));
+                            allColors[index] = new Color32(255, 255, 255, 5);
+
+                            if (allColors_1[index].r < 255)
+                            {
+                                if ((byte_Delta + allColors_1[index].r) > 255)
+                                    byte_Delta = System.Convert.ToByte(255 - allColors_1[index].r);
+
+                                allColors_1[index].r += byte_Delta;
+                            } 
+
+                            //allColors_1[index].r = (byte)Mathf.RoundToInt(Mathf.MoveTowards(allColors_1[index].r, 255, speedDeltaChangeTexture));
                         }
                         else if (exploredPoints[x, y])
                         {
-                            allColors[index] = new Color32(38, 38, 38, 38);
-                            allColors_1[index].r = (byte)Mathf.RoundToInt(Mathf.MoveTowards(allColors_1[index].r, 38, speedDeltaChangeTexture));
+                            allColors[index] = new Color32(fowCol_Explored, fowCol_Explored, fowCol_Explored, 100);
+
+                            if (allColors_1[index].r < fowCol_Explored)
+                            {
+                                if ((allColors_1[index].r + byte_Delta) > fowCol_Explored)
+                                    byte_Delta = System.Convert.ToByte(38 - allColors_1[index].r);
+
+                                allColors_1[index].r += byte_Delta;
+                            }
+                            else if (allColors_1[index].r > fowCol_Explored)
+                            {
+                                if ((allColors_1[index].r - byte_Delta) < fowCol_Explored)
+                                    byte_Delta = System.Convert.ToByte(allColors_1[index].r - fowCol_Explored);
+
+                                allColors_1[index].r -= byte_Delta;
+                            }
+                            
+
+                            //allColors_1[index].r = (byte)Mathf.RoundToInt(Mathf.MoveTowards(allColors_1[index].r, 38, speedDeltaChangeTexture));
                         }
                         else
                         {
-                            allColors[index] = new Color32(0, 0, 0, 0);
-                            allColors_1[index].r = (byte)Mathf.RoundToInt(Mathf.MoveTowards(allColors_1[index].r, 0, speedDeltaChangeTexture));
+                            allColors[index] = new Color32(0, 0, 0, 235);
+
+                            if (allColors_1[index].r > 0)
+                            {
+                                if ((allColors_1[index].r - byte_Delta) < 0)
+                                    byte_Delta = System.Convert.ToByte(allColors_1[index].r);
+
+                                allColors_1[index].r -= byte_Delta;
+                            }
+
+                            //allColors_1[index].r = (byte)Mathf.RoundToInt(Mathf.MoveTowards(allColors_1[index].r, 0, speedDeltaChangeTexture));
 
                         }
 
@@ -217,6 +206,29 @@ namespace ProtoRTS
                 nextTargetTexture.SetPixels32(allColors_1, 0);
                 rawDataTexture.Apply();
                 nextTargetTexture.Apply();
+            }
+
+
+            public void WriteBuffer(Vector2Int globalOffset, Vector2Int localOrigin, Vector2Int sizeDraw, CirclePixels circlePixel)
+            {
+                //every y, store indexes what X to draw. [2 * 256: + 0,1,2,3,4,5] [0 * 256: + 2,3,4]
+                //IDEA only
+
+                int startIndex = globalOffset.x + (globalOffset.y * 256);
+
+                var localIndexes = circlePixel.GetLocalIndexes(localOrigin, sizeDraw);
+
+
+                for (int c = 0; c < localIndexes.Length; c++)
+                {
+                    int myIndex = startIndex + localIndexes[c];
+                    if (localIndexes[c] == 0) continue;
+                    if (myIndex < 0) continue;
+
+                    ExplorePoint(myIndex, unitPosY: 1);
+                    //indexes[c] = myIndex;
+                }
+
             }
 
             [Button("Explore this point")]
@@ -300,6 +312,12 @@ namespace ProtoRTS
         public static int[] X_table_indexes { get => Instance.x_table_indexes; }
         public static int[] Y_table_indexes { get => Instance.y_table_indexes; }
 
+        public static FOWMap GetFOW(Unit.Player faction)
+        {
+            var fowMap = Instance.allFOWMaps.Find(x => x.faction == faction);
+            return fowMap;
+        }
+
 
         private void Awake()
         {
@@ -381,24 +399,6 @@ namespace ProtoRTS
             Vector2Int leftLower = originPos.ClampMapPixelPos();
             Vector2Int rightUpper = new Vector2Int(originPos.x + LineOfSight, originPos.y + LineOfSight).ClampMapPixelPos();
 
-            {
-                //int x_draw = unit.lineOfSight;
-                //int y_draw = unit.lineOfSight;
-
-                //if (originPos.x + half1 > 255)
-                //{
-                //    x_draw = Mathf.Clamp(255 - originPos.x, 0, 255);
-                //}
-                //if (originPos.y + half1 > 255)
-                //{
-                //    y_draw = Mathf.Clamp(255 - originPos.y, 0, 255);
-                //}
-
-                //for(int x = 0; )
-
-                //int[] indexesToDraw = new int[totalPixelsCovered];
-            }
-            int index1 = 0;
             int[] points_rect = new int[4];
             points_rect[0] = leftLower.x; //min x
             points_rect[1] = leftLower.y; //min y
@@ -414,49 +414,15 @@ namespace ProtoRTS
             if (originPos.y < 0) startDrawCircle_y = LineOfSight - yDrawLength; //based from circle texture coord
 
             //Debug.Log($"Rect: ({points_rect[0]} < {points_rect[3]} | {points_rect[1]} < {points_rect[2]}) = Draw: ({xDrawLength}, {yDrawLength}) | Origin pattern: ({startDrawCircle_x}, {startDrawCircle_y})");
-            int _index = 0;
 
-            var indexesToDraw = myCirclePattern.GetIndexes(originPos, new Vector2Int(startDrawCircle_x, startDrawCircle_y), new Vector2Int(xDrawLength, yDrawLength));
-
-            foreach (var pxToDraw in indexesToDraw)
-            {
-                if (fowMap.IsPointActive(pxToDraw) == true) continue;
-                fowMap.ExplorePoint(pxToDraw, unitPosY: (short)unit.transform.position.y);
-            }
-
-            {
-                //for (int x = points_rect[0]; x < points_rect[3]; x++)
-                //{
-                //    for (int y = points_rect[1]; y < points_rect[2]; y++)
-                //    {
-                //        int index = x + (y * 256);
-                //        fowMap.ExplorePoint(index);
-                //        _index++;
-                //    }
-                //}
-            }
+            fowMap.WriteBuffer(originPos, new Vector2Int(startDrawCircle_x, startDrawCircle_y), new Vector2Int(xDrawLength, yDrawLength), myCirclePattern);
 
 
+            //foreach (var pxToDraw in indexesToDraw)
+            //{
+            //    fowMap.ExplorePoint(pxToDraw, unitPosY: (short)unit.transform.position.y);
+            //}
 
-            {
-                //for (int x = originPos.x; x < (originPos.x + unit.lineOfSight); x++)
-                //{
-                //    if (x < 0) continue;
-                //    if (x > 255) continue;
-
-                //    for (int y = originPos.y; y < (originPos.y + unit.lineOfSight); y++)
-                //    {
-                //        if (y < 0) continue;
-                //        if (y > 255) continue;
-
-                //        int index = x + (y * 256);
-
-                //        //indexesToDraw[index1] = index;
-                //        fowMap.ExplorePoint(index);
-                //        index1++;
-                //    }
-                //}
-            }
         }
 
         [FoldoutGroup("DEBUG")]
@@ -473,6 +439,15 @@ namespace ProtoRTS
             foreach (var circle in FixedPatternCircles)
             {
                 circle.ConvertCoordToDrawToIndexes();
+            }
+        }
+        [FoldoutGroup("DEBUG")]
+        [Button("Convert bool instructions")]
+        public void DEBUG_CircleInstructions()
+        {
+            foreach (var circle in FixedPatternCircles)
+            {
+                circle.DEBUG_CreateCoordInstructions();
             }
         }
 

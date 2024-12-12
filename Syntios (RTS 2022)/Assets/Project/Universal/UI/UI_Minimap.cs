@@ -18,6 +18,7 @@ namespace ProtoRTS
 
         public LineRenderer line_Viewport;
         public RawImage mapTexture_Unit;
+        public RawImage mapTexture_FOW;
         public Image testImg_LD;
         public Image testImg_RD;
         public Image testImg_LU;
@@ -122,8 +123,23 @@ namespace ProtoRTS
             else
             {
                 Update_Minimap();
+                Update_FOW();
                 cooldown_MinimapRefresh = MinimapRefreshRate;
             }
+        }
+
+        Rect uvRect_MapFOW = new Rect();
+
+        private void Update_FOW()
+        {
+            var currentFOW = FOWScript.GetFOW(SyntiosEngine.Instance.CurrentFaction);
+            if (currentFOW == null) return;
+
+            uvRect_MapFOW.width = Map.TerrainData.size_x / 256f;
+            uvRect_MapFOW.height = Map.TerrainData.size_y / 256f;
+
+            mapTexture_FOW.uvRect = uvRect_MapFOW;
+            mapTexture_FOW.texture = currentFOW.rawDataTexture;
         }
 
         private void Update_Viewport()

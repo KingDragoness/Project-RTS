@@ -16,7 +16,7 @@ MonoBehaviour:
   NameDisplay: Mobius Minebot
   Rank: 
   Radius: 0.9
-  LineOfSight: 9
+  LineOfSight: 8
   spriteWireframe: {fileID: 21300000, guid: 6bc12da6eda2a0c43b57f0ee5dbf161e, type: 3}
   MaxHP: 35
   HasEnergy: 0

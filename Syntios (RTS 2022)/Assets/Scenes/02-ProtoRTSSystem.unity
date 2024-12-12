@@ -51831,12 +51831,12 @@ PrefabInstance:
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_x
-      value: 256
+      value: 128
       objectReference: {fileID: 0}
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_y
-      value: 256
+      value: 128
       objectReference: {fileID: 0}
     - target: {fileID: 5490426805696813136, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
@@ -69161,6 +69161,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1639962103692001358, guid: 4641de0c08106a046989671bf9d72fb9,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: cea2c9bf87b0c4dfdafb697a3ff00959,
+        type: 3}
     - target: {fileID: 8575795935291011314, guid: 4641de0c08106a046989671bf9d72fb9,
         type: 3}
       propertyPath: m_Name
@@ -74324,7 +74330,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1439840846
 Transform:
   m_ObjectHideFlags: 0
@@ -94661,6 +94667,7 @@ MonoBehaviour:
   MinimapRefreshRate: 1.5
   line_Viewport: {fileID: 862127517}
   mapTexture_Unit: {fileID: 2058531462}
+  mapTexture_FOW: {fileID: 0}
   testImg_LD: {fileID: 317114890}
   testImg_RD: {fileID: 1369347766}
   testImg_LU: {fileID: 705953715}
@@ -101487,7 +101494,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -420, y: 0}
+  m_AnchoredPosition: {x: -420.00006, y: 0}
   m_SizeDelta: {x: -718.0005, y: 210}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &2006580326
