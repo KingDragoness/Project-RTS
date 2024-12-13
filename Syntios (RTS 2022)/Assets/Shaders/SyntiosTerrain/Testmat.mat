@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FOWMap:
-        m_Texture: {fileID: 2800000, guid: 0c3219526e3e8a047ab60307434f770c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 41a61ce3430307840881788e51899ce3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _GroundTexture:
@@ -130,6 +130,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlbedoPower: 3
+    - _BorderMap: 10
     - _BumpDepth: 0.58
     - _BumpScale: 1
     - _ContrastCloud: 0.35
@@ -166,6 +167,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _LightColor: {r: 1, g: 1, b: 1, a: 1}
     - _MainLightPosition: {r: 512, g: 1, b: 512, a: 0}
+    - _MapSize: {r: 256, g: 256, b: 0, a: 0}
     - _RimColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
     - _UnexploredFog: {r: 0.08627451, g: 0.08627451, b: 0.08627451, a: 1}

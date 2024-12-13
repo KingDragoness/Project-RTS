@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
 using Sirenix.OdinInspector;
+using Pathfinding;
 
 namespace ProtoRTS
 {
@@ -13,6 +14,7 @@ namespace ProtoRTS
 		[Space]
         [SerializeField] private SyntiosTerrainData _terrainData;
 
+        [FoldoutGroup("References")] public AstarPath aStarPath;
         [FoldoutGroup("References")] public MeshRenderer DEBUG_MeshTerrain;
         [FoldoutGroup("References")] [SerializeField] private Shader terrainShader;
         [FoldoutGroup("References")] [SerializeField] private Material _sourceTerrainMat;
@@ -34,6 +36,15 @@ namespace ProtoRTS
             }
         }
 
+        public static Vector3 WorldPosCenter
+        {
+            get
+            {
+                return new Vector3(TerrainData.size_x, 0, TerrainData.size_y);
+            }
+        }
+
+
         public static SyntiosTerrainData TerrainData
         {
             get { return instance._terrainData; }
@@ -45,12 +56,30 @@ namespace ProtoRTS
         private void Awake()
         {
             instance = this;
+
+
         }
 
         private void Start()
         {
             InitializeMap();
+
+            var gridGraph = AstarPath.active.data.gridGraph;
+            int width = (_terrainData.size_x * 2) / 3;
+            int depth = (_terrainData.size_y * 2) / 3;
+            width -= 2;
+            depth -= 2;
+            var center = WorldPosCenter;
+            center.x += 1 * 3;
+            center.z += 0 * 3;
+
+            gridGraph.SetDimensions(width, depth, 3);
+            gridGraph.center = center;
+
+            AstarPath.active.Scan(gridGraph);
         }
+
+
 
         public SO_TerrainPreset MyPreset
         {
@@ -84,7 +113,7 @@ namespace ProtoRTS
             generatedTerrainMaterial.SetTexture("_TextureF", MyPreset.layer6);
             generatedTerrainMaterial.SetTexture("_TextureG", MyPreset.layer7);
             generatedTerrainMaterial.SetTexture("_TextureH", MyPreset.layer8);
-           
+            generatedTerrainMaterial.SetVector("_MapSize", new Vector4(_terrainData.size_x, _terrainData.size_y));
 
         }
 

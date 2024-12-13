@@ -98,7 +98,8 @@ Shader "Syntios/SynShader_FOWMapUI"
             {
                 half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
 
-      /*          #ifdef UNITY_UI_CLIP_RECT
+                /*          
+                #ifdef UNITY_UI_CLIP_RECT
                 color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
                 #endif
 
@@ -108,14 +109,15 @@ Shader "Syntios/SynShader_FOWMapUI"
 
                 if (color.r > 0.02 && color.r < 0.98)
                 {
-                    color.a = 0.75;
-                    color.r = 0.01;
+                    color.a = 0.8;
+                    color.r = 0.0012;
                     color.g = color.r;
                     color.b = color.r;
                 }
                 else 
                 {
                     color.a = 1 - color.r;
+                    color.a = clamp(color.a, 0, 0.9);
                     color.g = color.r;
                     color.b = color.r;
                 }

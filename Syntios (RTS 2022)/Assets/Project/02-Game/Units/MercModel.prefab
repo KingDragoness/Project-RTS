@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7360057663888559639}
   - component: {fileID: 4176454151478885582}
   - component: {fileID: 41182190677848136}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_arm.l
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -115,7 +115,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2788017071308972571}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: LowerLeg.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,7 +150,7 @@ GameObject:
   - component: {fileID: 8740767551842291242}
   - component: {fileID: 7351932639491196982}
   - component: {fileID: 2281234938533805462}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: MercModel(MeshSkined)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -233,7 +233,7 @@ GameObject:
   - component: {fileID: 9129325909521864106}
   - component: {fileID: 6788317977627090826}
   - component: {fileID: 9191946224148447102}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_upperleg.r
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -339,7 +339,7 @@ GameObject:
   - component: {fileID: 8595707413482553925}
   - component: {fileID: 4798066835832502719}
   - component: {fileID: 666474420181656188}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_arm.r
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -442,7 +442,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7994539607859652286}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Foot.L_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -473,7 +473,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1168946252320125208}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Foot.R_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -504,7 +504,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7172545046147027992}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: UpperLeg.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -537,7 +537,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1506448890861194359}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: LowerLeg.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -570,7 +570,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3915071595859359748}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Head_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -602,7 +602,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1826286360561600385}
   - component: {fileID: 3410404130800402626}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc.lod1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -701,7 +701,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2913101233313230136}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: MercHighPoly
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -736,7 +736,7 @@ GameObject:
   - component: {fileID: 6930458977634852303}
   - component: {fileID: 6743794741598134378}
   - component: {fileID: 6108522248901268012}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_Torso.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -839,7 +839,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8038578402625134149}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Foot.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -871,7 +871,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2664701575832946585}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: UpperSpine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -908,7 +908,7 @@ GameObject:
   - component: {fileID: 2199347514510577844}
   - component: {fileID: 3411461148881018805}
   - component: {fileID: 3105232705758931542}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_armHand.l
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1011,7 +1011,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6159747349431236830}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: LowerArm.R_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1042,7 +1042,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4134364041958097408}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: UpperArm.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1078,7 +1078,7 @@ GameObject:
   - component: {fileID: 4707521999307914521}
   - component: {fileID: 4374158389373898969}
   - component: {fileID: 6848114418757460042}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_upperleg.l
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1184,7 +1184,7 @@ GameObject:
   - component: {fileID: 3066082900005114900}
   - component: {fileID: 5010796120534207667}
   - component: {fileID: 4271907846433815044}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_armHand.r
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1288,7 +1288,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3477062205224117117}
   - component: {fileID: 227059044556139282}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: proxyshadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1387,7 +1387,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7635229762293004469}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: LowerArm.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1421,7 +1421,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9114955888027974668}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Pelvis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1457,7 +1457,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5960402353418679633}
   - component: {fileID: 2685081254657806599}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc.lod0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1556,7 +1556,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2415020929155696364}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Foot.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1591,7 +1591,7 @@ GameObject:
   - component: {fileID: 8485660701655096913}
   - component: {fileID: 4964436094980679898}
   - component: {fileID: 3649838509564936858}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_lowerleg.r
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1697,7 +1697,7 @@ GameObject:
   - component: {fileID: 9019814712852566015}
   - component: {fileID: 3309653076626051460}
   - component: {fileID: 119884350016473427}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_lowerleg.l
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1802,7 +1802,7 @@ GameObject:
   - component: {fileID: 7986059006231555916}
   - component: {fileID: 4164202763248669617}
   - component: {fileID: 7154634935495383675}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1883,7 +1883,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7125789197740056865}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: UpperArm.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1916,7 +1916,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1618454408437952563}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: LowerArm.L_end
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1950,7 +1950,7 @@ GameObject:
   - component: {fileID: 9184416083515019316}
   - component: {fileID: 7052840646184746638}
   - component: {fileID: 7975658728220085002}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Merc_Helmet.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2053,7 +2053,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1534124636585120017}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: LowerArm.L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2086,7 +2086,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3701847091334703809}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: UpperLeg.R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2119,7 +2119,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8443303347330214939}
-  m_Layer: 12
+  m_Layer: 0
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}

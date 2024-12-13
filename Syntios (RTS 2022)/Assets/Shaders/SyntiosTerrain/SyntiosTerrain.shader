@@ -46,7 +46,8 @@ Shader "Syntios/SyntiosTerrain"
         _RimColor("Rim Color", Color) = (1.0, 1.0, 1.0, 1.0)
         _RimPower("Rim Power", Range(0.1, 10.0)) = 3.0
         _AlbedoPower("Albedo Power", Range(1, 10.0)) = 1
-
+        [ShowAsVector2]_MapSize("MapSize", Vector) = (.25, .5, .5, 1)
+        _BorderMap("Map Border", Range(4, 32)) = 4.0
     }
  
     SubShader
@@ -102,6 +103,8 @@ Shader "Syntios/SyntiosTerrain"
             uniform float4 _RimColor;
             uniform float _RimPower;
             uniform float _AlbedoPower;
+            uniform float2 _MapSize;
+            uniform float _BorderMap;
 
             fixed _PrioGround;
             fixed _PrioA;
@@ -400,9 +403,69 @@ Shader "Syntios/SyntiosTerrain"
                     float3 rimLighting = saturate(pow(rim, _RimPower) * _RimColor.rgb * diffuseReflection);
                     float3 lightFinal = diffuseReflection + specularReflection + rimLighting + UNITY_LIGHTMODEL_AMBIENT.rgb;
 
-                    return float4(col * lightFinal * _AlbedoPower, 1.0);
+                    col = float4(col * lightFinal * _AlbedoPower, 1.0);
                 }
 
+                {
+                    float x_border_col = (_BorderMap - IN.posWorld.r / 2) / _BorderMap;
+                    float x_border_end = (_MapSize.r - IN.posWorld.r / 2) / _BorderMap;
+                    float y_border_col = (_BorderMap - IN.posWorld.b / 2) / _BorderMap;
+                    float y_border_end = (_MapSize.g - IN.posWorld.b / 2) / _BorderMap;
+
+                    x_border_col = 1 - x_border_col;
+                    y_border_col = 1 - y_border_col;
+                    x_border_end = x_border_end;
+                    y_border_end = y_border_end;
+
+                    x_border_col *= x_border_col;
+                    y_border_col *= y_border_col;
+                    x_border_end *= x_border_end;
+                    y_border_end *= y_border_end;
+
+                    x_border_col = clamp(x_border_col, 0, 1);
+                    y_border_col = clamp(y_border_col, 0, 1);
+                    x_border_end = clamp(x_border_end, 0, 1);
+                    y_border_end = clamp(y_border_end, 0, 1);
+
+                    if (IN.posWorld.r / 2 < _BorderMap)
+                    {
+                        col.r *= x_border_col;
+                        col.g *= x_border_col;
+                        col.b *= x_border_col;
+                    }
+                    if (IN.posWorld.b / 2 < _BorderMap)
+                    {
+                        col.r *= y_border_col;
+                        col.g *= y_border_col;
+                        col.b *= y_border_col;
+                    }
+                    if (IN.posWorld.r / 2 > _MapSize.r - _BorderMap)
+                    {
+                        col.r *= x_border_end;
+                        col.g *= x_border_end;
+                        col.b *= x_border_end;
+
+                        if (IN.posWorld.r / 2 > _MapSize.r)
+                        {
+                            col.r = 0;
+                            col.g = 0;
+                            col.b = 0;
+                        }
+                    }
+                    if (IN.posWorld.b / 2 > _MapSize.g - _BorderMap)
+                    {
+                        col.r *= y_border_end;
+                        col.g *= y_border_end;
+                        col.b *= y_border_end;
+
+                        if (IN.posWorld.b / 2 > _MapSize.g)
+                        {
+                            col.r = 0;
+                            col.g = 0;
+                            col.b = 0;
+                        }
+                    }
+                }
 
                 return col;
             }

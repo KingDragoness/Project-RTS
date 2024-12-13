@@ -113,7 +113,7 @@ GameObject:
   - component: {fileID: 95}
   - component: {fileID: 105}
   - component: {fileID: 87}
-  m_Layer: 1
+  m_Layer: 8
   m_Name: SomeBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -129,7 +129,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 32}
-  m_Layer: 1
+  m_Layer: 8
   m_Name: DynamicObstacle
   m_TagString: Untagged
   m_Icon: {fileID: 2800000, guid: 5cb832165cebecd46a73c7107316b85d, type: 3}
@@ -51820,6 +51820,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
+      propertyPath: aStarPath
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
+        type: 3}
       propertyPath: DEBUG_MeshTerrain
       value: 
       objectReference: {fileID: 1008129130}
@@ -51831,17 +51836,17 @@ PrefabInstance:
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_x
-      value: 128
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_y
-      value: 128
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 5490426805696813136, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: showNavGraphs
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6072066624927534290, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
@@ -69161,12 +69166,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1639962103692001358, guid: 4641de0c08106a046989671bf9d72fb9,
-        type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: cea2c9bf87b0c4dfdafb697a3ff00959,
-        type: 3}
     - target: {fileID: 8575795935291011314, guid: 4641de0c08106a046989671bf9d72fb9,
         type: 3}
       propertyPath: m_Name
@@ -70167,7 +70166,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1374135829
 Transform:
   m_ObjectHideFlags: 0

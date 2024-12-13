@@ -16,6 +16,7 @@ namespace ProtoRTS
         public Transform bait_noX;
         public float ySpeed = 25f;
         public LayerMask layer_Terrain;
+        public float mapBorder = 8f;
         public Vector3 Offset;
         [Space]
         public float speedPan = 10f;
@@ -152,24 +153,24 @@ namespace ProtoRTS
         {
             Vector3 pos = transform.position;
 
-            if (pos.x > Map.MapSize.x * 2f)
+            if (pos.x > Map.MapSize.x * 2f - (mapBorder))
             {
-                pos.x = Map.MapSize.x * 2f;
+                pos.x = Map.MapSize.x * 2f - (mapBorder);
             }
 
-            if (pos.x < 0)
+            if (pos.x < mapBorder)
             {
-                pos.x = 0;
+                pos.x = mapBorder;
             }
 
-            if (pos.z > Map.MapSize.y * 2f)
+            if (pos.z > Map.MapSize.y * 2f - (mapBorder))
             {
-                pos.z = Map.MapSize.y * 2f;
+                pos.z = Map.MapSize.y * 2f - (mapBorder);
             }
 
-            if (pos.z < -10)
+            if (pos.z < mapBorder - 15)
             {
-                pos.z = -10;
+                pos.z = mapBorder - 15;
             }
 
             transform.position = pos;
