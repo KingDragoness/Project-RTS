@@ -10,6 +10,9 @@ namespace ProtoRTS
         [FoldoutGroup("Selection")] public LayerMask layer_Terrain;
         [FoldoutGroup("Selection")] public GameObject go_StartDragBox;
         [FoldoutGroup("Selection")] public GameObject go_EndDragBox;
+        [FoldoutGroup("Selection")] public int minBoxSizeDrag = 12;
+        [FoldoutGroup("Selection")] public float DoubleClickTime = 0.3f;
+
 
         public GameObject circleOutline_Green;
         Camera myCam;
@@ -43,19 +46,46 @@ namespace ProtoRTS
             return Vector3.zero;
         }
 
+        public GameUnit GetSingleGameUnit()
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out hit, 500f))
+            {
+                if (hit.collider.gameObject.CompareTag("Unit"))
+                {
+                    var parentGameunit = hit.collider.gameObject.GetComponentInParent<GameUnit>();
+
+                    if (parentGameunit != null)
+                    {
+                        return parentGameunit;
+                    }
+                }
+            }
+
+            return null;
+        }
+
 
         private bool _invalidDrag = false;
+        private GameUnit singleSelectUnit;
+        [ShowInInspector] [DisableInEditorMode] [SerializeField] private float _timeSinceMouse0 = 0.2f;
 
 
         private void Update()
         {
 
+            bool doubleClickDetected = false;
 
+            _timeSinceMouse0 += Time.deltaTime;
             {
+                singleSelectUnit = GetSingleGameUnit();
 
                 // When Clicked
                 if (Input.GetMouseButtonDown(0))
                 {
+
                     if (MainUI.GetEventSystemRaycastResults().Count > 0)
                     {
                         _invalidDrag = true;
@@ -78,10 +108,19 @@ namespace ProtoRTS
                     endPosition = GetRaycastWorldClick();
                     DrawVisual();
                     DrawSelection();
-                    go_StartDragBox.transform.position = startPosition;
-                    go_EndDragBox.transform.position = endPosition;
-                    go_StartDragBox.gameObject.SetActive(true);
-                    go_EndDragBox.gameObject.SetActive(true);
+
+                    if (selectionBounds.size.magnitude > minBoxSizeDrag)
+                    {
+                        go_StartDragBox.transform.position = startPosition;
+                        go_EndDragBox.transform.position = endPosition;
+                        go_StartDragBox.gameObject.SetActive(true);
+                        go_EndDragBox.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+
+                    }
+
                 }
                 else
                 {
@@ -90,10 +129,33 @@ namespace ProtoRTS
 
                 }
 
+                if (_timeSinceMouse0 <= DoubleClickTime) doubleClickDetected = true;
+
                 // When Releasing
                 if (Input.GetMouseButtonUp(0))
                 {
-                    if (_invalidDrag == false) SelectUnits();
+                    _timeSinceMouse0 = 0f;
+
+                    if (doubleClickDetected == false)
+                    {
+                        if (_invalidDrag == false)
+                        {
+                            SelectUnits();
+                        }
+                        if (singleSelectUnit != null)
+                        {
+                            //Selection.DeselectAllUnits();
+                            SelectOneUnit(singleSelectUnit);
+                        }
+                    }
+                    else if (doubleClickDetected == true)
+                    {
+                        if (singleSelectUnit != null)
+                        {
+                            SelectAllUnitInScreenSpace(singleSelectUnit);
+                        }
+                    }
+                    
                     _invalidDrag = false;
 
                     startPosition = Vector2.zero;
@@ -101,6 +163,8 @@ namespace ProtoRTS
                     DrawVisual();
                 }
             }
+
+            doubleClickDetected = false;
 
         }
 
@@ -146,6 +210,44 @@ namespace ProtoRTS
 
         }
 
+        void SelectOneUnit(GameUnit unit)
+        {
+            Selection.SelectUnit(unit);
+            unit.SelectedUnit(circleOutline_Green.transform);
+
+            if (Selection.GetPortraitedUnit != null)
+            {
+                var unit1 = Selection.GetPortraitedUnit;
+                SyntiosEvents.UI_NewSelection?.Invoke(unit1);
+            }
+        }
+
+        void SelectAllUnitInScreenSpace(GameUnit singleUnit)
+        {
+            Debug.Log("Selecting all units in the view!");
+            Selection.DeselectAllUnits();
+
+            foreach (var unit in SyntiosEngine.Instance.ListedGameUnits)
+            {
+                if (unit._class.ID != singleUnit._class.ID) continue;
+                Vector3 vpPos = Camera.main.WorldToViewportPoint(unit.transform.position);
+
+                if (vpPos.x >= 0f && vpPos.x <= 1f && vpPos.y >= 0.2f && vpPos.y <= 1f && vpPos.z > 0f)
+                {
+                    Selection.SelectUnit(unit);
+                    unit.SelectedUnit(circleOutline_Green.transform);
+                }
+
+            }
+
+            if (Selection.GetPortraitedUnit != null)
+            {
+                var unit1 = Selection.GetPortraitedUnit;
+
+                SyntiosEvents.UI_NewSelection?.Invoke(unit1);
+
+            }
+        }
 
         void SelectUnits()
         {
@@ -153,24 +255,6 @@ namespace ProtoRTS
             Rect rect = new Rect();
             Vector3 pos1 = startPosition;
             Vector3 pos2 = endPosition;
-
-            {
-                //if (startPosition.x > endPosition.x)
-                //{
-                //    pos1.x = endPosition.x;
-                //    pos2.x = startPosition.x;
-                //}
-                //if (startPosition.z > endPosition.z)
-                //{
-                //    pos1.z = endPosition.z;
-                //    pos2.z = startPosition.z;
-                //}
-
-                //Debug.Log($"{pos1}, {pos2}");
-            }
-
-            //rect.min = myCam.WorldToScreenPoint(pos1);
-            //rect.max = myCam.WorldToScreenPoint(pos2);
 
             Vector3 camPos1 = myCam.WorldToScreenPoint(pos1);
             Vector3 camPos2 = myCam.WorldToScreenPoint(pos2);
@@ -194,7 +278,6 @@ namespace ProtoRTS
                     camPos2.y = max;
                 }
 
-                //Debug.Log($"{camPos1}, {camPos2}");
             }
 
             rect.min = camPos1;
@@ -217,8 +300,6 @@ namespace ProtoRTS
                 SyntiosEvents.UI_NewSelection?.Invoke(unit1);
 
             }
-
-            //UI.CommandPanel.RefreshUI();
 
         }
     }

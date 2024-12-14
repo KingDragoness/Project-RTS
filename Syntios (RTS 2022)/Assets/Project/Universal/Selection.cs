@@ -39,10 +39,12 @@ namespace ProtoRTS
         {
             get
             {
-				if (allSelectedUnits.Count > 0)
+				var highestOrder = allSelectedUnits.OrderByDescending(x => x._class.port_Importance).ToList();
+
+				if (highestOrder.Count > 0)
                 {
 					//process unit order here
-					return allSelectedUnits[0];
+					return highestOrder[0];
                 }
                 else
                 {
@@ -94,6 +96,20 @@ namespace ProtoRTS
 			}
 
 
+		}
+
+		//Also when dying, call this function.
+		internal static void RemoveUnit(GameUnit unit)
+        {
+			if (_instance.allSelectedUnits.Contains(unit) == true)
+			{
+				_instance.allSelectedUnits.Remove(unit);
+				unit.DeselectUnit();
+			}
+            else
+            {
+				_instance.allSelectedUnits.RemoveAll(x => x == null);
+            }
 		}
 
 	}

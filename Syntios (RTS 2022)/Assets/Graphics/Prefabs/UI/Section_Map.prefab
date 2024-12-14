@@ -1330,6 +1330,7 @@ MonoBehaviour:
   line_Viewport: {fileID: 542487250158233010}
   mapTexture_Unit: {fileID: 8494126977402838887}
   mapTexture_FOW: {fileID: 3134140914465027493}
+  image_SplatHeight: {fileID: 1639962103692001358}
   testImg_LD: {fileID: 4910085427212642875}
   testImg_RD: {fileID: 931109528894436238}
   testImg_LU: {fileID: 4251342909564651333}

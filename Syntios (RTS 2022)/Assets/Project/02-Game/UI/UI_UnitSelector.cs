@@ -15,15 +15,18 @@ namespace ProtoRTS.Game
         public Button_Unit prefab;
         public Button[] allGroupButtons;
         public Transform parentButton;
-        public Image image_PortraitScreen;
-        public Image image_NoiseTV;
-        public VideoPlayer portraitVideoPlayer;
-        public AudioSource portraitAudioSource;
+        public GridLayoutGroup gridLayoutGroup;
+        [FoldoutGroup("Portrait")] public Image image_PortraitScreen;
+        [FoldoutGroup("Portrait")] public Image image_NoiseTV;
+        [FoldoutGroup("Portrait")] public VideoPlayer portraitVideoPlayer;
+        [FoldoutGroup("Portrait")] public AudioSource portraitAudioSource;
         public int maxUnitInGroup = 24;
 
         [HideInEditorMode] private List<Button_Unit> pooledButtons = new List<Button_Unit>();
         private SO_GameUnit currentUnitPortrait;
         private bool _isTalking = false;
+        private bool _disallowTotalRefresh = false;
+        private int _groupIndex = 0;
 
         private void Awake()
         {
@@ -35,7 +38,7 @@ namespace ProtoRTS.Game
         private void Start()
         {
             prefab.gameObject.Populate(24);
-
+            _disallowTotalRefresh = false;
         }
 
         #region Wrapper events
@@ -52,6 +55,7 @@ namespace ProtoRTS.Game
         {
             UI.CommandPanel.RefreshUI();
             SwitchedIdlePortrait(null);
+            _disallowTotalRefresh = false;
         }
 
         private void event_UI_OrderMove(GameUnit gameunit)
@@ -94,52 +98,109 @@ namespace ProtoRTS.Game
 
         public void RefreshUI()
         {
+            //if (_disallowTotalRefresh)
+            //{
+            //    return;
+            //}
+            //else
+            //{
+
+            //}
+
+            gridLayoutGroup.enabled = true;
+
             foreach (var button in pooledButtons)
             {
 
 
             }
 
-            pooledButtons.ReleasePoolObject();
 
-            int selectedIndex = -1;
             int index = 0;
-
-            int count = Selection.AllSelectedUnits.Count; if (count > maxUnitInGroup) count = maxUnitInGroup;
+            int totalUnitCount = Selection.AllSelectedUnits.Count;
             int totalButtonCount = 1 + Mathf.FloorToInt(Selection.AllSelectedUnits.Count / maxUnitInGroup);
+
 
             if (totalButtonCount > allGroupButtons.Length)
             {
                 totalButtonCount = allGroupButtons.Length;
             }
 
-            for (int x = 0; x < count; x++)
+            if (_groupIndex >= totalButtonCount)
+            {
+                _groupIndex = 0;
+            }
+            else
+            {
+
+            }
+
+            int currentCeilingIndex = (_groupIndex + 1) * maxUnitInGroup;
+            if (currentCeilingIndex > totalUnitCount) currentCeilingIndex = totalUnitCount;
+
+            int currentIndex = (_groupIndex * maxUnitInGroup); 
+            if (currentIndex > currentCeilingIndex) currentIndex = currentCeilingIndex;
+
+            pooledButtons.ReleasePoolObject();
+
+            for (int x = currentIndex; x < currentCeilingIndex; x++)
             {
                 var unit = Selection.AllSelectedUnits[x];
                 var button = prefab.gameObject.Reuse<Button_Unit>(); //Instantiate(prefab, parentButton);
                 if (button.transform.parent != parentButton) button.transform.SetParent(parentButton);
                 button.gameObject.SetActive(true);
+                button.button.onClick.RemoveAllListeners();
                 button.icon_Unit.sprite = unit.Class.spriteWireframe;
                 button.transform.localPosition = Vector3.zero;
                 button.transform.localScale = Vector3.one;
+                button.attachedGameUnit = unit;
+
+                {
+                    button.button.onClick.AddListener(Check);
+                }
+
                 index++;
                 pooledButtons.Add(button);
             }
 
-            foreach(var button in allGroupButtons)
+            //GROUP BUTTONS
             {
-                button.gameObject.SetActive(false);
-            }
-
-            if (totalButtonCount > 1)
-            {
-                for (int z = 0; z < totalButtonCount; z++)
+                foreach (var button in allGroupButtons)
                 {
-                    allGroupButtons[z].gameObject.SetActive(true);
+                    button.gameObject.SetActive(false);
+                }
+
+                if (totalButtonCount > 1)
+                {
+                    for (int z = 0; z < totalButtonCount; z++)
+                    {
+                        allGroupButtons[z].gameObject.SetActive(true);
+                    }
                 }
             }
 
+            _disallowTotalRefresh = true;
+            StartCoroutine(DisableGLG(0.02f));
         }
+
+        public void ChangeGroup(int index)
+        {
+            _groupIndex = index;
+            RefreshUI();
+        }
+
+        private IEnumerator DisableGLG(float delayTime)
+        {
+            yield return new WaitForSeconds(delayTime);
+            gridLayoutGroup.enabled = false;
+
+        }
+
+        public void Check()
+        {
+
+        }
+
 
         public void PlayPortrait(VideoClip clip)
         {

@@ -19,6 +19,7 @@ namespace ProtoRTS
         public LineRenderer line_Viewport;
         public RawImage mapTexture_Unit;
         public RawImage mapTexture_FOW;
+        public Image image_SplatHeight;
         public Image testImg_LD;
         public Image testImg_RD;
         public Image testImg_LU;
@@ -307,8 +308,15 @@ namespace ProtoRTS
                 }
             }
 
+
+            float pixelsPerUnit = Map.TerrainData.size_x / 64f;
+
+            if (pixelsPerUnit < Map.TerrainData.size_y / 64f)
+                pixelsPerUnit = Map.TerrainData.size_y / 64f;
+
             texture_minimap_Units.Apply();
             mapTexture_Unit.texture = texture_minimap_Units;
+            image_SplatHeight.pixelsPerUnitMultiplier = pixelsPerUnit;
         }
 
 

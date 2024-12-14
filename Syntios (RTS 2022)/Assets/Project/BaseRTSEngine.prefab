@@ -6057,6 +6057,9 @@ MonoBehaviour:
     m_Bits: 64
   go_StartDragBox: {fileID: 5058879053892554432}
   go_EndDragBox: {fileID: 5871733897675503784}
+  minBoxSizeDrag: 12
+  DoubleClickTime: 0.21
   circleOutline_Green: {fileID: 8906759568970107544, guid: 649ff9c0101ea7847896705a8cf7be00,
     type: 3}
   boxVisual: {fileID: 3355188664619224047}
+  _timeSinceMouse0: 0.2
