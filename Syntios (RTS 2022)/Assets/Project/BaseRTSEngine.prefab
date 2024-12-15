@@ -5294,7 +5294,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ListedGameUnits: []
-  CurrentFaction: 0
+  CurrentGamemode: 0
+  currentFaction: 1
 --- !u!1 &3745240602089535829
 GameObject:
   m_ObjectHideFlags: 0

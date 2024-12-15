@@ -133,7 +133,7 @@ namespace ProtoRTS
 
         private void Update_FOW()
         {
-            var currentFOW = FOWScript.GetFOW(SyntiosEngine.Instance.CurrentFaction);
+            var currentFOW = FOWScript.GetFOW(SyntiosEngine.CurrentFaction);
             if (currentFOW == null) return;
 
             uvRect_MapFOW.width = Map.TerrainData.size_x / 256f;

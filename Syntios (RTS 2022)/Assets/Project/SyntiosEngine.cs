@@ -5,13 +5,24 @@ using Sirenix.OdinInspector;
 
 namespace ProtoRTS
 {
+
+    public enum Gamemode
+    {
+        Mainmenu,
+        Game,
+        MapEdit
+    }
+
 	public class SyntiosEngine : MonoBehaviour
 	{
 
 		public List<GameUnit> ListedGameUnits = new List<GameUnit>();
-        public Unit.Player CurrentFaction;
+        public Gamemode CurrentGamemode;
+        [SerializeField] private Unit.Player currentFaction;
 
-		public static SyntiosEngine Instance;
+        public static SyntiosEngine Instance;
+
+        public static Unit.Player CurrentFaction { get => Instance.currentFaction; }
 
         private void Awake()
         {

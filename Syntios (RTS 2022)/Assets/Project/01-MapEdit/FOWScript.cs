@@ -238,6 +238,9 @@ namespace ProtoRTS
                 exploredPoints[x, y] = true;
             }
 
+            int ch_x = 0;
+            int ch_y = 0;
+
             [Button("Explore this point")]
             public void ExplorePoint(int _index, System.Int16 unitPosY)
             {
@@ -247,10 +250,10 @@ namespace ProtoRTS
                     if (FOWScript.GetHeightmap[_index] - 128 > (unitPosY * 4)) return; //-128 for sbyte 
                 }
 
-                int x = FOWScript.X_table_indexes[_index]; //_index % 256;
-                int y = FOWScript.Y_table_indexes[_index]; //_index / 256;
-                activePoints[x, y] = true;
-                exploredPoints[x, y] = true;
+                ch_x = FOWScript.X_table_indexes[_index]; //_index % 256;
+                ch_y = FOWScript.Y_table_indexes[_index]; //_index / 256;
+                activePoints[ch_x, ch_y] = true;
+                exploredPoints[ch_x, ch_y] = true;
 
                 //Debug.Log($"Explore: ({x}, {y})");
             }
@@ -342,17 +345,20 @@ namespace ProtoRTS
                 circle._map = map;
             }
 
-            SetTerrainTexture(allFOWMaps[0]);
         }
 
         private void OnTick()
         {
+            SetTerrainTexture(GetFOW(SyntiosEngine.CurrentFaction));
 
-            allFOWMaps[0].GenerateTexture();
+            foreach (var fowMap in allFOWMaps)
+            {
+                fowMap.GenerateTexture();
+            }
 
             foreach (var unit in SyntiosEngine.Instance.ListedGameUnits)
             {
-                DrawSquare(unit, allFOWMaps[0]);
+                DrawSquare(unit, GetFOW(unit.stat_faction));
             }
 
             if (DEBUG_EnableSimulateUnitCall)
@@ -378,10 +384,6 @@ namespace ProtoRTS
                 _timerCooldown = 1f / UpdateTexturePerSecond;
             }
 
-            //foreach (var fowMap in allFOWMaps)
-            //{
-            //    fowMap.GenerateTexture();
-            //}
 
         }
 

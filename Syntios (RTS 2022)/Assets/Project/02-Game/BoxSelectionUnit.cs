@@ -229,6 +229,7 @@ namespace ProtoRTS
 
             foreach (var unit in SyntiosEngine.Instance.ListedGameUnits)
             {
+                if (unit.stat_faction != SyntiosEngine.CurrentFaction) continue;
                 if (unit._class.ID != singleUnit._class.ID) continue;
                 Vector3 vpPos = Camera.main.WorldToViewportPoint(unit.transform.position);
 
@@ -285,6 +286,8 @@ namespace ProtoRTS
 
             foreach (var unit in everyUnit)
             {
+                if (unit.stat_faction != SyntiosEngine.CurrentFaction) continue;
+
                 if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
                 {
                     Selection.SelectUnit(unit);
