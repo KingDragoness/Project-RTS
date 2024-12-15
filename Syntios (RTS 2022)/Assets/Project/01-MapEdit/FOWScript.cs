@@ -21,7 +21,11 @@ namespace ProtoRTS
         public bool[,] coordInstructions;
 
         internal Map _map; //this is because cross memory!
+        private int[] _cachedIndexes;
+        private int _maxCount;
 
+        public int MaxCount { get => _maxCount; }
+        public int[] CachedIndexes { get => _cachedIndexes; }
 
         public int[] ConvertCoordToDrawToIndexes()
         {
@@ -50,12 +54,20 @@ namespace ProtoRTS
             return new_coordInstructions;
         }
 
+
         //if circle is 7x7 and loc origin is at 4,4
         //retrieve all indexes between 4,4 and 7,7
-        public int[] GetLocalIndexes(Vector2Int localOffset, Vector2Int sizeDraw)
+        public void GetLocalIndexes(Vector2Int localOffset, Vector2Int sizeDraw)
         {
             int PixelLOS = LineOfSight * 2;
-            int[] indexes = new int[sizeDraw.x * sizeDraw.y];
+            if (_cachedIndexes == null)
+            {
+                _cachedIndexes = new int[32 * 32];
+            }
+            else
+            {
+                System.Array.Clear(_cachedIndexes, 0, _cachedIndexes.Length);
+            }
 
             int start_x = localOffset.x;
             int start_y = localOffset.y;
@@ -80,12 +92,12 @@ namespace ProtoRTS
 
                 if (x > start_x && y > start_y && x < end_x && y < end_y)
                 {
-                    indexes[_id] = myIndex;
+                    _cachedIndexes[_id] = myIndex;
                     _id++;
                 }
             }
 
-            return indexes;
+            _maxCount = _id + 1;
         }
 
     }
@@ -113,6 +125,11 @@ namespace ProtoRTS
             private Color32[] allColors;
             private Color32[] allColors_1;
 
+            //cached
+            int cachedStartIndex = 0;
+            int ch_x = 0;
+            int ch_y = 0;
+            int[] cached_LocalIndexes;
 
             public FOWMap(Unit.Player faction, bool[,] activePoints, bool[,] exploredPoints)
             {
@@ -198,7 +215,6 @@ namespace ProtoRTS
 
                         }
 
-                        activePoints[x, y] = false; //always reset
                     }
                 }
 
@@ -209,24 +225,46 @@ namespace ProtoRTS
             }
 
 
+            public void FlushActive()
+            {
+                System.Array.Clear(activePoints, 0, activePoints.Length);
+            }
+
+
             public void WriteBuffer(Vector2Int globalOffset, Vector2Int localOrigin, Vector2Int sizeDraw, CirclePixels circlePixel)
             {
                 //every y, store indexes what X to draw. [2 * 256: + 0,1,2,3,4,5] [0 * 256: + 2,3,4]
                 //IDEA only
 
-                int startIndex = globalOffset.x + (globalOffset.y * 256);
+                cachedStartIndex = globalOffset.x + (globalOffset.y * 256);
+                circlePixel.GetLocalIndexes(localOrigin, sizeDraw);
+                cached_LocalIndexes = circlePixel.CachedIndexes;
 
-                var localIndexes = circlePixel.GetLocalIndexes(localOrigin, sizeDraw);
+                int maxCount = circlePixel.MaxCount;
+                int unitPosY = 1;
+                int myIndex = 0;
 
-
-                for (int c = 0; c < localIndexes.Length; c++)
+                for (int c = 0; c < maxCount; c++)
                 {
-                    int myIndex = startIndex + localIndexes[c];
-                    if (localIndexes[c] == 0) continue;
+                    myIndex = cachedStartIndex + cached_LocalIndexes[c];
+                    if (cached_LocalIndexes[c] == 0) continue;
                     if (myIndex < 0) continue;
 
-                    ExplorePoint(myIndex, unitPosY: 1);
-                    //indexes[c] = myIndex;
+                    ch_x = FOWScript.X_table_indexes[myIndex];
+                    ch_y = FOWScript.Y_table_indexes[myIndex];
+
+                    //if already written skips
+                    if (activePoints[ch_x, ch_y]) continue;
+
+                    if (Map.TerrainData.cliffLevel.Length > myIndex)
+                    {
+                        if (FOWScript.GetHeightmap[myIndex] - 128 > (unitPosY * 4)) break; //-128 for sbyte 
+                    }
+               
+                    activePoints[ch_x, ch_y] = true;
+                    exploredPoints[ch_x, ch_y] = true;
+
+                    //ExplorePoint(myIndex, unitPosY: 1);
                 }
 
             }
@@ -238,9 +276,8 @@ namespace ProtoRTS
                 exploredPoints[x, y] = true;
             }
 
-            int ch_x = 0;
-            int ch_y = 0;
 
+            //TOO EXPENSIVE
             [Button("Explore this point")]
             public void ExplorePoint(int _index, System.Int16 unitPosY)
             {
@@ -250,8 +287,8 @@ namespace ProtoRTS
                     if (FOWScript.GetHeightmap[_index] - 128 > (unitPosY * 4)) return; //-128 for sbyte 
                 }
 
-                ch_x = FOWScript.X_table_indexes[_index]; //_index % 256;
-                ch_y = FOWScript.Y_table_indexes[_index]; //_index / 256;
+                ch_x = FOWScript.X_table_indexes[_index];
+                ch_y = FOWScript.Y_table_indexes[_index];
                 activePoints[ch_x, ch_y] = true;
                 exploredPoints[ch_x, ch_y] = true;
 
@@ -294,11 +331,13 @@ namespace ProtoRTS
         [Header("References")]
         public List<FOWMap> allFOWMaps = new List<FOWMap>();
         public int UpdateTexturePerSecond = 30;
+        public int UpdateFOWPerSecond = 10;
 
         [FoldoutGroup("DEBUG Perf")] public int Simulate_units = 100;
         [FoldoutGroup("DEBUG Perf")] public bool DEBUG_EnableSimulateUnitCall = false;
 
-        private float _timerCooldown = 0.1f;
+        private float _timerUpdateTexture = 0.1f;
+        private float _timerUpdateFOW = 0.1f;
         private static FOWScript Instance;
 
         public static sbyte[] GetHeightmap
@@ -325,7 +364,8 @@ namespace ProtoRTS
         private void Awake()
         {
             Instance = this;
-            _timerCooldown = 1f / UpdateTexturePerSecond;
+            _timerUpdateTexture = 1f / UpdateTexturePerSecond;
+            _timerUpdateFOW = 1f / UpdateFOWPerSecond;
 
         }
 
@@ -347,7 +387,7 @@ namespace ProtoRTS
 
         }
 
-        private void OnTick()
+        private void UpdateTexture()
         {
             SetTerrainTexture(GetFOW(SyntiosEngine.CurrentFaction));
 
@@ -356,6 +396,16 @@ namespace ProtoRTS
                 fowMap.GenerateTexture();
             }
 
+          
+        }
+
+        private void UpdateFOW()
+        {
+
+            foreach (var fowMap in allFOWMaps)
+            {
+                fowMap.FlushActive();
+            }
             foreach (var unit in SyntiosEngine.Instance.ListedGameUnits)
             {
                 DrawSquare(unit, GetFOW(unit.stat_faction));
@@ -368,20 +418,31 @@ namespace ProtoRTS
                     DrawSquare(SyntiosEngine.Instance.ListedGameUnits[0], allFOWMaps[0]);
                 }
             }
+
         }
 
 
         private void Update()
         {
 
-            if (_timerCooldown > 0)
+            if (_timerUpdateFOW > 0)
             {
-                _timerCooldown -= Time.deltaTime;
+                _timerUpdateFOW -= Time.deltaTime;
             }
             else
             {
-                OnTick();
-                _timerCooldown = 1f / UpdateTexturePerSecond;
+                UpdateFOW();
+                _timerUpdateFOW = 1f / UpdateFOWPerSecond;
+            }
+
+            if (_timerUpdateTexture > 0)
+            {
+                _timerUpdateTexture -= Time.deltaTime;
+            }
+            else
+            {
+                UpdateTexture();
+                _timerUpdateTexture = 1f / UpdateTexturePerSecond;
             }
 
 
