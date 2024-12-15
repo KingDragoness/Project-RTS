@@ -7,7 +7,7 @@ Shader "Syntios/SyntiosTerrain"
     Properties
     {
         _SplatMap("Splatmap (RGB)", 2D) = "black" {}
-        _FOWMap("Fog of War (Ever Explored)", 2D) = "black" {}
+        //_FOWMap("Fog of War (Ever Explored)", 2D) = "black" {}
         _GroundTexture("Ground Texture", 2D) = "white" {}
         _CloudFog("Cloud Fog Pattern", 2D) = "black" {}
         _UnexploredFog("Unexplored Fog Color", Color) = (0.1,0.1,0.1,1)
@@ -80,7 +80,7 @@ Shader "Syntios/SyntiosTerrain"
             #include "AutoLight.cginc"
  
             sampler2D _SplatMap;
-            sampler2D _FOWMap;
+            uniform sampler2D _FOWMap;
             sampler2D _GroundTexture;
             sampler2D _CloudFog;
             uniform float4 _UnexploredFog;

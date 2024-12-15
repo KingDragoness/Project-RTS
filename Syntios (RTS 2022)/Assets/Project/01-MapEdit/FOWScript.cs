@@ -539,7 +539,8 @@ namespace ProtoRTS
 
         public void SetTerrainTexture(FOWMap fowMapTarget)
         {
-            Map.instance.Material.SetTexture("_FOWMap", fowMapTarget.nextTargetTexture);
+            //Map.instance.Material.SetTexture("_FOWMap", fowMapTarget.nextTargetTexture);
+            Shader.SetGlobalTexture("_FOWMap", fowMapTarget.nextTargetTexture);
         }
 
         public Vector2Int WorldPosToMapPixel(Vector3 worldPos)
