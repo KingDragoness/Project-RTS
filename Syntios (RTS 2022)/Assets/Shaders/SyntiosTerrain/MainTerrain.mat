@@ -23,6 +23,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BlankSampler:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -108,7 +112,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SplatMap:
-        m_Texture: {fileID: 2800000, guid: a8ca96011ff6757418fd01535d4f78b4, type: 3}
+        m_Texture: {fileID: 2800000, guid: f68bb03186bff0d4792bbfd726d9275a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SplatMap2:
@@ -171,7 +175,11 @@ Material:
     - _PrioB: 1
     - _PrioC: 1
     - _PrioD: 1
+    - _PrioE: 0.01
+    - _PrioF: 1
+    - _PrioG: 1
     - _PrioGround: 1
+    - _PrioH: 1
     - _RimPower: 5
     - _Shininess: 15
     - _SmoothnessTextureChannel: 0
