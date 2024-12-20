@@ -21,7 +21,7 @@ namespace ProtoRTS
 
 
         [DisableInEditorMode] [SerializeField] private Material generatedTerrainMaterial;
-
+        private Transform terrainParent;
 
         /// <summary>
         /// Retrieve the generated material terrain shader.
@@ -56,8 +56,8 @@ namespace ProtoRTS
         private void Awake()
         {
             instance = this;
-
-
+            terrainParent = new GameObject().transform;
+            terrainParent.gameObject.name = "TerrainMesh";
         }
 
         private void Start()
@@ -118,6 +118,17 @@ namespace ProtoRTS
         }
 
 
+        #region Generate Terrain
+
+        [FoldoutGroup("DEBUG")]
+        [Button("Update terrain map")]
+
+        public void UpdateTerrainMap()
+        {
+
+        }
+
+        #endregion
 
 
         private void Update()

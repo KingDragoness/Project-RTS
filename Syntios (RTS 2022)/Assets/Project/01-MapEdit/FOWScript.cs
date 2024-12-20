@@ -330,6 +330,7 @@ namespace ProtoRTS
         [Space]
         [Header("References")]
         public List<FOWMap> allFOWMaps = new List<FOWMap>();
+        public Texture2D texture2d_WhiteFOW;
         public int UpdateTexturePerSecond = 30;
         public int UpdateFOWPerSecond = 10;
 
@@ -389,14 +390,20 @@ namespace ProtoRTS
 
         private void UpdateTexture()
         {
-            SetTerrainTexture(GetFOW(SyntiosEngine.CurrentFaction));
-
-            foreach (var fowMap in allFOWMaps)
+            if (SyntiosEngine.Instance.CurrentGamemode == Gamemode.Game)
             {
-                fowMap.GenerateTexture();
-            }
+                SetTerrainTexture(GetFOW(SyntiosEngine.CurrentFaction));
 
-          
+                foreach (var fowMap in allFOWMaps)
+                {
+                    fowMap.GenerateTexture();
+                }
+            }
+            else if (SyntiosEngine.Instance.CurrentGamemode == Gamemode.MapEdit)
+            {
+                Shader.SetGlobalTexture("_FOWMap", texture2d_WhiteFOW);
+
+            }
         }
 
         private void UpdateFOW()

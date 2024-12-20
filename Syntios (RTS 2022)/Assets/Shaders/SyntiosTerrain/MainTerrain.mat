@@ -19,7 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
-  m_LockedProperties: 
+  m_LockedProperties: _TextureF
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -79,6 +79,22 @@ Material:
         m_Texture: {fileID: 2800000, guid: 6162ad0e8e30ec6488a5f3fe2cbb0d01, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _NormalMapE:
+        m_Texture: {fileID: 2800000, guid: ba7c2a2ba82ee9f438dcdb6e415b37f8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMapF:
+        m_Texture: {fileID: 2800000, guid: d93a2f296e8af2a4ea3c7e8d50f181a1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMapG:
+        m_Texture: {fileID: 2800000, guid: 6162ad0e8e30ec6488a5f3fe2cbb0d01, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMapH:
+        m_Texture: {fileID: 2800000, guid: a4414ab975e6f5d41bded65f82390a5d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -93,6 +109,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _SplatMap:
         m_Texture: {fileID: 2800000, guid: a8ca96011ff6757418fd01535d4f78b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SplatMap2:
+        m_Texture: {fileID: 2800000, guid: b66eb40dae0fb804390522ba5d35cedb, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureA:
@@ -112,25 +132,25 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureE:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: d52c669556f288c40b01a3ec754c281c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureF:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: a2f0be70f9b33964abeaeb3f229be5b9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureG:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: a45fb4f83c7869a40b892a483d953318, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureH:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 6ec76ac714077a24c82031ab94fd72f6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _AlbedoPower: 3
-    - _BorderMap: 10
+    - _BorderMap: 14
     - _BumpDepth: 0.58
     - _BumpScale: 1
     - _ContrastCloud: 0.35

@@ -52682,6 +52682,11 @@ PrefabInstance:
       propertyPath: CurrentFaction
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2307484776730257944, guid: a77010b9b4facd643b4df1aaba37396c,
+        type: 3}
+      propertyPath: CurrentGamemode
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3481285380138300693, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: m_Name

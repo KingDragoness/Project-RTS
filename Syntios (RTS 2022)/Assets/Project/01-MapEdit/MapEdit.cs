@@ -9,6 +9,8 @@ namespace ProtoRTS.MapEditor
 {
 	
 
+
+	//MapEdit modifies terrain. To refresh terrain use Map.cs
 	public class MapEdit : MonoBehaviour
 	{
 
