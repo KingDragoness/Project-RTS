@@ -14,18 +14,20 @@ namespace ProtoRTS
 		//256 * 256 = 65.536
 		[Range(32, 256)] public int size_x = 64;
 		[Range(32, 256)] public int size_y = 64;
-		public sbyte[] cliffLevel; //-128 to 128 (only -8 to 8 used)
-        public byte[] heightVariation; //0 to 255
-		public byte[] fogOfWar;
-		public bool[] manmadeCliffs;
-		public byte[] terrain_layer1;
-		public byte[] terrain_layer2;
-		public byte[] terrain_layer3;
-		public byte[] terrain_layer4;
-		public byte[] terrain_layer5;
-		public byte[] terrain_layer6;
-		public byte[] terrain_layer7;
-		public byte[] terrain_layer8;
+		[FoldoutGroup("Arrays")] public sbyte[] cliffLevel; //-128 to 128 (only -8 to 8 used)
+		[FoldoutGroup("Arrays")] public byte[] heightVariation; //0 to 255
+		[FoldoutGroup("Arrays")] public byte[] fogOfWar;
+		[FoldoutGroup("Arrays")] public bool[] manmadeCliffs;
+		[FoldoutGroup("Arrays")] public byte[] terrain_layer1;
+		[FoldoutGroup("Arrays")] public byte[] terrain_layer2;
+		[FoldoutGroup("Arrays")] public byte[] terrain_layer3;
+		[FoldoutGroup("Arrays")] public byte[] terrain_layer4;
+		[FoldoutGroup("Arrays")] public byte[] terrain_layer5;
+		[FoldoutGroup("Arrays")] public byte[] terrain_layer6;
+		[FoldoutGroup("Arrays")] public byte[] terrain_layer7;
+		[FoldoutGroup("Arrays")] public byte[] terrain_layer8;
+		[FoldoutGroup("DEBUG")] public Color32 DEBUG_TargetColor1;
+		[FoldoutGroup("DEBUG")] public Color32 DEBUG_TargetColor2;
 
 		public int TotalLength
         {
@@ -38,6 +40,18 @@ namespace ProtoRTS
 					throw new System.Exception("Size is too big!");
                 }
 				return length; 
+			}
+        }
+
+
+		//4 times size
+		//(every splatmap is 1k texture / 1 million pixels)
+		public int SplatmapLength
+        {
+            get
+            {
+				return (256 * 4) * (256 * 4);
+
 			}
         }
 
@@ -66,14 +80,14 @@ namespace ProtoRTS
 			heightVariation = new byte[TotalLength];
 			fogOfWar = new byte[TotalLength * 4];
 			manmadeCliffs = new bool[TotalLength];
-			terrain_layer1 = new byte[TotalLength];
-			terrain_layer2 = new byte[TotalLength];
-			terrain_layer3 = new byte[TotalLength];
-			terrain_layer4 = new byte[TotalLength];
-			terrain_layer5 = new byte[TotalLength];
-			terrain_layer6 = new byte[TotalLength];
-			terrain_layer7 = new byte[TotalLength];
-			terrain_layer8 = new byte[TotalLength];
+			terrain_layer1 = new byte[SplatmapLength]; //splat r
+			terrain_layer2 = new byte[SplatmapLength]; //splat g
+			terrain_layer3 = new byte[SplatmapLength]; //splat b
+			terrain_layer4 = new byte[SplatmapLength]; //splat a
+			terrain_layer5 = new byte[SplatmapLength]; //splat2 r
+			terrain_layer6 = new byte[SplatmapLength]; //splat2 g
+			terrain_layer7 = new byte[SplatmapLength]; //splat2 b
+			terrain_layer8 = new byte[SplatmapLength]; //splat2 a
 
 		}
 
@@ -81,6 +95,11 @@ namespace ProtoRTS
 		[Button("Randomized Data")]
 		public void RandomizedData()
 		{
+			if (cliffLevel.Length <= 2)
+            {
+				InitializeData();
+			}
+
 			for(int x = 0; x < cliffLevel.Length; x++)
             {
 				cliffLevel[x] = (sbyte)Random.Range(0, sbyte.MaxValue);
@@ -93,49 +112,84 @@ namespace ProtoRTS
 
 			//modifies terrain layers
 			{
-				for (int x = 0; x < terrain_layer1.Length; x++)
-				{
-					terrain_layer1[x] = (byte)Random.Range(0, byte.MaxValue);
-				}
+				int perLayerLength = terrain_layer1.Length / 8;
 
-				for (int x = 0; x < terrain_layer2.Length; x++)
-				{
-					terrain_layer2[x] = (byte)Random.Range(0, byte.MaxValue);
-				}
+				//for (int x = 0; x < perLayerLength; x++)
+				//{
+				//	terrain_layer1[x] = 255;		
+				//}
 
-				for (int x = 0; x < terrain_layer3.Length; x++)
-				{
-					terrain_layer3[x] = (byte)Random.Range(0, byte.MaxValue);
-				}
+				//for (int x = perLayerLength; x < perLayerLength * 2; x++)
+				//{
+				//	terrain_layer2[x] = 255;
+				//}
 
-				for (int x = 0; x < terrain_layer4.Length; x++)
-				{
-					terrain_layer4[x] = (byte)Random.Range(0, byte.MaxValue);
-				}
+				//for (int x = perLayerLength * 2; x < perLayerLength * 3; x++)
+				//{
+				//	terrain_layer3[x] = 255;
+				//}
 
-				for (int x = 0; x < terrain_layer5.Length; x++)
-				{
-					terrain_layer5[x] = (byte)Random.Range(0, byte.MaxValue);
-				}
+				//for (int x = perLayerLength * 3; x < perLayerLength * 4; x++)
+				//{
+				//	terrain_layer4[x] = 255;
+				//}
 
-				for (int x = 0; x < terrain_layer6.Length; x++)
-				{
-					terrain_layer6[x] = (byte)Random.Range(0, byte.MaxValue);
-				}
+				//for (int x = perLayerLength * 4; x < perLayerLength * 5; x++)
+				//{
+				//	terrain_layer5[x] = 255;
+				//}
 
-				for (int x = 0; x < terrain_layer7.Length; x++)
-				{
-					terrain_layer7[x] = (byte)Random.Range(0, byte.MaxValue);
-				}
+				//for (int x = perLayerLength * 5; x < perLayerLength * 6; x++)
+				//{
+				//	terrain_layer6[x] = 255;
+				//}
+
+				//for (int x = perLayerLength * 6; x < perLayerLength * 7; x++)
+				//{
+				//	terrain_layer7[x] = 255;
+				//}
+
+				//for (int x = perLayerLength * 7; x < terrain_layer8.Length; x++)
+				//{
+				//	terrain_layer8[x] = 255;
+				//}
+			}
+
+			//test all colors paint
+			{
+				Color32 c1 = new Color32();
+				Color32 c2 = new Color32();
+				c1.r = (byte)(DEBUG_TargetColor1.r);
+				c1.g = (byte)(DEBUG_TargetColor1.g);
+				c1.b = (byte)(DEBUG_TargetColor1.b);
+				c1.a = (byte)(DEBUG_TargetColor1.a);
+				c2.r = (byte)(DEBUG_TargetColor2.r);
+				c2.g = (byte)(DEBUG_TargetColor2.g );
+				c2.b = (byte)(DEBUG_TargetColor2.b );
+				c2.a = (byte)(DEBUG_TargetColor2.a );
+
 
 				for (int x = 0; x < terrain_layer8.Length; x++)
-				{
-					terrain_layer8[x] = (byte)Random.Range(0, byte.MaxValue);
+                {			
+					terrain_layer1[x] = c1.r;
+					terrain_layer2[x] = c1.g;
+					terrain_layer3[x] = c1.b;
+					terrain_layer4[x] = c1.a;
+					terrain_layer5[x] = c2.r;
+					terrain_layer6[x] = c2.g;
+					terrain_layer7[x] = c2.b;
+					terrain_layer8[x] = c2.a;
+
 				}
+
+				Debug.Log($"{c1} / {c2}");
+
 			}
 
 
 		}
+
+
 
 		public void SaveMapData()
         {

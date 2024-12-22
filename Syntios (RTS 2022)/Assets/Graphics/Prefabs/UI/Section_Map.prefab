@@ -596,7 +596,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 255, y: 255}
+  m_SizeDelta: {x: 245, y: 245}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1282859282190201059
 CanvasRenderer:
@@ -1257,7 +1257,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 1, y: 0}
-  m_SizeDelta: {x: 306, y: 288}
+  m_SizeDelta: {x: 296, y: 276}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &7196200859678352359
 CanvasRenderer:
@@ -1322,7 +1322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b443b1d581a40a0438e02deb86cbc9bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultMinimapLength: 255
+  defaultMinimapLength: 245
   offset: {x: -16, y: -16}
   ui_Map: {fileID: 1818760570483986249}
   ui_OriginMinimap: {fileID: 4242291800469043898}

@@ -331,5 +331,13 @@ public static class FactoryUtilities
     {
         return Mathf.RoundToInt(f);
     }
+    public static Vector3Int ToInt(this Vector3 v)
+    {
+        Vector3Int vi = new Vector3Int();
+        vi.x = Mathf.RoundToInt(v.x);
+        vi.y = Mathf.RoundToInt(v.y);
+        vi.z = Mathf.RoundToInt(v.z);
 
+        return vi;
+    }
 }

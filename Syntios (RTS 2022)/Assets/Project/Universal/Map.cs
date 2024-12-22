@@ -93,6 +93,7 @@ namespace ProtoRTS
         private void InitializeMap()
         {
             GenerateMaterial();
+            _terrainData.InitializeData();
             DEBUG_MeshTerrain.material = generatedTerrainMaterial;
         }
 
@@ -102,8 +103,11 @@ namespace ProtoRTS
             generatedTerrainMaterial = new Material(_sourceTerrainMat);
             generatedTerrainMaterial.name = "GeneratedTerrainMat";
             var textureSplatTest = _sourceTerrainMat.GetTexture("_SplatMap");
+            var textureSplatTest2 = _sourceTerrainMat.GetTexture("_SplatMap2");
 
-            generatedTerrainMaterial.SetTexture("_SplatMap", textureSplatTest);
+            Shader.SetGlobalTexture("_SplatMap", textureSplatTest);
+            Shader.SetGlobalTexture("_SplatMap2", textureSplatTest2);
+
             generatedTerrainMaterial.SetTexture("_GroundTexture", MyPreset.ground);
             generatedTerrainMaterial.SetTexture("_TextureA", MyPreset.layer1);
             generatedTerrainMaterial.SetTexture("_TextureB", MyPreset.layer2);
@@ -120,11 +124,64 @@ namespace ProtoRTS
 
         #region Generate Terrain
 
+        public static void UpdateTerrainMap()
+        {
+            instance._updateTerrainMap();
+        }
+
+        private Texture2D generatedSplatmap;
+        private Texture2D generatedSplatmap2;
+
         [FoldoutGroup("DEBUG")]
         [Button("Update terrain map")]
 
-        public void UpdateTerrainMap()
+        //Very expensive operation, avoid this at all cost
+        private void _updateTerrainMap()
         {
+            if (generatedSplatmap == null)
+            {
+                generatedSplatmap = new Texture2D(256 * 4, 256 * 4, TextureFormat.RGBA32, false);
+                Shader.SetGlobalTexture("_SplatMap", generatedSplatmap);
+            }
+            if (generatedSplatmap2 == null)
+            {
+                generatedSplatmap2 = new Texture2D(256 * 4, 256 * 4, TextureFormat.RGBA32, false);
+                Shader.SetGlobalTexture("_SplatMap2", generatedSplatmap2);
+            }
+
+            Color32[] color_splat1 = new Color32[_terrainData.SplatmapLength];
+            Color32[] color_splat2 = new Color32[_terrainData.SplatmapLength];
+
+            byte r1;
+            byte g1;
+            byte b1;
+            byte a1;
+            byte r2;
+            byte g2;
+            byte b2;
+            byte a2;
+
+            for (int x = 0; x < _terrainData.SplatmapLength; x++)
+            {
+                r1 = _terrainData.terrain_layer1[x];
+                g1 = _terrainData.terrain_layer2[x];
+                b1 = _terrainData.terrain_layer3[x];
+                a1 = _terrainData.terrain_layer4[x];
+                r2 = _terrainData.terrain_layer5[x];
+                g2 = _terrainData.terrain_layer6[x];
+                b2 = _terrainData.terrain_layer7[x];
+                a2 = _terrainData.terrain_layer8[x];
+
+                color_splat1[x] = new Color32(r1, g1, b1, a1);
+                color_splat2[x] = new Color32(r2, g2, b2, a2);
+
+            }
+
+            generatedSplatmap.SetPixels32(color_splat1);
+            generatedSplatmap2.SetPixels32(color_splat2);
+            generatedSplatmap.Apply();
+            generatedSplatmap2.Apply();
+
 
         }
 

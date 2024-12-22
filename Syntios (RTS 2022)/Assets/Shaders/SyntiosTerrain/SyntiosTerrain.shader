@@ -4,8 +4,8 @@ Shader "Syntios/SyntiosTerrain"
 {
     Properties
     {
-        _SplatMap("Splatmap (g,1,2,3,4)", 2D) = "black" {}
-        _SplatMap2("Splatmap (5,6,7,8)", 2D) = "black" {}
+        //_SplatMap("Splatmap (g,1,2,3,4)", 2D) = "black" {}
+        //_SplatMap2("Splatmap (5,6,7,8)", 2D) = "black" {}
 
         //_FOWMap("Fog of War (Ever Explored)", 2D) = "black" {}
         _GroundTexture("Ground Texture", 2D) = "white" {}
@@ -46,10 +46,10 @@ Shader "Syntios/SyntiosTerrain"
         _PrioB("Prio layer2", Range(0.01, 2.0)) = 1
         _PrioC("Prio layer3", Range(0.01, 2.0)) = 1
         _PrioD("Prio layer4", Range(0.01, 2.0)) = 1
-        _PrioE("Prio layer1", Range(0.01, 2.0)) = 1
-        _PrioF("Prio layer2", Range(0.01, 2.0)) = 1
-        _PrioG("Prio layer3", Range(0.01, 2.0)) = 1
-        _PrioH("Prio layer4", Range(0.01, 2.0)) = 1
+        _PrioE("Prio layer5", Range(0.01, 2.0)) = 1
+        _PrioF("Prio layer6", Range(0.01, 2.0)) = 1
+        _PrioG("Prio layer7", Range(0.01, 2.0)) = 1
+        _PrioH("Prio layer8", Range(0.01, 2.0)) = 1
         _ContrastCloud("Cloud Contrast", Range(0.001, 1.0)) = 0.01
         _Depth("Depth", Range(0.01,1.0)) = 0.2
 
@@ -91,8 +91,8 @@ Shader "Syntios/SyntiosTerrain"
         #include "UnityLightingCommon.cginc"
         #include "AutoLight.cginc"
 
-        Texture2D _SplatMap;
-        Texture2D _SplatMap2;
+        uniform Texture2D _SplatMap;
+        uniform Texture2D _SplatMap2;
         Texture2D _CloudFog;
         uniform Texture2D _FOWMap;
         SamplerState sampler_SplatMap;
@@ -303,10 +303,12 @@ Shader "Syntios/SyntiosTerrain"
             fixed4 materialAmounts2 = _SplatMap2.Sample(sampler_SplatMap, IN.uvSplat).argb; // tex2D(_SplatMap, IN.uvSplat).argb;
 
             // the ground amount takes up all unused space
-            fixed groundAmount = 1.0 - min(1.0, materialAmounts.r + materialAmounts.g + materialAmounts.b + materialAmounts.a +
+            fixed groundAmount = 1.0 - min(1.0, 
+                materialAmounts.r + materialAmounts.g + materialAmounts.b + materialAmounts.a +
                 materialAmounts2.r + materialAmounts2.g + materialAmounts2.b + materialAmounts2.a);
 
-            // calculate material strenghts
+            // calculate material strengths / getting the highest point of a texture
+            // alphaMaterials are all "alpha channel"
             fixed alphaGround = groundAmount * _PrioGround * groundHeight;
             fixed4 alphaMaterials = materialAmounts * IN.materialPrios * materialHeights;
             fixed4 alphaMaterials2 = materialAmounts2 * IN.materialPrios2 * materialHeightsb;
