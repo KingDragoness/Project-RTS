@@ -72,6 +72,16 @@ namespace ProtoRTS
 			return x + (size_x * y);
 		}
 
+		public int GetSplatmapIndex(int x, int y)
+		{
+			if (x > size_x * 4) return 0;
+			if (y > size_y * 4) return 0;
+			if (x < 0) return 0;
+			if (y < 0) return 0;
+
+			return x + (1024 * y);
+		}
+
 		[FoldoutGroup("DEBUG")]
 		[Button("Initialize Data")]
 		public void InitializeData()
@@ -189,6 +199,80 @@ namespace ProtoRTS
 
 		}
 
+		public void SetTerrainLayer(int layer, int index, float targetStrength)
+        {
+			if (layer == 0)
+			{
+				terrain_layer1[index] = (byte)targetStrength;
+			}
+			if (layer == 1)
+			{
+				terrain_layer2[index] = (byte)targetStrength;
+			}
+			if (layer == 2)
+			{
+				terrain_layer3[index] = (byte)targetStrength;
+			}
+			if (layer == 3)
+			{
+				terrain_layer4[index] = (byte)targetStrength;
+			}
+			if (layer == 4)
+			{
+				terrain_layer5[index] = (byte)targetStrength;
+			}
+			if (layer == 5)
+			{
+				terrain_layer6[index] = (byte)targetStrength;
+			}
+			if (layer == 6)
+			{
+				terrain_layer7[index] = (byte)targetStrength;
+			}
+			if (layer == 7)
+			{
+				terrain_layer8[index] = (byte)targetStrength;
+			}
+		}
+
+
+		public byte GetTerrainLayer_str(int layer, int index)
+        {
+			if (layer == 0)
+			{
+				return terrain_layer1[index];
+			}
+			if (layer == 1)
+			{
+				return terrain_layer2[index];
+			}
+			if (layer == 2)
+			{
+				return terrain_layer3[index];
+			}
+			if (layer == 3)
+			{
+				return terrain_layer4[index];
+			}
+			if (layer == 4)
+			{
+				return terrain_layer5[index];
+			}
+			if (layer == 5)
+			{
+				return terrain_layer6[index];
+			}
+			if (layer == 6)
+			{
+				return terrain_layer7[index];
+			}
+			if (layer == 7)
+			{
+				return terrain_layer8[index];
+			}
+
+			return 0;
+		}
 
 
 		public void SaveMapData()

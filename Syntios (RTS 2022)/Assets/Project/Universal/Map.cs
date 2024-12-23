@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Collections;
 using Sirenix.OdinInspector;
 using Pathfinding;
+using ReadOnlyAttribute = Sirenix.OdinInspector.ReadOnlyAttribute;
 
 namespace ProtoRTS
 {
@@ -22,6 +23,10 @@ namespace ProtoRTS
 
         [DisableInEditorMode] [SerializeField] private Material generatedTerrainMaterial;
         private Transform terrainParent;
+        [SerializeField] [ReadOnly] private Texture2D generatedSplatmap;
+        [SerializeField] [ReadOnly] private Texture2D generatedSplatmap2;
+        private Color32[] color_splat1 = new Color32[0];
+        private Color32[] color_splat2 = new Color32[0];
 
         /// <summary>
         /// Retrieve the generated material terrain shader.
@@ -129,8 +134,12 @@ namespace ProtoRTS
             instance._updateTerrainMap();
         }
 
-        private Texture2D generatedSplatmap;
-        private Texture2D generatedSplatmap2;
+        public static void PartialUpdateTerrainMap(int x, int y, int width, int length)
+        {
+            instance._partialUpdateMap(x,y,width,length);
+        }
+
+
 
         [FoldoutGroup("DEBUG")]
         [Button("Update terrain map")]
@@ -149,8 +158,11 @@ namespace ProtoRTS
                 Shader.SetGlobalTexture("_SplatMap2", generatedSplatmap2);
             }
 
-            Color32[] color_splat1 = new Color32[_terrainData.SplatmapLength];
-            Color32[] color_splat2 = new Color32[_terrainData.SplatmapLength];
+            if (color_splat1.Length != _terrainData.SplatmapLength)
+            {
+                color_splat1 = new Color32[_terrainData.SplatmapLength];
+                color_splat2 = new Color32[_terrainData.SplatmapLength];
+            }
 
             byte r1;
             byte g1;
@@ -183,6 +195,61 @@ namespace ProtoRTS
             generatedSplatmap2.Apply();
 
 
+        }
+
+        private void _partialUpdateMap(int x, int y, int width, int length)
+        {
+            if (generatedSplatmap == null)
+            {
+                _updateTerrainMap();
+                Debug.LogError("splatmap not yet generated! Generating splat...");
+                return;
+            }
+
+            int lengthArr = width * length;
+
+            color_splat1 = generatedSplatmap.GetPixels32();
+            color_splat2 = generatedSplatmap2.GetPixels32();
+
+            byte r1;
+            byte g1;
+            byte b1;
+            byte a1;
+            byte r2;
+            byte g2;
+            byte b2;
+            byte a2;
+
+            for (int x1 = 0; x1 < width * 2; x1++)
+            {
+
+                for (int y1 = 0; y1 < length * 2; y1++)
+                {
+                    int index = _terrainData.GetSplatmapIndex(x,y) + _terrainData.GetSplatmapIndex(x1, y1);
+
+                    if (index < 0) continue;
+                    if (index >= _terrainData.SplatmapLength) continue;
+
+
+                    r1 = _terrainData.terrain_layer1[index];
+                    g1 = _terrainData.terrain_layer2[index];
+                    b1 = _terrainData.terrain_layer3[index];
+                    a1 = _terrainData.terrain_layer4[index];
+                    r2 = _terrainData.terrain_layer5[index];
+                    g2 = _terrainData.terrain_layer6[index];
+                    b2 = _terrainData.terrain_layer7[index];
+                    a2 = _terrainData.terrain_layer8[index];
+
+                    color_splat1[index] = new Color32(r1, g1, b1, a1);
+                    color_splat2[index] = new Color32(r2, g2, b2, a2);
+                }
+
+            }
+
+            generatedSplatmap.SetPixels32(color_splat1);
+            generatedSplatmap2.SetPixels32(color_splat2);
+            generatedSplatmap.Apply();
+            generatedSplatmap2.Apply();
         }
 
         #endregion

@@ -2207,9 +2207,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 878cbd42bc7aae64db332533204913e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brushSize: 2
+  brushes: []
+  hardness: 0.9
+  clampOpacity: 255
+  brushSize: 8
   refreshRate: 30
-  brushCurrent: 1
+  brushCurrent: 2
+  isMaskByDistance: 0
+  circle_cutoff: 150
+  brushStrength: 45
   brushProjector: {fileID: 600833228}
   DEBUG_originBrush: {fileID: 2109102731}
   projector: {fileID: 600833229}
