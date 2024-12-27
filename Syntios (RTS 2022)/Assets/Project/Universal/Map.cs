@@ -15,6 +15,7 @@ namespace ProtoRTS
 		[Space]
         [SerializeField] private SyntiosTerrainData _terrainData;
 
+        public bool DEBUG_dontInitializeData;
         [FoldoutGroup("References")] public AstarPath aStarPath;
         [FoldoutGroup("References")] public MeshRenderer DEBUG_MeshTerrain;
         [FoldoutGroup("References")] [SerializeField] private Shader terrainShader;
@@ -98,7 +99,7 @@ namespace ProtoRTS
         private void InitializeMap()
         {
             GenerateMaterial();
-            _terrainData.InitializeData();
+            if (DEBUG_dontInitializeData == false) _terrainData.InitializeData();
             DEBUG_MeshTerrain.material = generatedTerrainMaterial;
         }
 

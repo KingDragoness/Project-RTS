@@ -5,10 +5,19 @@ using Sirenix.OdinInspector;
 
 namespace ProtoRTS.MapEditor
 {
-	public class MapToolScript : MonoBehaviour
+
+
+	public abstract class MapToolScript : MonoBehaviour
 	{
 
-		
+		public MapToolBrush Brush;
+
+		public abstract string GetBrushName();
+
+		public virtual void OnDisable()
+		{
+			Brush.DisableBrush();
+		}
 
 	}
 }

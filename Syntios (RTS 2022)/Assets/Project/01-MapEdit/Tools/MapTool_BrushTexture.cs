@@ -7,41 +7,64 @@ namespace ProtoRTS.MapEditor
 {
     public class MapTool_BrushTexture : MapToolScript
     {
+        
+        public enum Operation
+        {
+            None,
+            Add,
+            Subtract,
+            Uniform
+        }
 
         /// <summary>
         /// Minimum 256 x 256
         /// 
         /// </summary>
         public Texture2D[] brushes;
+        public Operation currentOperation;
 
         [Range(0f,1f)] public float hardness = 0.9f;
         [Range(0, 255)] public int clampOpacity = 200;
         [Range(2, 32)] public int brushSize = 4;
         public int refreshRate = 5;
         [Range(-1,7)] public int brushCurrent = -1;
-        
+        [Range(5, 128)] public int brushStrength = 45;
+
         [FoldoutGroup("Circle Draw")] public bool isMaskByDistance = false; //mouse
         [FoldoutGroup("Circle Draw")] public int circle_cutoff = 30;
-        [FoldoutGroup("Circle Draw")] public int brushStrength = 45;
 
-        [Header("References")]
-        public Transform brushProjector;
-        public Transform DEBUG_originBrush;
-        public Projector projector;
 
-        private Vector3 brushPosition = new Vector3();
+   
         private float _refreshTime = 1f;
+        private bool _allowMouseToEdit = false;
 
         private void Update()
         {
             _refreshTime -= Time.deltaTime;
-            projector.orthographicSize = brushSize / 2f;
 
-            Update_BrushProjector();
+            if (currentOperation != Operation.None)
+            {
+                Brush.EnableBrush();
+            }
+            else
+            {
+                Brush.DisableBrush();
+            }
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (MainUI.GetEventSystemRaycastResults().Count == 0)
+                {
+                    _allowMouseToEdit = true;
+                }
+                else
+                    _allowMouseToEdit = false;
+            }
 
             if (_refreshTime <= 0f)
             {
-                if (Input.GetMouseButton(0) && MainUI.GetEventSystemRaycastResults().Count == 0)
+                if (Input.GetMouseButton(0) && _allowMouseToEdit
+                    && currentOperation != Operation.None)
                 {
                     Update_BrushingTexture();
                 }
@@ -53,22 +76,20 @@ namespace ProtoRTS.MapEditor
             {
                 Map.UpdateTerrainMap();
             }
-        }
 
-        private void Update_BrushProjector()
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(ray, out hit, 100))
+            if (isMaskByDistance)
             {
-                Vector3 pos = hit.point;
-                pos.y = 50f;
-
-                brushPosition = hit.point;
-                brushProjector.transform.position = pos;
+                Brush.targetShape = MapToolBrush.Shape.Circle;
+                Brush.targetBrushSize = brushSize * 0.75f;
             }
+            else
+            {
+                Brush.targetShape = MapToolBrush.Shape.Square;
+                Brush.targetBrushSize = brushSize;
+            }
+
         }
+
 
 
         private void Update_BrushingTexture()
@@ -78,12 +99,11 @@ namespace ProtoRTS.MapEditor
             int pixelWidthBrush = brushSize * 2;
             int totalLength = (brushSize * 2) * (brushSize * 2);
             float halfSize = brushSize / 2f;
-            Vector3 posOrigin = brushPosition - new Vector3(halfSize, 0, halfSize);
-            Vector2Int pixelPosCenter = WorldPosToPixelPos(brushPosition);
+            Vector3 posOrigin = Brush.BrushPosition - new Vector3(halfSize, 0, halfSize);
+            Vector2Int pixelPosCenter = WorldPosToPixelPos(Brush.BrushPosition);
             Vector2Int pixelPosOrigin = new Vector2Int();
 
             pixelPosOrigin = WorldPosToPixelPos(posOrigin);
-            DEBUG_originBrush.transform.position = posOrigin;
 
             int countDebug = 0;
 
@@ -141,7 +161,7 @@ namespace ProtoRTS.MapEditor
             //Map.TerrainData.terrain_layer7[currentIndex] = 0;
             //Map.TerrainData.terrain_layer8[currentIndex] = 0;
 
-            float delta = 10 + (brushStrength / refreshRate);
+            float delta = 10 + (brushStrength * 2 / refreshRate);
             float current = Map.TerrainData.GetTerrainLayer_str(brush, currentIndex);
             float target = Map.TerrainData.GetTerrainLayer_str(brush, currentIndex) + strength;
 
@@ -158,15 +178,18 @@ namespace ProtoRTS.MapEditor
             f = Mathf.Clamp(f, 0, clampOpacity);
 
             //everything else reduce opacity
-            if (f >= clampOpacity / 2f)
+            if (f >= clampOpacity)
             {
                 for(int x = 0; x < 8; x++)
                 {
-                    if (x == brush) continue;
+                    if (x == brush)
+                    {
+                        continue;
+                    }
                     float f2 = Map.TerrainData.GetTerrainLayer_str(x, currentIndex);
 
-                    f2 -= delta;
-                    f2 = Mathf.Clamp(f2, 0, clampOpacity);
+                    f2 -= (brushStrength * 2 / refreshRate);
+                    f2 = Mathf.Clamp(f2, 0, 255);
                     Map.TerrainData.SetTerrainLayer(x, currentIndex, f2);
 
                 }
@@ -209,6 +232,11 @@ namespace ProtoRTS.MapEditor
         {
             int index = (pos.y * 1024) + (pos.x);
             return index;
+        }
+
+        public override string GetBrushName()
+        {
+            return "Texture";
         }
     }
 

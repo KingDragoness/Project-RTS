@@ -299,8 +299,8 @@ Shader "Syntios/SyntiosTerrain"
             materialHeightsb = max(0.0001, materialHeightsb);
 
             // get material amounts from splatmap
-            fixed4 materialAmounts = _SplatMap.Sample(sampler_SplatMap, IN.uvSplat).argb; // tex2D(_SplatMap, IN.uvSplat).argb;
-            fixed4 materialAmounts2 = _SplatMap2.Sample(sampler_SplatMap, IN.uvSplat).argb; // tex2D(_SplatMap, IN.uvSplat).argb;
+            fixed4 materialAmounts = _SplatMap.Sample(sampler_SplatMap, IN.uvSplat).rgba; // tex2D(_SplatMap, IN.uvSplat).argb;
+            fixed4 materialAmounts2 = _SplatMap2.Sample(sampler_SplatMap, IN.uvSplat).rgba; // tex2D(_SplatMap, IN.uvSplat).argb;
 
             // the ground amount takes up all unused space
             fixed groundAmount = 1.0 - min(1.0, 

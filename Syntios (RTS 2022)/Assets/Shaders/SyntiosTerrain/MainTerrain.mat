@@ -159,7 +159,7 @@ Material:
     - _BumpScale: 1
     - _ContrastCloud: 0.35
     - _Cutoff: 0.5
-    - _Depth: 0.5
+    - _Depth: 0.57
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _FOWSampleRadiusBlur: 0.001
@@ -171,7 +171,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _PrioA: 0.5
+    - _PrioA: 1
     - _PrioB: 1
     - _PrioC: 1
     - _PrioD: 1

@@ -288,7 +288,32 @@ namespace ProtoRTS
             {
                 if (unit.stat_faction != SyntiosEngine.CurrentFaction) continue;
 
+                var upRad = unit.transform.position + Vector3.forward * unit.Class.Radius;
+                var downRad = unit.transform.position + -Vector3.forward * unit.Class.Radius;
+                var leftRad = unit.transform.position + -Vector3.right * unit.Class.Radius;
+                var rightRad = unit.transform.position + Vector3.right * unit.Class.Radius;
+
                 if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
+                {
+                    Selection.SelectUnit(unit);
+                    unit.SelectedUnit(circleOutline_Green.transform);
+                }
+                else if (rect.Contains(myCam.WorldToScreenPoint(upRad)))
+                {
+                    Selection.SelectUnit(unit);
+                    unit.SelectedUnit(circleOutline_Green.transform);
+                }
+                else if (rect.Contains(myCam.WorldToScreenPoint(downRad)))
+                {
+                    Selection.SelectUnit(unit);
+                    unit.SelectedUnit(circleOutline_Green.transform);
+                }
+                else if (rect.Contains(myCam.WorldToScreenPoint(leftRad)))
+                {
+                    Selection.SelectUnit(unit);
+                    unit.SelectedUnit(circleOutline_Green.transform);
+                }
+                else if (rect.Contains(myCam.WorldToScreenPoint(rightRad)))
                 {
                     Selection.SelectUnit(unit);
                     unit.SelectedUnit(circleOutline_Green.transform);
