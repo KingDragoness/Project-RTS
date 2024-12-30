@@ -30,3 +30,20 @@ MonoBehaviour:
   layer7: {fileID: 2800000, guid: 0d9823b57c108444c8663e25d18cc64e, type: 3}
   layer8_name: Earth Concrete
   layer8: {fileID: 2800000, guid: bbbfdf12c7fa43c48b5fecfde5ed821d, type: 3}
+  manmadeCliffs:
+  - {fileID: 2818572044666443437, guid: a128785418cf80942aa25a1b7f2f3789, type: 3}
+  - {fileID: 6976830663521611413, guid: 6fc51e58cb7a54d468efdfa7ab5c03bd, type: 3}
+  - {fileID: 8798819560200276634, guid: 64da4df973d3f2047966d3cde866415a, type: 3}
+  - {fileID: 918124403514232763, guid: eefe43f21785986459cc30a919f21100, type: 3}
+  - {fileID: 3094280191230153322, guid: 8094ad188ab29bd418a550a4b6058aa6, type: 3}
+  - {fileID: 372034074144971281, guid: d274f186ef9095043b3a4ed9eed0c146, type: 3}
+  - {fileID: 5670655035066638029, guid: bfc7465e30953744ab5483270f9e4855, type: 3}
+  - {fileID: 7667830383796347647, guid: 85dbec1b5cb86e240bf0858489bcdeff, type: 3}
+  - {fileID: 7184860274134409882, guid: 2b876b5272e0d734a9ad53553adf3882, type: 3}
+  - {fileID: 7296384343978023454, guid: beafd1b921d11914881254c398eae15b, type: 3}
+  - {fileID: 282712208750429372, guid: d5386c49751d0ec4793be1255582cbe3, type: 3}
+  - {fileID: 2938879142146369305, guid: da26e1c9a12b90b4f94c387cb86bcfeb, type: 3}
+  - {fileID: 462820149733609648, guid: e9e2d9cbd2f5cd0419d0d73ce63d349a, type: 3}
+  - {fileID: 4892625721245932557, guid: a6ccf3a2457110f49b871ec57dbbb160, type: 3}
+  - {fileID: 3322267142006155482, guid: f9df300367601324bb54cb2f6f77da38, type: 3}
+  naturalCliffs: []

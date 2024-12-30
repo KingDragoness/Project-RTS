@@ -28,12 +28,20 @@ namespace ProtoRTS.MapEditor
 		[FoldoutGroup("Brush: Texture/Settings")] public Slider slider_Texture_BrushSize;
 		[FoldoutGroup("Brush: Texture/Settings")] public Slider slider_Texture_BrushStrength;
 
+		[FoldoutGroup("Brush: Cliffs")] public Text label_CliffsOperation;
+		[FoldoutGroup("Brush: Cliffs")] public GameObject uiPanel_Cliffs;
+		[FoldoutGroup("Brush: Cliffs")] public GameObject uiPanel_Cliffs_brushSettings;
+		[FoldoutGroup("Brush: Cliffs")] public Toggle tg_Cliffs_Raise;
+		[FoldoutGroup("Brush: Cliffs")] public Toggle tg_Cliffs_Lower;
+		[FoldoutGroup("Brush: Cliffs")] public Toggle tg_Cliffs_SameLevel;
 
 
 		private void Start()
 		{
 			uiPanel_Texture.gameObject.SetActive(false);
+			uiPanel_Cliffs.gameObject.SetActive(false);
 			uiPanel_Texture_brushSettings.gameObject.SetActive(false);
+			uiPanel_Cliffs_brushSettings.gameObject.SetActive(false);
 			Texture_CreateButtonLayers();
 		}
 
@@ -84,6 +92,7 @@ namespace ProtoRTS.MapEditor
 			else if (tg_Cliffs.isOn)
 			{
 				SwitchBrush(2);
+				Running_CliffsBrush();
 			}
             else
             {
@@ -101,11 +110,19 @@ namespace ProtoRTS.MapEditor
 			if (type == 1)
             {
 				uiPanel_Texture.gameObject.SetActive(true);
+				uiPanel_Cliffs.gameObject.SetActive(false);
 			}
-            else
+			else if (type == 2)
+			{
+				uiPanel_Texture.gameObject.SetActive(false);
+				uiPanel_Cliffs.gameObject.SetActive(true);
+			}
+			else
             {
 				uiPanel_Texture.gameObject.SetActive(false);
 				uiPanel_Texture_brushSettings.gameObject.SetActive(false);
+				uiPanel_Cliffs.gameObject.SetActive(false);
+				uiPanel_Cliffs_brushSettings.gameObject.SetActive(false);
 			}
 		}
 
@@ -173,6 +190,31 @@ namespace ProtoRTS.MapEditor
 
 			}
 
+		}
+
+		private void Running_CliffsBrush()
+		{
+			if (MapEdit.instance.CurrentBrush != MapEdit.instance.BrushCliffs) return; //mismatched
+			var preset = Map.instance.MyPreset;
+
+			label_CliffsOperation.text = $"<b>Operation:</b> {MapEdit.instance.BrushCliffs.currentOperation.ToString()}";
+
+			if (tg_Cliffs_Raise.isOn)
+			{
+				MapEdit.instance.BrushCliffs.currentOperation = MapTool_Cliffs.Operation.Raise;
+			}
+			else if (tg_Cliffs_Lower.isOn)
+			{
+				MapEdit.instance.BrushCliffs.currentOperation = MapTool_Cliffs.Operation.Lower;
+			}
+			else if (tg_Cliffs_SameLevel.isOn)
+			{
+				MapEdit.instance.BrushCliffs.currentOperation = MapTool_Cliffs.Operation.SameLevel;
+			}
+			else
+			{
+				MapEdit.instance.BrushCliffs.currentOperation = MapTool_Cliffs.Operation.None;
+			}
 		}
 
 		public int GetIndexToggle(List<Toggle> allToggles)

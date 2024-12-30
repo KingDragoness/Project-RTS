@@ -10,22 +10,40 @@ namespace ProtoRTS
 	public class SyntiosTerrainData
 	{
 
+		public enum DirectionNeighbor
+        {
+			North,
+			South,
+			West,
+			East,
+			NorthEast,
+			NorthWest,
+			SouthEast,
+			SouthWest
+        }
+
 		public string ID = "Earth";
 		//256 * 256 = 65.536
 		[Range(32, 256)] public int size_x = 64;
 		[Range(32, 256)] public int size_y = 64;
-		[FoldoutGroup("Arrays")] public sbyte[] cliffLevel; //-128 to 128 (only -8 to 8 used)
-		[FoldoutGroup("Arrays")] public byte[] heightVariation; //0 to 255
-		[FoldoutGroup("Arrays")] public byte[] fogOfWar;
-		[FoldoutGroup("Arrays")] public bool[] manmadeCliffs;
-		[FoldoutGroup("Arrays")] public byte[] terrain_layer1;
-		[FoldoutGroup("Arrays")] public byte[] terrain_layer2;
-		[FoldoutGroup("Arrays")] public byte[] terrain_layer3;
-		[FoldoutGroup("Arrays")] public byte[] terrain_layer4;
-		[FoldoutGroup("Arrays")] public byte[] terrain_layer5;
-		[FoldoutGroup("Arrays")] public byte[] terrain_layer6;
-		[FoldoutGroup("Arrays")] public byte[] terrain_layer7;
-		[FoldoutGroup("Arrays")] public byte[] terrain_layer8;
+
+		// [000000] 00 (using first 6 bit to store cliff heights: 64 heights)
+		//  000000 [00] (last 2 bit to store what type of cliffs: 4 cliff types)
+		// wait there's bool array of manmadeCliffs
+
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public sbyte[] cliffLevel;
+
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] heightVariation; //0 to 255
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] fogOfWar;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public bool[] manmadeCliffs;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] terrain_layer1;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] terrain_layer2;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] terrain_layer3;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] terrain_layer4;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] terrain_layer5;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] terrain_layer6;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] terrain_layer7;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] terrain_layer8;
 		[FoldoutGroup("DEBUG")] public Color32 DEBUG_TargetColor1;
 		[FoldoutGroup("DEBUG")] public Color32 DEBUG_TargetColor2;
 
@@ -101,6 +119,24 @@ namespace ProtoRTS
 
 		}
 
+		[FoldoutGroup("DEBUG")]
+		[Button("ClearArrays Data")]
+		public void ClearArrays()
+        {
+			cliffLevel = new sbyte[1];
+			heightVariation = new byte[1];
+			fogOfWar = new byte[1];
+			manmadeCliffs = new bool[1];
+			terrain_layer1 = new byte[1]; //splat r
+			terrain_layer2 = new byte[1]; //splat g
+			terrain_layer3 = new byte[1]; //splat b
+			terrain_layer4 = new byte[1]; //splat a
+			terrain_layer5 = new byte[1]; //splat2 r
+			terrain_layer6 = new byte[1]; //splat2 g
+			terrain_layer7 = new byte[1]; //splat2 b
+			terrain_layer8 = new byte[1]; //splat2 a
+		}
+
 		[FoldoutGroup("DEBUG")] 
 		[Button("Randomized Data")]
 		public void RandomizedData()
@@ -112,7 +148,7 @@ namespace ProtoRTS
 
 			for(int x = 0; x < cliffLevel.Length; x++)
             {
-				cliffLevel[x] = (sbyte)Random.Range(0, sbyte.MaxValue);
+				cliffLevel[x] = 0;
 			}
 
 			for (int x = 0; x < heightVariation.Length; x++)
@@ -196,8 +232,153 @@ namespace ProtoRTS
 
 			}
 
+            {
+				for (int i = 0; i < TotalLength; i++)
+				{
+					int x = i % size_x;
+					int y = i / size_y;
+
+					if (i == 1000 | i == 1024 | i == 1025 | i == 1026)
+                    {
+						cliffLevel[i] = 1;
+                    }
+					if ((x == 15) && (y >= 11 | y <= 20))
+					{
+						cliffLevel[i] = 1;
+					}
+
+					if (x < 14 | x > 30) continue;
+					if (y < 30 | y > 32) continue;
+
+					cliffLevel[i] = 1;
+
+
+				}
+			}
+
 
 		}
+
+		public bool IsNeighborValid(DirectionNeighbor dir, Vector2Int origin)
+        {
+			Vector2Int offsetPos = new Vector2Int(0, 1);
+
+			if (dir == DirectionNeighbor.North)
+            {
+				offsetPos = new Vector2Int(0, 1);
+			}
+			else if (dir == DirectionNeighbor.South)
+			{
+				offsetPos = new Vector2Int(0, -1);
+			}
+			else if (dir == DirectionNeighbor.West)
+			{
+				offsetPos = new Vector2Int(-1, 0);
+			}
+			else if (dir == DirectionNeighbor.East)
+			{
+				offsetPos = new Vector2Int(1, 0);
+			}
+			else if(dir == DirectionNeighbor.NorthEast)
+			{
+				offsetPos = new Vector2Int(1, 1);
+			}
+			else if (dir == DirectionNeighbor.NorthWest)
+			{
+				offsetPos = new Vector2Int(-1, 1);
+			}
+			else if (dir == DirectionNeighbor.SouthEast)
+			{
+				offsetPos = new Vector2Int(1, -1);
+			}
+			else if (dir == DirectionNeighbor.SouthWest)
+			{
+				offsetPos = new Vector2Int(-1, -1);
+			}
+
+
+			if ((origin + offsetPos).x >= size_x |
+			(origin + offsetPos).x < 0 |
+			(origin + offsetPos).y >= size_y |
+			(origin + offsetPos).y < 0)
+			{
+				return false;
+			}
+			else
+			{
+				int offIndex = GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y);
+				int index = GetIndex(origin.x, origin.y);
+
+				if (cliffLevel[index] == cliffLevel[offIndex])
+				{
+					return true;
+                }
+			}
+
+			return false;
+		}
+
+		public Vector2Int[] GetValidNeighbors(Vector2Int origin)
+		{
+			int length = 0;
+			Vector2Int offsetPos1 = new Vector2Int(0, 0);
+			Vector2Int offsetPos2 = new Vector2Int(1, 0);
+			Vector2Int offsetPos3 = new Vector2Int(0, 1);
+			Vector2Int offsetPos4 = new Vector2Int(1, 1);
+
+			List<Vector2Int> myPosArray = new List<Vector2Int>();
+
+			if ((origin + offsetPos1).x >= size_x |
+				(origin + offsetPos1).x < 0 |
+				(origin + offsetPos1).y >= size_y |
+				(origin + offsetPos1).y < 0)
+			{
+
+			}
+			else
+			{
+				myPosArray.Add(origin + offsetPos1);
+			}
+
+			if ((origin + offsetPos2).x >= size_x |
+			  (origin + offsetPos2).x < 0 |
+			  (origin + offsetPos2).y >= size_y |
+			  (origin + offsetPos2).y < 0)
+			{
+
+			}
+			else
+			{
+				myPosArray.Add(origin + offsetPos2);
+			}
+
+			if ((origin + offsetPos3).x >= size_x |
+			  (origin + offsetPos3).x < 0 |
+			  (origin + offsetPos3).y >= size_y |
+			  (origin + offsetPos3).y < 0)
+			{
+
+			}
+			else
+			{
+				myPosArray.Add(origin + offsetPos3);
+			}
+
+			if ((origin + offsetPos4).x >= size_x |
+			  (origin + offsetPos4).x < 0 |
+			  (origin + offsetPos4).y >= size_y |
+			  (origin + offsetPos4).y < 0)
+			{
+
+			}
+			else
+			{
+				myPosArray.Add(origin + offsetPos4);
+			}
+
+			return myPosArray.ToArray();
+		}
+
 
 		public void SetTerrainLayer(int layer, int index, float targetStrength)
         {

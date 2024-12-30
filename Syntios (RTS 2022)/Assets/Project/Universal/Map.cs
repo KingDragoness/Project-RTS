@@ -28,6 +28,7 @@ namespace ProtoRTS
         [SerializeField] [ReadOnly] private Texture2D generatedSplatmap2;
         private Color32[] color_splat1 = new Color32[0];
         private Color32[] color_splat2 = new Color32[0];
+        private List<GameObject> allCliffObjects = new List<GameObject>();
 
         /// <summary>
         /// Retrieve the generated material terrain shader.
@@ -71,15 +72,15 @@ namespace ProtoRTS
             InitializeMap();
 
             var gridGraph = AstarPath.active.data.gridGraph;
-            int width = (_terrainData.size_x * 2) / 3;
-            int depth = (_terrainData.size_y * 2) / 3;
+            int width = (_terrainData.size_x * 2) / 2;
+            int depth = (_terrainData.size_y * 2) / 2;
             width -= 2;
             depth -= 2;
             var center = WorldPosCenter;
-            center.x += 1 * 3;
-            center.z += 0 * 3;
+            center.x += 1 * 2;
+            center.z += 0 * 2;
 
-            gridGraph.SetDimensions(width, depth, 3);
+            gridGraph.SetDimensions(width, depth, 2);
             gridGraph.center = center;
 
             AstarPath.active.Scan(gridGraph);
@@ -252,6 +253,238 @@ namespace ProtoRTS
             generatedSplatmap.Apply();
             generatedSplatmap2.Apply();
         }
+
+
+        public bool DEBUG_SeeCliff = false;
+
+        [FoldoutGroup("DEBUG")]
+        [Button("UpdateCliffMap")]
+
+        public void UpdateCliffMap()
+        {
+            foreach(var cliffObj in allCliffObjects)
+            {
+                Destroy(cliffObj.gameObject);
+            }
+
+            allCliffObjects.Clear();
+
+            Dictionary<Vector2Int, GameObject> vd3 = new Dictionary<Vector2Int, GameObject>();
+            Vector2Int[] offsetCoords = new Vector2Int[4]
+            {
+                new Vector2Int(0, 0),
+                new Vector2Int(1, 0),
+                new Vector2Int(0, 1),
+                new Vector2Int(1, 1)
+            };
+            Vector2Int offsetPos1 = new Vector2Int(0, 0);
+            Vector2Int offsetPos2 = new Vector2Int(1, 0);
+            Vector2Int offsetPos3 = new Vector2Int(0, 1);
+            Vector2Int offsetPos4 = new Vector2Int(1, 1);
+
+            for (int i = 0; i < _terrainData.cliffLevel.Length; i++)
+            {
+                int x = i % _terrainData.size_x;
+                int y = i / _terrainData.size_y;
+
+                if (_terrainData.cliffLevel[i] < 1) continue;
+
+                Vector2Int myPos = new Vector2Int(x, y);
+
+                Vector2Int[] myPosArray = new Vector2Int[4]
+                {
+                    myPos + offsetPos1,
+                    myPos + offsetPos2,
+                    myPos + offsetPos3,
+                    myPos + offsetPos4
+                };
+
+                //check type
+                bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
+                bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);
+                bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos);
+                bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos);
+                bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
+                bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
+                bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
+                bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
+
+
+                int indexDir = 0;
+
+                //atlas coord
+                foreach (var coord in myPosArray)
+                {
+                    GameObject instantiated = null;
+                    SO_TerrainPreset.Tileset tilesetTarget = SO_TerrainPreset.Tileset.Null;
+
+                    //southwest correct
+                    //norteast correct
+
+                    if (indexDir == 2)
+                    {
+                        if (!west && !northwest && !north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.CornerNorthWest;
+                        }
+
+                        if (west && !northwest && !north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.North;
+                        }
+
+                        if (!west && !northwest && north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.West;
+                        }
+
+                        if (west && !northwest && north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerNorthWest;
+                        }
+
+                        if (!west && northwest && !north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.DiagonalWest;
+                        }
+
+                        if (west && northwest && north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.Flat;
+                        }
+                    }
+                    else if (indexDir == 3)
+                    {
+                        if (!east && !northeast && !north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.CornerNorthEast;
+                        }
+
+                        if (east && !northeast && !north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.North;
+                        }
+
+                        if (!east && !northeast && north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.East;
+                        }
+
+                        if (east && !northeast && north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerNorthEast;
+                        }
+
+                        if (!east && northeast && !north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.DiagonalEast;
+                        }
+
+                        if (east && northeast && north)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.Flat;
+                        }
+                    }
+                    else if (indexDir == 1)
+                    {
+                        if (!east && !southeast && !south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.CornerSouthEast;
+                        }
+
+                        if (east && !southeast && !south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.South;
+                        }
+
+                        if (!east && !southeast && south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.East;
+                        }
+
+                        if (east && !southeast && south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerSouthEast;
+                        }
+
+                        if (!east && southeast && !south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.DiagonalEast;
+                        }
+
+                        if (east && southeast && south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.Flat;
+                        }
+                    }
+                    else if (indexDir == 0)
+                    {
+                        if (!west && !southwest && !south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.CornerSouthWest;
+                        }
+
+                        if (west && !southwest && !south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.South;
+                        }
+
+                        if (!west && !southwest && south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.West;
+                        }
+
+                        if (west && !southwest && south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerSouthWest;
+                        }
+
+                        if (!west && southwest && !south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.DiagonalWest;
+                        }
+
+                        if (west && southwest && south)
+                        {
+                            tilesetTarget = SO_TerrainPreset.Tileset.Flat;
+                        }
+                    }
+
+                    Vector3 worldPos = new Vector3();
+                    worldPos.x = (coord.x * 2) + 1;
+                    worldPos.y = _terrainData.cliffLevel[i] * 2;
+                    worldPos.z = (coord.y * 2) + 1;
+
+                    if (vd3.ContainsKey(coord))
+                    {
+                        //instantiated = Instantiate(MyPreset.GetManmadeCliff(tilesetTarget));
+                        //instantiated.transform.position = worldPos;
+                        //vd3[coord] = instantiated;
+                    }
+                    else
+                    {
+                        var template = MyPreset.GetManmadeCliff(tilesetTarget);
+
+                        if (template != null)
+                        {
+                            instantiated = Instantiate(template);
+                            instantiated.transform.position = worldPos;
+                            vd3.Add(coord, instantiated);
+                        }
+                        
+                    }
+
+                    allCliffObjects.Add(instantiated);
+
+                    indexDir++;
+                }
+
+            }
+
+            Debug.Log(allCliffObjects.Count);
+        }
+
+
 
         #endregion
 
