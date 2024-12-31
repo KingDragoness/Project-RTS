@@ -341,7 +341,7 @@ namespace ProtoRTS
         private float _timerUpdateFOW = 0.1f;
         private static FOWScript Instance;
 
-        public static sbyte[] GetHeightmap
+        public static byte[] GetHeightmap
         {
             get
             {

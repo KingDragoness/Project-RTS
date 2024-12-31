@@ -21,8 +21,19 @@ namespace ProtoRTS.MapEditor
 		/// </summary>
 		public Texture2D[] brushes;
 		public Operation currentOperation;
+
 		public bool isManmade = true;
-		[Range(2, 32)] public int brushSize = 4;
+		[Range(0f, 1f)] public float hardness = 0.9f;
+		[Range(1, 32)] public int brushSize = 4;
+		[Range(5, 128)] public int brushStrength = 45;
+		public int refreshRate = 5;
+
+		public bool isMaskByDistance = false;
+		public int circle_cutoff = 30;
+
+
+		private float _refreshTime = 1f;
+		private bool _allowMouseToEdit = false;
 
 
 		private void Start()
@@ -32,9 +43,147 @@ namespace ProtoRTS.MapEditor
 
 		private void Update()
 		{
-			
+			_refreshTime -= Time.deltaTime;
+
+			if (currentOperation != Operation.None)
+			{
+				Brush.EnableBrush();
+			}
+			else
+			{
+				Brush.DisableBrush();
+			}
+
+
+			if (Input.GetMouseButtonDown(0))
+			{
+				if (MainUI.GetEventSystemRaycastResults().Count == 0)
+				{
+					_allowMouseToEdit = true;
+				}
+				else
+					_allowMouseToEdit = false;
+			}
+
+			if (_refreshTime <= 0f)
+			{
+				if (Input.GetMouseButton(0) && _allowMouseToEdit
+					&& currentOperation != Operation.None)
+				{
+					Update_BrushingCliff();
+				}
+
+				_refreshTime = 1f / refreshRate;
+			}
+
+			if (Input.GetMouseButtonUp(0))
+			{
+				//Map.UpdateTerrainMap();
+				Map.instance.UpdateCliffMap();
+			}
+
+
+			if (isMaskByDistance)
+			{
+				Brush.targetShape = MapToolBrush.Shape.Circle;
+				Brush.targetBrushSize = brushSize * 3f;
+			}
+			else
+			{
+				Brush.targetShape = MapToolBrush.Shape.Square;
+				Brush.targetBrushSize = brushSize * 4;
+			}
 		}
-		
+
+		private void Update_BrushingCliff()
+		{
+			int pixelWidthBrush = brushSize;
+			int totalLength = (brushSize) * (brushSize);
+			float halfSize = brushSize / 2f;
+			Vector3 posOrigin = Brush.BrushPosition - new Vector3(halfSize, 0, halfSize);
+			Vector2Int pixelPosCenter = WorldPosToCliffmapPos(Brush.BrushPosition);
+			Vector2Int pixelPosOrigin = new Vector2Int();
+
+			pixelPosOrigin = WorldPosToCliffmapPos(posOrigin);
+
+			int countDebug = 0;
+
+			//Debug.Log($"Size: {totalLength} | {pixelPosOrigin}");
+			//Debug.Log($"Cliffmap origin: {pixelPosOrigin} | worldOrigin: {posOrigin}");
+
+
+			for (int i = 0; i < totalLength; i++)
+			{
+				int x = i % pixelWidthBrush;
+				int y = Mathf.FloorToInt(i / pixelWidthBrush);
+				Vector2Int pixelPos = new Vector2Int(pixelPosOrigin.x, pixelPosOrigin.y);
+
+				if (halfSize >= 1)
+				{
+					pixelPos.x -= halfSize.ToInt();
+					pixelPos.y -= halfSize.ToInt();
+				}
+				else
+                {
+					pixelPos.x -= 1;
+					pixelPos.y -= 1;
+				}
+			
+				pixelPos.x += x;
+				pixelPos.y += y;
+
+				if (pixelPos.x >= Map.TerrainData.size_x) continue;
+				if (pixelPos.x < 0) continue;
+				if (pixelPos.y >= Map.TerrainData.size_y) continue;
+				if (pixelPos.y < 0) continue;
+
+				int currentIndex = HeightmapPosToIndex(pixelPos);
+				byte strength_i = 255;
+
+				if (isMaskByDistance)
+				{
+					Vector2Int midPosLocal = new Vector2Int(pixelPosCenter.x, pixelPosCenter.y);
+					float dist = Vector2Int.Distance(pixelPos, midPosLocal);
+					float widthBrush_f = (float)brushSize;
+					float cLength = (widthBrush_f * widthBrush_f) + (widthBrush_f * widthBrush_f);
+					cLength = Mathf.Sqrt(cLength);
+
+					float rawValue = dist / (float)widthBrush_f;
+					rawValue = 1 - rawValue;
+					rawValue *= hardness;
+					rawValue *= 255f;
+					rawValue = Mathf.Clamp(rawValue, 0, 255);
+					if (rawValue < circle_cutoff) rawValue = 0f; //CUT OFF
+					strength_i = (byte)rawValue;
+				}
+
+				countDebug++;
+
+				if (currentOperation == Operation.Raise)
+                {
+					BrushCliff(currentIndex, 1);
+				}
+                else if (currentOperation == Operation.Lower)
+                {
+					BrushCliff(currentIndex, 0);
+				}
+
+			}
+
+			Map.instance.UpdateCliffMap();
+			//Map.instance.UpdateCliffMap(pixelPosOrigin.x, pixelPosOrigin.y, pixelWidthBrush, pixelWidthBrush);
+
+		}
+
+		public void BrushCliff(int currentIndex, byte height)
+		{
+
+			Map.TerrainData.cliffLevel[currentIndex] = height;
+
+
+
+		}
+
 		private void OnEnable()
 		{
 			

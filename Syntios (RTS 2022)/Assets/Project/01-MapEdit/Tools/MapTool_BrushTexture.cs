@@ -30,8 +30,8 @@ namespace ProtoRTS.MapEditor
         [Range(-1,7)] public int brushCurrent = -1;
         [Range(5, 128)] public int brushStrength = 45;
 
-        [FoldoutGroup("Circle Draw")] public bool isMaskByDistance = false; //mouse
-        [FoldoutGroup("Circle Draw")] public int circle_cutoff = 30;
+        public bool isMaskByDistance = false;
+        public int circle_cutoff = 30;
 
 
    
@@ -219,20 +219,7 @@ namespace ProtoRTS.MapEditor
 
         }
 
-        public Vector2Int WorldPosToPixelPos(Vector3 worldPos)
-        {
-            Vector2Int pos_1 = new Vector2Int();
-            pos_1.x = Mathf.RoundToInt(worldPos.x * 2);
-            pos_1.y = Mathf.RoundToInt(worldPos.z * 2);
 
-            return pos_1;
-        }
-
-        public int PixelPosToIndex(Vector2Int pos)
-        {
-            int index = (pos.y * 1024) + (pos.x);
-            return index;
-        }
 
         public override string GetBrushName()
         {

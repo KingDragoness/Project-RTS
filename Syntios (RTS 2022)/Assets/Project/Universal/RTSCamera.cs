@@ -137,7 +137,7 @@ namespace ProtoRTS
                 }
 
                 Vector3 pos = transform.position;
-                pos.y = y_position / 2f;
+                pos.y = y_position / 1.6f;
 
                 //if (pos.y >= 8) pos.y = 8f;
 

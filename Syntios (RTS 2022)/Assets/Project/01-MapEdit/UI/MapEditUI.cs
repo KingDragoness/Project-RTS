@@ -34,7 +34,10 @@ namespace ProtoRTS.MapEditor
 		[FoldoutGroup("Brush: Cliffs")] public Toggle tg_Cliffs_Raise;
 		[FoldoutGroup("Brush: Cliffs")] public Toggle tg_Cliffs_Lower;
 		[FoldoutGroup("Brush: Cliffs")] public Toggle tg_Cliffs_SameLevel;
-
+		[FoldoutGroup("Brush: Cliffs/Settings")] public Toggle tg_Cliffs_Shape_Circle;
+		[FoldoutGroup("Brush: Cliffs/Settings")] public Toggle tg_Cliffs_Shape_Rect;
+		[FoldoutGroup("Brush: Cliffs/Settings")] public Toggle tg_Cliffs_Shape_Diagonal;
+		[FoldoutGroup("Brush: Cliffs/Settings")] public Slider slider_Cliffs_BrushSize;
 
 		private void Start()
 		{
@@ -111,11 +114,14 @@ namespace ProtoRTS.MapEditor
             {
 				uiPanel_Texture.gameObject.SetActive(true);
 				uiPanel_Cliffs.gameObject.SetActive(false);
+				uiPanel_Cliffs_brushSettings.gameObject.SetActive(false);
+
 			}
 			else if (type == 2)
 			{
 				uiPanel_Texture.gameObject.SetActive(false);
 				uiPanel_Cliffs.gameObject.SetActive(true);
+				uiPanel_Texture_brushSettings.gameObject.SetActive(false);
 			}
 			else
             {
@@ -214,6 +220,34 @@ namespace ProtoRTS.MapEditor
 			else
 			{
 				MapEdit.instance.BrushCliffs.currentOperation = MapTool_Cliffs.Operation.None;
+			}
+
+
+			if (MapEdit.instance.BrushCliffs.currentOperation == MapTool_Cliffs.Operation.None)
+			{
+				uiPanel_Cliffs_brushSettings.gameObject.SetActive(false);
+			}
+			else
+			{
+				label_Texture_Layer.text = $"<b>Layer:</b>";
+				uiPanel_Cliffs_brushSettings.gameObject.SetActive(true);
+
+				//shape
+				{
+					if (tg_Cliffs_Shape_Circle.isOn)
+					{
+						MapEdit.instance.BrushCliffs.isMaskByDistance = true;
+
+					}
+					else if (tg_Cliffs_Shape_Rect.isOn)
+					{
+						MapEdit.instance.BrushCliffs.isMaskByDistance = false;
+
+					}
+				}
+
+				MapEdit.instance.BrushCliffs.brushSize = slider_Cliffs_BrushSize.value.ToInt();
+
 			}
 		}
 

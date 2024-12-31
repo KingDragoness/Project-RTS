@@ -31,7 +31,7 @@ namespace ProtoRTS
 		//  000000 [00] (last 2 bit to store what type of cliffs: 4 cliff types)
 		// wait there's bool array of manmadeCliffs
 
-		[HideInEditorMode] [FoldoutGroup("Arrays")] public sbyte[] cliffLevel;
+		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] cliffLevel;
 
 		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] heightVariation; //0 to 255
 		[HideInEditorMode] [FoldoutGroup("Arrays")] public byte[] fogOfWar;
@@ -104,7 +104,7 @@ namespace ProtoRTS
 		[Button("Initialize Data")]
 		public void InitializeData()
         {
-			cliffLevel = new sbyte[TotalLength];
+			cliffLevel = new byte[TotalLength];
 			heightVariation = new byte[TotalLength];
 			fogOfWar = new byte[TotalLength * 4];
 			manmadeCliffs = new bool[TotalLength];
@@ -123,7 +123,7 @@ namespace ProtoRTS
 		[Button("ClearArrays Data")]
 		public void ClearArrays()
         {
-			cliffLevel = new sbyte[1];
+			cliffLevel = new byte[1];
 			heightVariation = new byte[1];
 			fogOfWar = new byte[1];
 			manmadeCliffs = new bool[1];
