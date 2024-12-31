@@ -30,6 +30,8 @@ namespace ProtoRTS.MapEditor
 
 		public bool isMaskByDistance = false;
 		public int circle_cutoff = 30;
+		[FoldoutGroup("DEBUG")] public GameObject DEBUG_start;
+		[FoldoutGroup("DEBUG")] public GameObject DEBUG_end;
 
 
 		private float _refreshTime = 1f;
@@ -79,7 +81,7 @@ namespace ProtoRTS.MapEditor
 			if (Input.GetMouseButtonUp(0))
 			{
 				//Map.UpdateTerrainMap();
-				Map.instance.UpdateCliffMap();
+				//Map.instance.UpdateCliffMap();
 			}
 
 
@@ -100,16 +102,15 @@ namespace ProtoRTS.MapEditor
 			int pixelWidthBrush = brushSize;
 			int totalLength = (brushSize) * (brushSize);
 			float halfSize = brushSize / 2f;
-			Vector3 posOrigin = Brush.BrushPosition - new Vector3(halfSize, 0, halfSize);
+			Vector3 posOrigin = Brush.BrushPosition - new Vector3(halfSize / 2f, 0, halfSize / 2f);
 			Vector2Int pixelPosCenter = WorldPosToCliffmapPos(Brush.BrushPosition);
-			Vector2Int pixelPosOrigin = new Vector2Int();
+			Vector2Int pixelPosOrigin = WorldPosToCliffmapPos(posOrigin);
 
-			pixelPosOrigin = WorldPosToCliffmapPos(posOrigin);
 
 			int countDebug = 0;
 
 			//Debug.Log($"Size: {totalLength} | {pixelPosOrigin}");
-			//Debug.Log($"Cliffmap origin: {pixelPosOrigin} | worldOrigin: {posOrigin}");
+			Debug.Log($"Cliffmap origin: {pixelPosOrigin} | worldOrigin: {posOrigin}");
 
 
 			for (int i = 0; i < totalLength; i++)
@@ -170,8 +171,26 @@ namespace ProtoRTS.MapEditor
 
 			}
 
-			Map.instance.UpdateCliffMap();
-			//Map.instance.UpdateCliffMap(pixelPosOrigin.x, pixelPosOrigin.y, pixelWidthBrush, pixelWidthBrush);
+
+
+            //Map.instance.UpdateCliffMap();
+
+            {
+				//bigger refresh
+				int refreshRadius = ((brushSize + 2) * 2) + 4;
+				float refresh_halfSize = refreshRadius / 2f;
+				Vector3 refreshPosOrigin_v3 = Brush.BrushPosition - new Vector3(refresh_halfSize, 0, refresh_halfSize);
+				Vector3 refreshPosCenter = Brush.BrushPosition;
+				Vector2Int refreshPosOrigin = WorldPosToCliffmapPos(refreshPosOrigin_v3);
+
+
+				Map.instance.UpdateCliffMap(refreshPosOrigin.x, refreshPosOrigin.y, refreshRadius, refreshRadius);
+				//Debug.Log($"Origin: {refreshPosOrigin}  Center: {refreshPosCenter}  | radius: {refreshRadius}  | halfsize: {refresh_halfSize}");
+
+				DEBUG_start.transform.position = refreshPosOrigin_v3;
+				DEBUG_end.transform.position = refreshPosOrigin_v3 + new Vector3(refreshRadius,0,refreshRadius);
+
+			}
 
 		}
 

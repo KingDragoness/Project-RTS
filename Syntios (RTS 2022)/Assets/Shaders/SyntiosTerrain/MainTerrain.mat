@@ -154,7 +154,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlbedoPower: 3
-    - _BorderMap: 14
+    - _BorderMap: 4
     - _BumpDepth: 0.58
     - _BumpScale: 1
     - _ContrastCloud: 0.35

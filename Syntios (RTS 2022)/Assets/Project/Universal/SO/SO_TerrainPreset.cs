@@ -199,11 +199,11 @@ namespace ProtoRTS
 			}
 			else if (dir == Tileset.DiagonalEast)
 			{
-				return manmadeCliffs[1];
+				return manmadeCliffs[7];
 			}
 			else if (dir == Tileset.DiagonalWest)
 			{
-				return manmadeCliffs[7];
+				return manmadeCliffs[1];
 			}
 			else if (dir == Tileset.SharpCornerNorthWest)
 			{

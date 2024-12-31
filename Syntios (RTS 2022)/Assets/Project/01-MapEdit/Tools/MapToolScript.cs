@@ -29,7 +29,7 @@ namespace ProtoRTS.MapEditor
 			return pos_1;
 		}
 
-		public Vector2Int WorldPosToCliffmapPos(Vector3 worldPos)
+		public static Vector2Int WorldPosToCliffmapPos(Vector3 worldPos)
 		{
 			Vector2Int pos_1 = new Vector2Int();
 			pos_1.x = Mathf.RoundToInt(worldPos.x / 2);

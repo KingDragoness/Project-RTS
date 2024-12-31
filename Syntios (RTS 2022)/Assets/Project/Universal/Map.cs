@@ -276,26 +276,31 @@ namespace ProtoRTS
             Vector2Int offsetPos3 = new Vector2Int(0, 1);
             Vector2Int offsetPos4 = new Vector2Int(1, 1);
 
+            startX = Mathf.Clamp(startX, 0, _terrainData.size_x);
+            startY = Mathf.Clamp(startY, 0, _terrainData.size_y);
+
             int startingIndex = _terrainData.GetIndex(startX, startY);
             int finalIndex = _terrainData.cliffLevel.Length;
 
-            int boxEndX = Mathf.Clamp(startX + width, startX, _terrainData.size_x);
-            int boxEndY = Mathf.Clamp(startY + height, startY, _terrainData.size_y);
+            int boxEndX = Mathf.Clamp(startX + width, 0, _terrainData.size_x);
+            int boxEndY = Mathf.Clamp(startY + height, 0, _terrainData.size_y);
 
 
             if (width < 255 && height < 255) finalIndex = _terrainData.GetIndex(boxEndX, boxEndY);
             finalIndex = Mathf.Clamp(finalIndex, 0, _terrainData.TotalLength);
 
             {
-                foreach (var cliffObj in cliffObjects)
-                {
-                    if (cliffObj != null) Destroy(cliffObj.gameObject);
-                }
+                //foreach (var cliffObj in vd3)
+                //{
+                //    if (cliffObj.Value != null) Destroy(cliffObj.Value.gameObject);
+                //}
 
-                vd3.Clear();
-                cliffObjects.Clear();
+                //vd3.Clear();
+                //cliffObjects.Clear();
 
             }
+
+            //Debug.Log($"{startX}, {startY} | ({boxEndX}, {boxEndY})");
 
             int indexToPrintDebug = Random.Range(startingIndex, finalIndex);
 
@@ -352,12 +357,17 @@ namespace ProtoRTS
                     {
                         if (vd3.ContainsKey(coord))
                         {
-                            
+                            Destroy(vd3[coord].gameObject);
+                            instantiated = Instantiate(template);
+                            instantiated.transform.position = worldPos;
+                            instantiated.gameObject.name = $"Tile_{coord}";
+                            vd3[coord] = instantiated;
                         }
                         else
                         {
                             instantiated = Instantiate(template);
                             instantiated.transform.position = worldPos;
+                            instantiated.gameObject.name = $"Tile_{coord}";
                             vd3.Add(coord, instantiated);
                             cliffObjects.Add(instantiated);
                         }
@@ -365,7 +375,7 @@ namespace ProtoRTS
                     }
                     else
                     {
-                      
+
                     }
 
 

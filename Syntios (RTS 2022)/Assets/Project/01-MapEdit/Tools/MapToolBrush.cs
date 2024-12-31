@@ -30,6 +30,14 @@ namespace ProtoRTS.MapEditor
         public Vector3 BrushPosition { get => brushPosition; set => brushPosition = value; }
 
 
+        private void OnGUI()
+        {
+            Vector3 posOrigin = BrushPosition;
+            Vector2Int pixelPos = MapToolScript.WorldPosToCliffmapPos(BrushPosition);
+
+            if (Application.isEditor) GUI.Label(new Rect(Input.mousePosition.x + 25, Screen.height - Input.mousePosition.y, 100, 20), $"{pixelPos}");
+        }
+
         public void EnableBrush()
         {
             if (gameObject.activeSelf == false) gameObject.SetActive(true);
