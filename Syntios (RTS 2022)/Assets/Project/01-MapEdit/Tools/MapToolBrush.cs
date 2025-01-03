@@ -46,16 +46,16 @@ namespace ProtoRTS.MapEditor
                 {
                     int x = index % Map.TerrainData.size_x;
                     int y = index / Map.TerrainData.size_y;
+                    index++;
 
                     Vector3 v3 = new Vector3(x * 2, 0, y * 2);
 
                     Vector3 uiPos = Camera.main.WorldToScreenPoint(v3);
                     uiPos.y = Screen.height - uiPos.y;
 
-                    //if (uiPos.x > Screen.width) continue;
-                    //if (uiPos.y > Screen.height) continue;
-                    GUI.Label(new Rect(uiPos.x, uiPos.y, 100, 20), $"{test}");
-                    index++;
+                    if (x > 16) continue;
+                    if (y > 16) continue;
+                    GUI.Label(new Rect(uiPos.x, uiPos.y, 100, 20), $"({x}, {y}) {test}");
                 }
             }
         }

@@ -6,6 +6,17 @@ using Sirenix.OdinInspector;
 namespace ProtoRTS
 {
 
+	public struct RESULT_Neighbor
+    {
+		public bool cliffLevelValid;
+		public bool hasNeighbor;
+
+		public bool IsValid()
+        {
+			return cliffLevelValid && hasNeighbor;
+        }
+    }
+
 	[System.Serializable]
 	public class SyntiosTerrainData
 	{
@@ -309,17 +320,27 @@ namespace ProtoRTS
 			}
 		}
 
-		public bool IsNeighborValid(DirectionNeighbor dir, Vector2Int origin)
+		private RESULT_Neighbor resultReport_neighbor;
+
+		//SHOULD HAVE RETURN CLIFF LEVEL TOO!!!
+		public RESULT_Neighbor IsNeighborValid(DirectionNeighbor dir, Vector2Int origin)
         {
+			resultReport_neighbor = new RESULT_Neighbor();
+			resultReport_neighbor.hasNeighbor = false;
+			resultReport_neighbor.cliffLevelValid = false;
 			int level = cliffLevel_neighbour(dir, origin); //GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y);
 			int index = GetIndex(origin.x, origin.y);
 
-			if (cliffLevel[index] == level)
+			if (cliffLevel[index] == 0)
+            {
+			}
+			else if (cliffLevel[index] == level)
 			{
-				return true;
+				resultReport_neighbor.cliffLevelValid = true;
+				resultReport_neighbor.hasNeighbor = true;
 			}
 
-			return false;
+			return resultReport_neighbor;
 		}
 
 		public Vector2Int[] GetValidNeighbors(Vector2Int origin)

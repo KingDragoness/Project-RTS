@@ -335,14 +335,14 @@ namespace ProtoRTS
                 };
 
                 //check type
-                bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
-                bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);
-                bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos);
-                bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos);
-                bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
-                bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
-                bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
-                bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
+                bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos).hasNeighbor;
+                bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos).hasNeighbor;
+                bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos).hasNeighbor;
+                bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos).hasNeighbor;
+                bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos).hasNeighbor;
+                bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos).hasNeighbor;
+                bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos).hasNeighbor;
+                bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos).hasNeighbor;
 
 
                 int indexDir = 0;
@@ -371,48 +371,52 @@ namespace ProtoRTS
                     int DEBUG_result = 0;
                     bool isNeighborCliffOk = IsNeighbourCliffOk(myPos, indexDir);
 
+                    if (DEBUG_lastSecondChecked != Time.time.ToInt())
+                    {
+                        Debug.Log($"[{i}] mypos: {x},{y} | {coord} [{template} : {tilesetTarget}]");
+                    }
+
+                    //remove pre-existing first.
+                    if (vd3.ContainsKey(coord))
+                    {
+                        Destroy(vd3[coord].gameObject);
+                    }
+
+                    //replacing existing
                     if (template != null)
                     {
+                        instantiated = CreateCliffObject(template, worldPos, _terrainData.cliffLevel[i], $"Tile_{coord}", isNeighborCliffOk);
+
                         if (vd3.ContainsKey(coord))
                         {
-                            Destroy(vd3[coord].gameObject);
-                            instantiated = CreateCliffObject(template, worldPos, _terrainData.cliffLevel[i], $"Tile_{coord}", isNeighborCliffOk);
-
-                            //instantiated = Instantiate(template);
-                            //instantiated.transform.position = worldPos;
-                            //instantiated.gameObject.name = $"Tile_{coord}";
-                            //keyedCoord.Add(coord);
                             vd3[coord] = instantiated;
                             cliffObjects.Add(instantiated);
                             DEBUG_result = 1;
-
                         }
                         else
                         {
-                            instantiated = CreateCliffObject(template, worldPos, _terrainData.cliffLevel[i], $"Tile_{coord}", isNeighborCliffOk);
-
-                            //instantiated = Instantiate(template);
-                            //instantiated.transform.position = worldPos;
-                            //instantiated.gameObject.name = $"Tile_{coord}";
                             vd3.Add(coord, instantiated);
                             //keyedCoord.Add(coord);
                             cliffObjects.Add(instantiated);
                             DEBUG_result = 2;
                         }
 
-                    }
-                    else
-                    {
-                        if (vd3.ContainsKey(coord))//&& keyedCoord.Contains(coord) == false)
+                        if (DEBUG_lastSecondChecked != Time.time.ToInt())
                         {
-                            Destroy(vd3[coord].gameObject);
-                            DEBUG_result = 3;
-                        }
+                            //Debug.Log($"mypos: {x} {y} | {coord}");
+                        }                       
+
                     }
+                    //remove
+                    else if (template == null)
+                    {
+                        vd3.Remove(coord);
+                    }
+
 
                     if (DEBUG_lastSecondChecked != Time.time.ToInt())
                     {
-                        Debug.Log($"{i} : ({x}, {y}) ({coord}) [result: {DEBUG_result}] [tileset: {tilesetTarget}]");
+                        //Debug.Log($"{i} : ({x}, {y}) ({coord}) [result: {DEBUG_result}] [tileset: {tilesetTarget}]");
                     }
 
                     Debug_CreateNoNeighborObject(worldPos, isNeighborCliffOk);
@@ -435,7 +439,7 @@ namespace ProtoRTS
 
         private GameObject Debug_CreateNoNeighborObject(Vector3 worldPos, bool neighbourOk)
         {
-            if (DEBUG_ShowNoNeighborCheck && neighbourOk == false)
+            if (DEBUG_ShowNoNeighborCheck && neighbourOk == true)
             {
                 Vector3 cliffPos = worldPos;
 
@@ -500,14 +504,14 @@ namespace ProtoRTS
                 };
 
                 //check type
-                bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
-                bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);
-                bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos);
-                bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos);
-                bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
-                bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
-                bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
-                bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
+                bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos).hasNeighbor;
+                bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos).hasNeighbor;
+                bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos).hasNeighbor;
+                bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos).hasNeighbor;
+                bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos).hasNeighbor;
+                bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos).hasNeighbor;
+                bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos).hasNeighbor;
+                bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos).hasNeighbor;
 
                 int indexDir = 0;
 
@@ -539,14 +543,14 @@ namespace ProtoRTS
         #endregion
         public bool IsNeighbourCliffOk(Vector2Int myPos, int indexDir)
         {
-            bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
-            bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);
-            bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos);
-            bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos);
-            bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
-            bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
-            bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
-            bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
+            bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos).hasNeighbor;
+            bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos).hasNeighbor;
+            bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos).hasNeighbor;
+            bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos).hasNeighbor;
+            bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos).hasNeighbor;
+            bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos).hasNeighbor;
+            bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos).hasNeighbor;
+            bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos).hasNeighbor;
 
             var north_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.North, myPos);
             var south_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.South, myPos);
@@ -557,36 +561,31 @@ namespace ProtoRTS
             var southwest_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
             var southeast_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
 
-            SO_TerrainPreset.Tileset tilesetTarget = SO_TerrainPreset.Tileset.Null;
 
             if (indexDir == 2)
             {
-                if ((west | northwest | north) 
-                    && (west_level > 0 | northwest_level > 0 | north_level > 0))
+                if (west | northwest | north)
                 {
                     return true;
                 }
             }
             else if (indexDir == 3)
             {
-                if ((east | northeast | north)
-                    && (east_level > 0 | northeast_level > 0 | north_level > 0))
+                if (east | northeast | north)
                 {
                     return true;
                 }
             }
             else if (indexDir == 1)
             {
-                if ((east | southeast | south)
-                     && (east_level > 0 | southeast_level > 0 | south_level > 0))
+                if (east | southeast | south)
                 {
                     return true;
                 }
             }
             else if (indexDir == 0)
             {           
-                if ((west | southwest | south)
-                     && (west_level > 0 | southwest_level > 0 | south_level > 0))
+                if (west | southwest | south)
                 {
                     return true;
                 }
@@ -595,143 +594,157 @@ namespace ProtoRTS
             return false;
         }
 
+        //there is a problem here
         public SO_TerrainPreset.Tileset GetTileSet(Vector2Int myPos, int indexDir, bool printDEBUG = false)
         {
-            bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
-            bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);
-            bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos);
-            bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos);
-            bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
-            bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
-            bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
-            bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
+            var north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
+            var south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);
+            var west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos);
+            var east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos);
+            var northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
+            var northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
+            var southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
+            var southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
 
             SO_TerrainPreset.Tileset tilesetTarget = SO_TerrainPreset.Tileset.Null;
 
+            if (myPos.x == 3 && myPos.y == 3)
+            {
+                //Debug.Log($"{myPos} === NSWE: {north.IsValid()} | {south.IsValid()} | {west.IsValid()} | {east.IsValid()}");
+            }
+
+            //the problem is that it will never be null because the first (!west.IsValid() && !northwest.IsValid() && !north.IsValid())
+            //basically guaranteed to change none neighbors
+            if (!west.IsValid() && !northwest.IsValid() && !north.IsValid() && !east.IsValid() && !southeast.IsValid() && !south.IsValid()
+                && !northeast.IsValid() && !southwest.IsValid())
+            {
+                return SO_TerrainPreset.Tileset.Null;
+            }
+
             if (indexDir == 2)
             {
-                if (!west && !northwest && !north)
+                if (!west.IsValid() && !northwest.IsValid() && !north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.CornerNorthWest;
                 }
 
-                if (west && !northwest && !north)
+                if (west.IsValid() && !northwest.IsValid() && !north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.North;
                 }
 
-                if (!west && !northwest && north)
+                if (!west.IsValid() && !northwest.IsValid() && north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.West;
                 }
 
-                if (west && !northwest && north)
+                if (west.IsValid() && !northwest.IsValid() && north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerNorthWest;
                 }
 
-                if (!west && northwest && !north)
+                if (!west.IsValid() && northwest.IsValid() && !north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.DiagonalWest;
                 }
 
-                if (west && northwest && north)
+                if (west.IsValid() && northwest.IsValid() && north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.Flat;
                 }
             }
             else if (indexDir == 3)
             {
-                if (!east && !northeast && !north)
+                if (!east.IsValid() && !northeast.IsValid() && !north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.CornerNorthEast;
                 }
 
-                if (east && !northeast && !north)
+                if (east.IsValid() && !northeast.IsValid() && !north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.North;
                 }
 
-                if (!east && !northeast && north)
+                if (!east.IsValid() && !northeast.IsValid() && north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.East;
                 }
 
-                if (east && !northeast && north)
+                if (east.IsValid() && !northeast.IsValid() && north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerNorthEast;
                 }
 
-                if (!east && northeast && !north)
+                if (!east.IsValid() && northeast.IsValid() && !north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.DiagonalEast;
                 }
 
-                if (east && northeast && north)
+                if (east.IsValid() && northeast.IsValid() && north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.Flat;
                 }
             }
             else if (indexDir == 1)
             {
-                if (!east && !southeast && !south)
+                if (!east.IsValid() && !southeast.IsValid() && !south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.CornerSouthEast;
                 }
 
-                if (east && !southeast && !south)
+                if (east.IsValid() && !southeast.IsValid() && !south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.South;
                 }
 
-                if (!east && !southeast && south)
+                if (!east.IsValid() && !southeast.IsValid() && south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.East;
                 }
 
-                if (east && !southeast && south)
+                if (east.IsValid() && !southeast.IsValid() && south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerSouthEast;
                 }
 
-                if (!east && southeast && !south)
+                if (!east.IsValid() && southeast.IsValid() && !south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.DiagonalEast;
                 }
 
-                if (east && southeast && south)
+                if (east.IsValid() && southeast.IsValid() && south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.Flat;
                 }
             }
             else if (indexDir == 0)
             {
-                if (!west && !southwest && !south)
+                if (!west.IsValid() && !southwest.IsValid() && !south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.CornerSouthWest;
                 }
 
-                if (west && !southwest && !south)
+                if (west.IsValid() && !southwest.IsValid() && !south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.South;
                 }
 
-                if (!west && !southwest && south)
+                if (!west.IsValid() && !southwest.IsValid() && south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.West;
                 }
 
-                if (west && !southwest && south)
+                if (west.IsValid() && !southwest.IsValid() && south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerSouthWest;
                 }
 
-                if (!west && southwest && !south)
+                if (!west.IsValid() && southwest.IsValid() && !south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.DiagonalWest;
                 }
 
-                if (west && southwest && south)
+                if (west.IsValid() && southwest.IsValid() && south.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.Flat;
                 }
