@@ -17,6 +17,7 @@ namespace ProtoRTS.MapEditor
 
         public float targetBrushSize = 2;
         public Shape targetShape;
+        public bool isCliff = false;
 
         [Header("References")]
         public Material mat_projectorSquare;
@@ -35,7 +36,28 @@ namespace ProtoRTS.MapEditor
             Vector3 posOrigin = BrushPosition;
             Vector2Int pixelPos = MapToolScript.WorldPosToCliffmapPos(BrushPosition);
 
-            if (Application.isEditor) GUI.Label(new Rect(Input.mousePosition.x + 25, Screen.height - Input.mousePosition.y, 100, 20), $"{pixelPos}");
+            if (Application.isEditor)
+            {
+                GUI.Label(new Rect(Input.mousePosition.x + 25, Screen.height - Input.mousePosition.y, 100, 20), $"{pixelPos}");
+
+                int index = 0;
+
+                foreach(var test in Map.TerrainData.cliffLevel)
+                {
+                    int x = index % Map.TerrainData.size_x;
+                    int y = index / Map.TerrainData.size_y;
+
+                    Vector3 v3 = new Vector3(x * 2, 0, y * 2);
+
+                    Vector3 uiPos = Camera.main.WorldToScreenPoint(v3);
+                    uiPos.y = Screen.height - uiPos.y;
+
+                    //if (uiPos.x > Screen.width) continue;
+                    //if (uiPos.y > Screen.height) continue;
+                    GUI.Label(new Rect(uiPos.x, uiPos.y, 100, 20), $"{test}");
+                    index++;
+                }
+            }
         }
 
         public void EnableBrush()
@@ -60,10 +82,16 @@ namespace ProtoRTS.MapEditor
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit, 100))
+            if (Physics.Raycast(ray, out hit, 1000))
             {
                 Vector3 pos = hit.point;
                 pos.y = 50f;
+
+                if (isCliff)
+                {
+                    pos.x = Mathf.Round(pos.x / 2f) * 2f;
+                    pos.z = Mathf.Round(pos.z / 2f) * 2f;
+                }
 
                 brushPosition = hit.point;
                 brushProjector.transform.position = pos;

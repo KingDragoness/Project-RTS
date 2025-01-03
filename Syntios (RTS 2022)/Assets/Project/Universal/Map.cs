@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Unity.Collections;
 using Sirenix.OdinInspector;
@@ -15,7 +16,9 @@ namespace ProtoRTS
 		[Space]
         [SerializeField] private SyntiosTerrainData _terrainData;
 
-        public bool DEBUG_dontInitializeData;
+        [FoldoutGroup("DEBUG")] public bool DEBUG_dontInitializeData;
+        [FoldoutGroup("DEBUG")] public bool DEBUG_ShowNoNeighborCheck = false;
+        [FoldoutGroup("DEBUG")] public GameObject DEBUGObject_NoNeighborCheck;
         [FoldoutGroup("References")] public AstarPath aStarPath;
         [FoldoutGroup("References")] public MeshRenderer DEBUG_MeshTerrain;
         [FoldoutGroup("References")] [SerializeField] private Shader terrainShader;
@@ -257,7 +260,7 @@ namespace ProtoRTS
         public bool DEBUG_SeeCliff = false;
         [ShowInInspector] Dictionary<Vector2Int, GameObject> vd3 = new Dictionary<Vector2Int, GameObject>();
         [ShowInInspector] private List<GameObject> cliffObjects = new List<GameObject>();
-
+        private int DEBUG_lastSecondChecked = 0;
 
         [FoldoutGroup("DEBUG")]
         [Button("UpdateCliffMap")]
@@ -289,6 +292,12 @@ namespace ProtoRTS
             if (width < 255 && height < 255) finalIndex = _terrainData.GetIndex(boxEndX, boxEndY);
             finalIndex = Mathf.Clamp(finalIndex, 0, _terrainData.TotalLength);
 
+            foreach(var noNeighbor in debug_listAllNoNeighborObjs)
+            {
+                Destroy(noNeighbor.gameObject);
+            }
+            debug_listAllNoNeighborObjs.Clear();
+
             {
                 //foreach (var cliffObj in vd3)
                 //{
@@ -303,12 +312,15 @@ namespace ProtoRTS
             //Debug.Log($"{startX}, {startY} | ({boxEndX}, {boxEndY})");
 
             int indexToPrintDebug = Random.Range(startingIndex, finalIndex);
+            string allIndexes = "";
 
-            for (int i = startingIndex; i < finalIndex; i++)
+            for (int i = startingIndex; i <= finalIndex; i++)
             {
                 int x = i % _terrainData.size_x;
                 int y = i / _terrainData.size_y;
 
+                if (x < startX) continue;
+                if (y < startY) continue;
                 if (x > boxEndX) continue;
                 if (y > boxEndY) continue;
 
@@ -341,9 +353,13 @@ namespace ProtoRTS
                     GameObject instantiated = null;
                     var tilesetTarget = GetTileSet(myPos, indexDir);
 
+                    //big problem because this is shared 
+                    //causing valid neighbours to be set null
+                    //it must check the surrounding to be valid
+                    //IT WAS FIGHTING FOR THE SAME FUCKING CELL
                     if (_terrainData.cliffLevel[i] < 1)
-                    {
-                        tilesetTarget = SO_TerrainPreset.Tileset.Null;
+                    {                  
+                        //tilesetTarget = SO_TerrainPreset.Tileset.Null;
                     }
 
                     Vector3 worldPos = new Vector3();
@@ -351,39 +367,115 @@ namespace ProtoRTS
                     worldPos.y = _terrainData.cliffLevel[i] * 2;
                     worldPos.z = (coord.y * 2);
 
-                    var template = MyPreset.GetManmadeCliff(tilesetTarget);            
+                    var template = MyPreset.GetManmadeCliff(tilesetTarget);
+                    int DEBUG_result = 0;
+                    bool isNeighborCliffOk = IsNeighbourCliffOk(myPos, indexDir);
 
                     if (template != null)
                     {
                         if (vd3.ContainsKey(coord))
                         {
                             Destroy(vd3[coord].gameObject);
-                            instantiated = Instantiate(template);
-                            instantiated.transform.position = worldPos;
-                            instantiated.gameObject.name = $"Tile_{coord}";
+                            instantiated = CreateCliffObject(template, worldPos, _terrainData.cliffLevel[i], $"Tile_{coord}", isNeighborCliffOk);
+
+                            //instantiated = Instantiate(template);
+                            //instantiated.transform.position = worldPos;
+                            //instantiated.gameObject.name = $"Tile_{coord}";
+                            //keyedCoord.Add(coord);
                             vd3[coord] = instantiated;
+                            cliffObjects.Add(instantiated);
+                            DEBUG_result = 1;
+
                         }
                         else
                         {
-                            instantiated = Instantiate(template);
-                            instantiated.transform.position = worldPos;
-                            instantiated.gameObject.name = $"Tile_{coord}";
+                            instantiated = CreateCliffObject(template, worldPos, _terrainData.cliffLevel[i], $"Tile_{coord}", isNeighborCliffOk);
+
+                            //instantiated = Instantiate(template);
+                            //instantiated.transform.position = worldPos;
+                            //instantiated.gameObject.name = $"Tile_{coord}";
                             vd3.Add(coord, instantiated);
+                            //keyedCoord.Add(coord);
                             cliffObjects.Add(instantiated);
+                            DEBUG_result = 2;
                         }
 
                     }
                     else
                     {
-
+                        if (vd3.ContainsKey(coord))//&& keyedCoord.Contains(coord) == false)
+                        {
+                            Destroy(vd3[coord].gameObject);
+                            DEBUG_result = 3;
+                        }
                     }
 
+                    if (DEBUG_lastSecondChecked != Time.time.ToInt())
+                    {
+                        Debug.Log($"{i} : ({x}, {y}) ({coord}) [result: {DEBUG_result}] [tileset: {tilesetTarget}]");
+                    }
 
+                    Debug_CreateNoNeighborObject(worldPos, isNeighborCliffOk);
                     indexDir++;
                 }
 
+                if (DEBUG_lastSecondChecked != Time.time.ToInt())
+                {
+                    //Debug.Log($"{i} : ({x}, {y})");
+                }
             }
 
+            if (Time.time % 2 == 0) DEBUG_lastSecondChecked = Time.time.ToInt();
+
+            vd3 = vd3.Where(f => f.Value != null).ToDictionary(x => x.Key, x => x.Value);
+            cliffObjects.RemoveAll(x => x == null);
+        }
+
+        private List<GameObject> debug_listAllNoNeighborObjs = new List<GameObject>();
+
+        private GameObject Debug_CreateNoNeighborObject(Vector3 worldPos, bool neighbourOk)
+        {
+            if (DEBUG_ShowNoNeighborCheck && neighbourOk == false)
+            {
+                Vector3 cliffPos = worldPos;
+
+                var debugObj1 = Instantiate(DEBUGObject_NoNeighborCheck);
+                debugObj1.gameObject.SetActive(true);
+                debugObj1.transform.position = cliffPos;
+                debug_listAllNoNeighborObjs.Add(debugObj1);
+
+                return debugObj1;
+            }
+
+            return null;
+        }
+
+        public GameObject CreateCliffObject(GameObject template, Vector3 worldPos, int cliffLevel, string goName, bool neighbourOk)
+        {
+            GameObject parentObject = new GameObject();
+            parentObject.name = $"Parent_{goName}";
+
+            for(int x = 0; x < cliffLevel; x++)
+            {
+                var cliffnewObj = Instantiate(template);
+                Vector3 cliffPos = worldPos;
+                cliffPos.y = cliffLevel * 2;
+
+                cliffnewObj.transform.position = cliffPos;
+                cliffnewObj.gameObject.name = goName;
+                cliffnewObj.transform.SetParent(parentObject.transform);
+
+                if (DEBUG_ShowNoNeighborCheck && neighbourOk == false)
+                {
+                    var debugObj1 = Instantiate(DEBUGObject_NoNeighborCheck);
+                    debugObj1.transform.SetParent(parentObject.transform);
+                    debugObj1.gameObject.SetActive(true);
+                    debugObj1.transform.position = cliffPos;
+                }
+            }
+
+            return parentObject;
+          
         }
 
 
@@ -445,8 +537,65 @@ namespace ProtoRTS
 
 
         #endregion
+        public bool IsNeighbourCliffOk(Vector2Int myPos, int indexDir)
+        {
+            bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
+            bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);
+            bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos);
+            bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos);
+            bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
+            bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
+            bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
+            bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
 
-        public SO_TerrainPreset.Tileset GetTileSet(Vector2Int myPos, int indexDir)
+            var north_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.North, myPos);
+            var south_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.South, myPos);
+            var west_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.West, myPos);
+            var east_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.East, myPos);
+            var northwest_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
+            var northeast_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
+            var southwest_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
+            var southeast_level = _terrainData.cliffLevel_neighbour(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
+
+            SO_TerrainPreset.Tileset tilesetTarget = SO_TerrainPreset.Tileset.Null;
+
+            if (indexDir == 2)
+            {
+                if ((west | northwest | north) 
+                    && (west_level > 0 | northwest_level > 0 | north_level > 0))
+                {
+                    return true;
+                }
+            }
+            else if (indexDir == 3)
+            {
+                if ((east | northeast | north)
+                    && (east_level > 0 | northeast_level > 0 | north_level > 0))
+                {
+                    return true;
+                }
+            }
+            else if (indexDir == 1)
+            {
+                if ((east | southeast | south)
+                     && (east_level > 0 | southeast_level > 0 | south_level > 0))
+                {
+                    return true;
+                }
+            }
+            else if (indexDir == 0)
+            {           
+                if ((west | southwest | south)
+                     && (west_level > 0 | southwest_level > 0 | south_level > 0))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public SO_TerrainPreset.Tileset GetTileSet(Vector2Int myPos, int indexDir, bool printDEBUG = false)
         {
             bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
             bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);

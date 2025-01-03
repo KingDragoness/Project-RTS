@@ -50,6 +50,7 @@ namespace ProtoRTS.MapEditor
 			if (currentOperation != Operation.None)
 			{
 				Brush.EnableBrush();
+				Brush.isCliff = true;
 			}
 			else
 			{
@@ -110,7 +111,7 @@ namespace ProtoRTS.MapEditor
 			int countDebug = 0;
 
 			//Debug.Log($"Size: {totalLength} | {pixelPosOrigin}");
-			Debug.Log($"Cliffmap origin: {pixelPosOrigin} | worldOrigin: {posOrigin}");
+			//Debug.Log($"Cliffmap origin: {pixelPosOrigin} | worldOrigin: {posOrigin}");
 
 
 			for (int i = 0; i < totalLength; i++)
@@ -184,7 +185,8 @@ namespace ProtoRTS.MapEditor
 				Vector2Int refreshPosOrigin = WorldPosToCliffmapPos(refreshPosOrigin_v3);
 
 
-				Map.instance.UpdateCliffMap(refreshPosOrigin.x, refreshPosOrigin.y, refreshRadius, refreshRadius);
+				//divides /2 for world conversion
+				Map.instance.UpdateCliffMap(refreshPosOrigin.x, refreshPosOrigin.y, refreshRadius/2, refreshRadius/2);
 				//Debug.Log($"Origin: {refreshPosOrigin}  Center: {refreshPosCenter}  | radius: {refreshRadius}  | halfsize: {refresh_halfSize}");
 
 				DEBUG_start.transform.position = refreshPosOrigin_v3;

@@ -259,12 +259,12 @@ namespace ProtoRTS
 
 		}
 
-		public bool IsNeighborValid(DirectionNeighbor dir, Vector2Int origin)
+		public int cliffLevel_neighbour(DirectionNeighbor dir, Vector2Int origin)
         {
 			Vector2Int offsetPos = new Vector2Int(0, 1);
 
 			if (dir == DirectionNeighbor.North)
-            {
+			{
 				offsetPos = new Vector2Int(0, 1);
 			}
 			else if (dir == DirectionNeighbor.South)
@@ -279,7 +279,7 @@ namespace ProtoRTS
 			{
 				offsetPos = new Vector2Int(1, 0);
 			}
-			else if(dir == DirectionNeighbor.NorthEast)
+			else if (dir == DirectionNeighbor.NorthEast)
 			{
 				offsetPos = new Vector2Int(1, 1);
 			}
@@ -296,23 +296,27 @@ namespace ProtoRTS
 				offsetPos = new Vector2Int(-1, -1);
 			}
 
-
 			if ((origin + offsetPos).x >= size_x |
 			(origin + offsetPos).x < 0 |
 			(origin + offsetPos).y >= size_y |
 			(origin + offsetPos).y < 0)
 			{
-				return false;
+				return 0;
 			}
 			else
 			{
-				int offIndex = GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y);
-				int index = GetIndex(origin.x, origin.y);
+				return cliffLevel[GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y)];			
+			}
+		}
 
-				if (cliffLevel[index] == cliffLevel[offIndex])
-				{
-					return true;
-                }
+		public bool IsNeighborValid(DirectionNeighbor dir, Vector2Int origin)
+        {
+			int level = cliffLevel_neighbour(dir, origin); //GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y);
+			int index = GetIndex(origin.x, origin.y);
+
+			if (cliffLevel[index] == level)
+			{
+				return true;
 			}
 
 			return false;

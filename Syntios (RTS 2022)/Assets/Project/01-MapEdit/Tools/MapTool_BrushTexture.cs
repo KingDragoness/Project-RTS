@@ -45,6 +45,7 @@ namespace ProtoRTS.MapEditor
             if (currentOperation != Operation.None)
             {
                 Brush.EnableBrush();
+                Brush.isCliff = false;
             }
             else
             {
