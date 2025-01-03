@@ -23,6 +23,7 @@ namespace ProtoRTS.MapEditor
 		public Operation currentOperation;
 
 		public bool isManmade = true;
+		[Range(1,10)] public byte cliffLevelTarget = 1;
 		[Range(0f, 1f)] public float hardness = 0.9f;
 		[Range(1, 32)] public int brushSize = 4;
 		[Range(5, 128)] public int brushStrength = 45;
@@ -163,7 +164,7 @@ namespace ProtoRTS.MapEditor
 
 				if (currentOperation == Operation.Raise)
                 {
-					BrushCliff(currentIndex, 1);
+					BrushCliff(currentIndex, cliffLevelTarget);
 				}
                 else if (currentOperation == Operation.Lower)
                 {

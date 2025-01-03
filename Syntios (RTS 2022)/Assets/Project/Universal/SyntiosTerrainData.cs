@@ -270,7 +270,7 @@ namespace ProtoRTS
 
 		}
 
-		public int cliffLevel_neighbour(DirectionNeighbor dir, Vector2Int origin)
+		public int cliffLevel_neighbour(DirectionNeighbor dir, Vector2Int origin, int magnitude = 1)
         {
 			Vector2Int offsetPos = new Vector2Int(0, 1);
 
@@ -307,6 +307,8 @@ namespace ProtoRTS
 				offsetPos = new Vector2Int(-1, -1);
 			}
 
+			offsetPos *= magnitude;
+
 			if ((origin + offsetPos).x >= size_x |
 			(origin + offsetPos).x < 0 |
 			(origin + offsetPos).y >= size_y |
@@ -320,20 +322,77 @@ namespace ProtoRTS
 			}
 		}
 
+		public Vector2Int GetDirection(DirectionNeighbor dir)
+        {
+			Vector2Int offsetPos = new Vector2Int(0, 1);
+
+			if (dir == DirectionNeighbor.North)
+			{
+				offsetPos = new Vector2Int(0, 1);
+			}
+			else if (dir == DirectionNeighbor.South)
+			{
+				offsetPos = new Vector2Int(0, -1);
+			}
+			else if (dir == DirectionNeighbor.West)
+			{
+				offsetPos = new Vector2Int(-1, 0);
+			}
+			else if (dir == DirectionNeighbor.East)
+			{
+				offsetPos = new Vector2Int(1, 0);
+			}
+			else if (dir == DirectionNeighbor.NorthEast)
+			{
+				offsetPos = new Vector2Int(1, 1);
+			}
+			else if (dir == DirectionNeighbor.NorthWest)
+			{
+				offsetPos = new Vector2Int(-1, 1);
+			}
+			else if (dir == DirectionNeighbor.SouthEast)
+			{
+				offsetPos = new Vector2Int(1, -1);
+			}
+			else if (dir == DirectionNeighbor.SouthWest)
+			{
+				offsetPos = new Vector2Int(-1, -1);
+			}
+
+			return offsetPos;
+		}
+
 		private RESULT_Neighbor resultReport_neighbor;
 
-		//SHOULD HAVE RETURN CLIFF LEVEL TOO!!!
-		public RESULT_Neighbor IsNeighborValid(DirectionNeighbor dir, Vector2Int origin)
+		public RESULT_Neighbor IsNeighborValid(DirectionNeighbor dir, Vector2Int myPos)
         {
 			resultReport_neighbor = new RESULT_Neighbor();
 			resultReport_neighbor.hasNeighbor = false;
 			resultReport_neighbor.cliffLevelValid = false;
-			int level = cliffLevel_neighbour(dir, origin); //GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y);
-			int index = GetIndex(origin.x, origin.y);
+			int level = cliffLevel_neighbour(dir, myPos); //GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y);
+			var v2_dir = GetDirection(dir);
+			int index = GetIndex(myPos.x, myPos.y);
+			int index_extra = 0;
 
-			if (cliffLevel[index] == 0)
+			Vector2Int secondNeighbor = myPos + v2_dir;
+
+			if (secondNeighbor.x <= size_x && secondNeighbor.y <= size_y &&
+				secondNeighbor.x >= 0 && secondNeighbor.y >= 0)
+				index_extra = GetIndex(secondNeighbor.x, secondNeighbor.y);
+
+
+			if (index_extra != 0 && cliffLevel[index_extra] == level)
+			{
+				Debug.Log($"NO: {myPos} | second neigh: {secondNeighbor}");
+                resultReport_neighbor.cliffLevelValid = true;
+                resultReport_neighbor.hasNeighbor = true;
+            }
+			else if (cliffLevel[index] == 0)
             {
+
 			}
+			//problem persists: checks cliff level on shared cell. 
+			//the coord must sample 4 tiles.
 			else if (cliffLevel[index] == level)
 			{
 				resultReport_neighbor.cliffLevelValid = true;

@@ -364,7 +364,7 @@ namespace ProtoRTS
 
                     Vector3 worldPos = new Vector3();
                     worldPos.x = (coord.x * 2);
-                    worldPos.y = _terrainData.cliffLevel[i] * 2;
+                    worldPos.y = 0;
                     worldPos.z = (coord.y * 2);
 
                     var template = MyPreset.GetManmadeCliff(tilesetTarget);
@@ -373,7 +373,7 @@ namespace ProtoRTS
 
                     if (DEBUG_lastSecondChecked != Time.time.ToInt())
                     {
-                        Debug.Log($"[{i}] mypos: {x},{y} | {coord} [{template} : {tilesetTarget}]");
+                        Debug.Log($"[{i}] mypos: {x}, {y} | {coord} [{template} : {tilesetTarget}]");
                     }
 
                     //remove pre-existing first.
@@ -459,11 +459,11 @@ namespace ProtoRTS
             GameObject parentObject = new GameObject();
             parentObject.name = $"Parent_{goName}";
 
-            for(int x = 0; x < cliffLevel; x++)
+            for(int i = 0; i < cliffLevel; i++)
             {
                 var cliffnewObj = Instantiate(template);
                 Vector3 cliffPos = worldPos;
-                cliffPos.y = cliffLevel * 2;
+                cliffPos.y = i * 4;
 
                 cliffnewObj.transform.position = cliffPos;
                 cliffnewObj.gameObject.name = goName;
@@ -594,6 +594,20 @@ namespace ProtoRTS
             return false;
         }
 
+        public Vector2Int IndexDirOffset(int indexDir)
+        {
+            Vector2Int offsetPos1 = new Vector2Int(0, 0);
+            Vector2Int offsetPos2 = new Vector2Int(1, 0);
+            Vector2Int offsetPos3 = new Vector2Int(0, 1);
+            Vector2Int offsetPos4 = new Vector2Int(1, 1);
+
+            if (indexDir == 0) return offsetPos1;
+            if (indexDir == 1) return offsetPos2;
+            if (indexDir == 2) return offsetPos3;
+            if (indexDir == 3) return offsetPos4;
+            return offsetPos1;
+        }
+
         //there is a problem here
         public SO_TerrainPreset.Tileset GetTileSet(Vector2Int myPos, int indexDir, bool printDEBUG = false)
         {
@@ -608,21 +622,23 @@ namespace ProtoRTS
 
             SO_TerrainPreset.Tileset tilesetTarget = SO_TerrainPreset.Tileset.Null;
 
-            if (myPos.x == 3 && myPos.y == 3)
+            if (myPos.x == 5 && myPos.y == 3)
             {
-                //Debug.Log($"{myPos} === NSWE: {north.IsValid()} | {south.IsValid()} | {west.IsValid()} | {east.IsValid()}");
+                Debug.Log($"{myPos} === NSWE: {north.hasNeighbor}, {north.cliffLevelValid} | {south.hasNeighbor}, {south.cliffLevelValid}  " +
+                    $"| {west.hasNeighbor}, {west.cliffLevelValid} | {east.hasNeighbor}, {east.cliffLevelValid} ");
             }
+
 
             //the problem is that it will never be null because the first (!west.IsValid() && !northwest.IsValid() && !north.IsValid())
             //basically guaranteed to change none neighbors
-            if (!west.IsValid() && !northwest.IsValid() && !north.IsValid() && !east.IsValid() && !southeast.IsValid() && !south.IsValid()
-                && !northeast.IsValid() && !southwest.IsValid())
-            {
+
+            if (!west.IsValid() && !northwest.IsValid() && !north.IsValid() && !east.IsValid() && !southeast.IsValid() && !south.IsValid() && !northeast.IsValid() && !southwest.IsValid())
                 return SO_TerrainPreset.Tileset.Null;
-            }
+
 
             if (indexDir == 2)
-            {
+            {    
+
                 if (!west.IsValid() && !northwest.IsValid() && !north.IsValid())
                 {
                     tilesetTarget = SO_TerrainPreset.Tileset.CornerNorthWest;
