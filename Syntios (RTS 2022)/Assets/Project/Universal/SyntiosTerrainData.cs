@@ -7,22 +7,22 @@ namespace ProtoRTS
 {
 
 	public struct RESULT_Neighbor
-    {
-		public bool cliffLevelValid;
+	{
+		public bool isNotOnEdge;
 		public bool hasNeighbor;
 
 		public bool IsValid()
-        {
-			return cliffLevelValid && hasNeighbor;
-        }
-    }
+		{
+			return isNotOnEdge && hasNeighbor;
+		}
+	}
 
 	[System.Serializable]
 	public class SyntiosTerrainData
 	{
 
 		public enum DirectionNeighbor
-        {
+		{
 			North,
 			South,
 			West,
@@ -31,7 +31,7 @@ namespace ProtoRTS
 			NorthWest,
 			SouthEast,
 			SouthWest
-        }
+		}
 
 		public string ID = "Earth";
 		//256 * 256 = 65.536
@@ -59,30 +59,30 @@ namespace ProtoRTS
 		[FoldoutGroup("DEBUG")] public Color32 DEBUG_TargetColor2;
 
 		public int TotalLength
-        {
-			get 
+		{
+			get
 			{
 				int length = size_x * size_y;
 
 				if (length > 90000)
-                {
+				{
 					throw new System.Exception("Size is too big!");
-                }
-				return length; 
+				}
+				return length;
 			}
-        }
+		}
 
 
 		//4 times size
 		//(every splatmap is 1k texture / 1 million pixels)
 		public int SplatmapLength
-        {
-            get
-            {
+		{
+			get
+			{
 				return (256 * 4) * (256 * 4);
 
 			}
-        }
+		}
 
 		/// <summary>
 		/// The game scans X first then Y.
@@ -92,7 +92,7 @@ namespace ProtoRTS
 		/// <param name="y"></param>
 		/// <returns></returns>
 		public int GetIndex(int x, int y)
-        {
+		{
 			if (x > size_x) throw new System.Exception("Invalid X coord!");
 			if (y > size_y) throw new System.Exception("Invalid Y coord!");
 			if (x < 0) throw new System.Exception("Invalid X coord!");
@@ -114,7 +114,7 @@ namespace ProtoRTS
 		[FoldoutGroup("DEBUG")]
 		[Button("Initialize Data")]
 		public void InitializeData()
-        {
+		{
 			cliffLevel = new byte[TotalLength];
 			heightVariation = new byte[TotalLength];
 			fogOfWar = new byte[TotalLength * 4];
@@ -133,7 +133,7 @@ namespace ProtoRTS
 		[FoldoutGroup("DEBUG")]
 		[Button("ClearArrays Data")]
 		public void ClearArrays()
-        {
+		{
 			cliffLevel = new byte[1];
 			heightVariation = new byte[1];
 			fogOfWar = new byte[1];
@@ -148,17 +148,17 @@ namespace ProtoRTS
 			terrain_layer8 = new byte[1]; //splat2 a
 		}
 
-		[FoldoutGroup("DEBUG")] 
+		[FoldoutGroup("DEBUG")]
 		[Button("Randomized Data")]
 		public void RandomizedData()
 		{
 			if (cliffLevel.Length <= 2)
-            {
+			{
 				InitializeData();
 			}
 
-			for(int x = 0; x < cliffLevel.Length; x++)
-            {
+			for (int x = 0; x < cliffLevel.Length; x++)
+			{
 				cliffLevel[x] = 0;
 			}
 
@@ -221,13 +221,13 @@ namespace ProtoRTS
 				c1.b = (byte)(DEBUG_TargetColor1.b);
 				c1.a = (byte)(DEBUG_TargetColor1.a);
 				c2.r = (byte)(DEBUG_TargetColor2.r);
-				c2.g = (byte)(DEBUG_TargetColor2.g );
-				c2.b = (byte)(DEBUG_TargetColor2.b );
-				c2.a = (byte)(DEBUG_TargetColor2.a );
+				c2.g = (byte)(DEBUG_TargetColor2.g);
+				c2.b = (byte)(DEBUG_TargetColor2.b);
+				c2.a = (byte)(DEBUG_TargetColor2.a);
 
 
 				for (int x = 0; x < terrain_layer8.Length; x++)
-                {			
+				{
 					terrain_layer1[x] = c1.r;
 					terrain_layer2[x] = c1.g;
 					terrain_layer3[x] = c1.b;
@@ -243,16 +243,16 @@ namespace ProtoRTS
 
 			}
 
-            {
+			{
 				for (int i = 0; i < TotalLength; i++)
 				{
 					int x = i % size_x;
 					int y = i / size_y;
 
 					if (i == 1000 | i == 1024 | i == 1025 | i == 1026)
-                    {
+					{
 						cliffLevel[i] = 1;
-                    }
+					}
 					if ((x == 15) && (y >= 11 | y <= 20))
 					{
 						cliffLevel[i] = 1;
@@ -271,41 +271,8 @@ namespace ProtoRTS
 		}
 
 		public int cliffLevel_neighbour(DirectionNeighbor dir, Vector2Int origin, int magnitude = 1)
-        {
-			Vector2Int offsetPos = new Vector2Int(0, 1);
-
-			if (dir == DirectionNeighbor.North)
-			{
-				offsetPos = new Vector2Int(0, 1);
-			}
-			else if (dir == DirectionNeighbor.South)
-			{
-				offsetPos = new Vector2Int(0, -1);
-			}
-			else if (dir == DirectionNeighbor.West)
-			{
-				offsetPos = new Vector2Int(-1, 0);
-			}
-			else if (dir == DirectionNeighbor.East)
-			{
-				offsetPos = new Vector2Int(1, 0);
-			}
-			else if (dir == DirectionNeighbor.NorthEast)
-			{
-				offsetPos = new Vector2Int(1, 1);
-			}
-			else if (dir == DirectionNeighbor.NorthWest)
-			{
-				offsetPos = new Vector2Int(-1, 1);
-			}
-			else if (dir == DirectionNeighbor.SouthEast)
-			{
-				offsetPos = new Vector2Int(1, -1);
-			}
-			else if (dir == DirectionNeighbor.SouthWest)
-			{
-				offsetPos = new Vector2Int(-1, -1);
-			}
+		{
+			Vector2Int offsetPos = GetDirection(dir);
 
 			offsetPos *= magnitude;
 
@@ -318,12 +285,12 @@ namespace ProtoRTS
 			}
 			else
 			{
-				return cliffLevel[GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y)];			
+				return cliffLevel[GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y)];
 			}
 		}
 
 		public Vector2Int GetDirection(DirectionNeighbor dir)
-        {
+		{
 			Vector2Int offsetPos = new Vector2Int(0, 1);
 
 			if (dir == DirectionNeighbor.North)
@@ -365,10 +332,10 @@ namespace ProtoRTS
 		private RESULT_Neighbor resultReport_neighbor;
 
 		public RESULT_Neighbor IsNeighborValid(DirectionNeighbor dir, Vector2Int myPos)
-        {
+		{
 			resultReport_neighbor = new RESULT_Neighbor();
 			resultReport_neighbor.hasNeighbor = false;
-			resultReport_neighbor.cliffLevelValid = false;
+			resultReport_neighbor.isNotOnEdge = false;
 			int level = cliffLevel_neighbour(dir, myPos); //GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y);
 			var v2_dir = GetDirection(dir);
 			int index = GetIndex(myPos.x, myPos.y);
@@ -384,18 +351,18 @@ namespace ProtoRTS
 			if (index_extra != 0 && cliffLevel[index_extra] == level)
 			{
 				Debug.Log($"NO: {myPos} | second neigh: {secondNeighbor}");
-                resultReport_neighbor.cliffLevelValid = true;
-                resultReport_neighbor.hasNeighbor = true;
-            }
+				resultReport_neighbor.isNotOnEdge = false;
+				resultReport_neighbor.hasNeighbor = true;
+			}
 			else if (cliffLevel[index] == 0)
-            {
+			{
 
 			}
 			//problem persists: checks cliff level on shared cell. 
 			//the coord must sample 4 tiles.
 			else if (cliffLevel[index] == level)
 			{
-				resultReport_neighbor.cliffLevelValid = true;
+				resultReport_neighbor.isNotOnEdge = true;
 				resultReport_neighbor.hasNeighbor = true;
 			}
 
@@ -465,7 +432,7 @@ namespace ProtoRTS
 
 
 		public void SetTerrainLayer(int layer, int index, float targetStrength)
-        {
+		{
 			if (layer == 0)
 			{
 				terrain_layer1[index] = (byte)targetStrength;
@@ -502,7 +469,7 @@ namespace ProtoRTS
 
 
 		public byte GetTerrainLayer_str(int layer, int index)
-        {
+		{
 			if (layer == 0)
 			{
 				return terrain_layer1[index];
@@ -541,10 +508,10 @@ namespace ProtoRTS
 
 
 		public void SaveMapData()
-        {
+		{
 
-        }
+		}
 
-	
+
 	}
 }
