@@ -6,7 +6,21 @@ using Sirenix.OdinInspector;
 namespace ProtoRTS
 {
 
-	public struct RESULT_Neighbor
+	public struct NeighborCliffmap
+    {
+		public int x;
+		public int y;
+		public int cliffLevel;
+
+        public NeighborCliffmap(int x, int y, int cliffLevel)
+        {
+            this.x = x;
+            this.y = y;
+            this.cliffLevel = cliffLevel;
+        }
+    }
+
+	public struct NeighborResult
 	{
 		public bool isNotOnEdge;
 		public bool hasNeighbor;
@@ -30,7 +44,8 @@ namespace ProtoRTS
 			NorthEast,
 			NorthWest,
 			SouthEast,
-			SouthWest
+			SouthWest,
+			Self
 		}
 
 		public string ID = "Earth";
@@ -325,15 +340,20 @@ namespace ProtoRTS
 			{
 				offsetPos = new Vector2Int(-1, -1);
 			}
+			else if (dir == DirectionNeighbor.Self)
+            {
+				offsetPos = new Vector2Int(0, 0);
+			}
 
 			return offsetPos;
 		}
 
-		private RESULT_Neighbor resultReport_neighbor;
 
-		public RESULT_Neighbor IsNeighborValid(DirectionNeighbor dir, Vector2Int myPos)
+		private NeighborResult resultReport_neighbor;
+
+		public NeighborResult IsNeighborValid(DirectionNeighbor dir, Vector2Int myPos)
 		{
-			resultReport_neighbor = new RESULT_Neighbor();
+			resultReport_neighbor = new NeighborResult();
 			resultReport_neighbor.hasNeighbor = false;
 			resultReport_neighbor.isNotOnEdge = false;
 			int level = cliffLevel_neighbour(dir, myPos); //GetIndex(origin.x + offsetPos.x, origin.y + offsetPos.y);
@@ -367,6 +387,21 @@ namespace ProtoRTS
 			}
 
 			return resultReport_neighbor;
+		}
+
+		public NeighborCliffmap GetNeighbor(DirectionNeighbor dir, Vector2Int myPos)
+        {
+			Vector2Int posTarget = myPos + GetDirection(dir);
+
+
+			if (posTarget.x >= size_x && posTarget.y >= size_y &&
+				posTarget.x < 0 && posTarget.y < 0)
+				return new NeighborCliffmap(0,0,0); //invalid coord returns edge of map
+
+
+			int index = GetIndex(posTarget.x, posTarget.y);
+			int cliffLevel_i = cliffLevel[index];
+			return new NeighborCliffmap(posTarget.x, posTarget.y, cliffLevel_i);
 		}
 
 		public Vector2Int[] GetValidNeighbors(Vector2Int origin)

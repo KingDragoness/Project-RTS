@@ -483,91 +483,135 @@ namespace ProtoRTS
             return offsetPos1;
         }
 
-        public enum TypeFloor
+        public enum Direction_TileCheck
         {
-            Nothing,
-            Edge,
-            Flat
+            Southwest,
+            Southeast,
+            Northwest,
+            Northeast
         }
 
         //there is a problem here
         //Array because it returns depends on the cliff levels (3 means it returns 3 objects)
         public SO_TerrainPreset.Tileset[] GetTileSet(Vector2Int myPos, int indexDir, Vector2Int coord, bool printDEBUG = false)
         {
-            var north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos);
-            var south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos);
-            var west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos);
-            var east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos);
-            var northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
-            var northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
-            var southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
-            var southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
+            List<SO_TerrainPreset.Tileset> tilesetList = new List<SO_TerrainPreset.Tileset>();
+            SO_TerrainPreset.Tileset tilesetTarget ;
 
-            var northPos = myPos + _terrainData.GetDirection(SyntiosTerrainData.DirectionNeighbor.North);
-            var southPos = myPos + _terrainData.GetDirection(SyntiosTerrainData.DirectionNeighbor.South);
-            var westPos = myPos + _terrainData.GetDirection(SyntiosTerrainData.DirectionNeighbor.West);
-            var eastPos = myPos + _terrainData.GetDirection(SyntiosTerrainData.DirectionNeighbor.East);
+            Direction_TileCheck dir = (Direction_TileCheck)indexDir;
 
-            int indexNorth = 0;
-            int indexSouth = 0;
-            int indexWest = 0;
-            int indexEast = 0;
+            var myPos_cliff = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.Self, myPos);
+            var north = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.North, myPos);
+            var south = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.South, myPos);
+            var west = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.West, myPos);
+            var east = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.East, myPos);
+            var northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos);
+            var northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos);
+            var southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos);
+            var southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos);
 
-            if (northPos.x <= _terrainData.size_x && northPos.y <= _terrainData.size_y && northPos.x >= 0 && northPos.y >= 0)
-                indexNorth = _terrainData.GetIndex(northPos.x, northPos.y);
 
-            if (southPos.x <= _terrainData.size_x && southPos.y <= _terrainData.size_y && southPos.x >= 0 && southPos.y >= 0)
-                indexSouth = _terrainData.GetIndex(southPos.x, southPos.y);
+            int countTile = 0;
 
-            if (westPos.x <= _terrainData.size_x && westPos.y <= _terrainData.size_y && westPos.x >= 0 && westPos.y >= 0)
-                indexWest = _terrainData.GetIndex(westPos.x, westPos.y);
-
-            if (eastPos.x <= _terrainData.size_x && eastPos.y <= _terrainData.size_y && eastPos.x >= 0 && eastPos.y >= 0)
-                indexEast = _terrainData.GetIndex(eastPos.x, eastPos.y);
-
-            //WHICH CLIFF LEVEL TO USE at coord????
-            //myPos (5,3)
-            //coord (5,3) then use what? (4,3)? (5,2)?
-            var northNeighbor = _terrainData.cliffLevel[indexNorth];
-            var southNeighbor = _terrainData.cliffLevel[indexSouth];
-            var westNeighbor = _terrainData.cliffLevel[indexWest];
-            var eastNeighbor = _terrainData.cliffLevel[indexEast];
-            var myCliff = _terrainData.cliffLevel[_terrainData.GetIndex(myPos.x, myPos.y)];
-            bool isOnEdge = false;
-
-            if (northNeighbor > myCliff) isOnEdge = true;
-            if (southNeighbor > myCliff) isOnEdge = true;
-            if (westNeighbor > myCliff) isOnEdge = true;
-            if (eastNeighbor > myCliff) isOnEdge = true;
-
-            for(int x = 0; x < )
-
-            if (indexDir == 2)
+            if (dir == Direction_TileCheck.Southwest)
             {
-                if (northNeighbor > myCliff)
+                int maxHeight = Mathf.Max(new int[] { south.cliffLevel, southwest.cliffLevel, west.cliffLevel, myPos_cliff.cliffLevel});
+       
+
+                for(int x = 0; x <= maxHeight; x++)
                 {
-                    return SO_TerrainPreset.Tileset.CornerNorthWest;
+                    if (x == 0) continue;
+                    //only allows 8 permutations!
+                    //we have 15 tiles to map with!
+                    //WRONG AGAIN NOOOOOOOOOOO
+                    bool is_south_higher = false;
+                    bool is_southwest_higher = false;
+                    bool is_west_higher = false;
+                    int tempLevel = myPos_cliff.cliffLevel + x;
+
+                    if (south.cliffLevel >= tempLevel) is_south_higher = true;
+                    if (southwest.cliffLevel >= tempLevel) is_southwest_higher = true;
+                    if (west.cliffLevel >= tempLevel) is_west_higher = true;
+
+                    //Sharp corners
+                    {
+                        if (is_south_higher && is_southwest_higher && !is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        }
+
+                        if (is_south_higher && is_southwest_higher && is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        }                
+
+                        if (is_south_higher && is_southwest_higher && !is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        }
+
+                        if (!is_south_higher && is_southwest_higher && is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        }
+                    }
+
+                    //Corners
+                    {
+                        if (is_south_higher && !is_southwest_higher && !is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthWest);
+                        }
+
+                        if (!is_south_higher && is_southwest_higher && !is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthEast);
+                        }
+
+                        if (!is_south_higher && !is_southwest_higher && !is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthWest);
+                        }
+
+                        if (!is_south_higher && !is_southwest_higher && is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthEast);
+                        }
+                    }
+
+                    //flat
+                    {
+
+                        if (is_south_higher && is_southwest_higher && !is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.North);
+                        }
+
+                        if (!is_south_higher && !is_southwest_higher && is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.South);
+                        }
+
+                        if (is_south_higher && !is_southwest_higher && !is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.West);
+                        }
+
+                        if (!is_south_higher && is_southwest_higher && is_west_higher)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.East);
+                        }
+
+                    }
+
+
+
+
+                    countTile++;
+
                 }
+                
             }
-            else if (indexDir == 3)
-            {
-                if (northNeighbor > 0 && eastNeighbor > 0)
-                {
-                    return SO_TerrainPreset.Tileset.CornerNorthEast;
-                }
-            }
-
-            SO_TerrainPreset.Tileset tilesetTarget = SO_TerrainPreset.Tileset.Null;
-            TypeFloor floorType;
-
-
-
-            if (myPos.x == 5 && myPos.y == 3)
-            {
-                Debug.Log($"{myPos} === NSWE: {north.hasNeighbor}, {north.isNotOnEdge} | {south.hasNeighbor}, {south.isNotOnEdge}  " +
-                    $"| {west.hasNeighbor}, {west.isNotOnEdge} | {east.hasNeighbor}, {east.isNotOnEdge} ");
-            }
-
 
             if (indexDir == 2)
             {
