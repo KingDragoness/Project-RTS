@@ -363,18 +363,17 @@ namespace ProtoRTS
 
 			Vector2Int secondNeighbor = myPos + v2_dir;
 
-			if (secondNeighbor.x <= size_x && secondNeighbor.y <= size_y &&
-				secondNeighbor.x >= 0 && secondNeighbor.y >= 0)
+			if (secondNeighbor.x <= size_x - 1 && secondNeighbor.y <= size_y - 1 &&
+				secondNeighbor.x > 0 && secondNeighbor.y > 0)
 				index_extra = GetIndex(secondNeighbor.x, secondNeighbor.y);
-
 
 			if (index_extra != 0 && cliffLevel[index_extra] == level)
 			{
-				Debug.Log($"NO: {myPos} | second neigh: {secondNeighbor}");
+				//Debug.Log($"NO: {myPos} | second neigh: {secondNeighbor}");
 				resultReport_neighbor.isNotOnEdge = false;
 				resultReport_neighbor.hasNeighbor = true;
 			}
-			else if (cliffLevel[index] == 0)
+			else if (cliffLevel[0] == 0)
 			{
 
 			}
@@ -394,8 +393,8 @@ namespace ProtoRTS
 			Vector2Int posTarget = myPos + GetDirection(dir);
 
 
-			if (posTarget.x >= size_x && posTarget.y >= size_y &&
-				posTarget.x < 0 && posTarget.y < 0)
+			if (posTarget.x >= size_x | posTarget.y >= size_y |
+				posTarget.x < 0 | posTarget.y < 0)
 				return new NeighborCliffmap(0,0,0); //invalid coord returns edge of map
 
 

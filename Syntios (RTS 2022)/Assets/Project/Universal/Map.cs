@@ -257,8 +257,34 @@ namespace ProtoRTS
         }
 
 
+        public struct CliffObjectDat
+        {
+            public Vector3 pos;
+            public SO_TerrainPreset.Tileset tileset;
+
+            public CliffObjectDat(Vector3 pos, SO_TerrainPreset.Tileset tileset)
+            {
+                this.pos = pos;
+                this.tileset = tileset;
+            }
+
+            public override Vector3 GetHashCode()
+            {
+                return pos;
+            }
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as pos);
+            }
+
+            public bool Equals(Foo obj)
+            {
+                return obj != null && obj.FooID == this.FooID;
+            }
+        }
+
         public bool DEBUG_SeeCliff = false;
-        [ShowInInspector] Dictionary<Vector2Int, GameObject> vd3 = new Dictionary<Vector2Int, GameObject>();
+        [ShowInInspector] Dictionary<CliffObjectDat, GameObject> vd3 = new Dictionary<CliffObjectDat, GameObject>();
         [ShowInInspector] private List<GameObject> cliffObjects = new List<GameObject>();
         private int DEBUG_lastSecondChecked = 0;
 
@@ -314,10 +340,10 @@ namespace ProtoRTS
             int indexToPrintDebug = Random.Range(startingIndex, finalIndex);
             string allIndexes = "";
 
-            for (int i = startingIndex; i <= finalIndex; i++)
+            for (int i = startingIndex; i < finalIndex; i++)
             {
                 int x = i % _terrainData.size_x;
-                int y = i / _terrainData.size_y;
+                int y = i / _terrainData.size_x;
 
                 if (x < startX) continue;
                 if (y < startY) continue;
@@ -351,7 +377,7 @@ namespace ProtoRTS
                 foreach (var coord in myPosArray)
                 {
                     GameObject instantiated = null;
-                    var tilesetTarget = GetTileSet(myPos, indexDir, coord);
+                    var tilesetList= GetTileSet(myPos, indexDir, coord);
 
                     //big problem because this is shared 
                     //causing valid neighbours to be set null
@@ -362,61 +388,69 @@ namespace ProtoRTS
                         //tilesetTarget = SO_TerrainPreset.Tileset.Null;
                     }
 
-                    Vector3 worldPos = new Vector3();
-                    worldPos.x = (coord.x * 2);
-                    worldPos.y = 0;
-                    worldPos.z = (coord.y * 2);
-
-                    var template = MyPreset.GetManmadeCliff(tilesetTarget);
-                    int DEBUG_result = 0;
-
-                    if (DEBUG_lastSecondChecked != Time.time.ToInt())
+                    for(int d1 = 0; d1 < tilesetList.Length; d1++)
                     {
-                        Debug.Log($"[{i}] mypos: {x}, {y} | {coord} [{template} : {tilesetTarget}]");
-                    }
+                        var tileSet1 = tilesetList[d1];
 
-                    //remove pre-existing first.
-                    if (vd3.ContainsKey(coord))
-                    {
-                        Destroy(vd3[coord].gameObject);
-                    }
+                        Vector3 worldPos = new Vector3();
+                        worldPos.x = (coord.x * 2);
+                        worldPos.y = d1 * 4;
+                        worldPos.z = (coord.y * 2);
+                        var template = MyPreset.GetManmadeCliff(tileSet1);
+                        int DEBUG_result = 0;
 
-                    //replacing existing
-                    if (template != null)
-                    {
-                        instantiated = CreateCliffObject(template, worldPos, _terrainData.cliffLevel[i], $"Tile_{coord}");
+                        CliffObjectDat cod = new CliffObjectDat(worldPos, tileSet1);
 
-                        if (vd3.ContainsKey(coord))
-                        {
-                            vd3[coord] = instantiated;
-                            cliffObjects.Add(instantiated);
-                            DEBUG_result = 1;
-                        }
-                        else
-                        {
-                            vd3.Add(coord, instantiated);
-                            //keyedCoord.Add(coord);
-                            cliffObjects.Add(instantiated);
-                            DEBUG_result = 2;
-                        }
 
                         if (DEBUG_lastSecondChecked != Time.time.ToInt())
                         {
-                            //Debug.Log($"mypos: {x} {y} | {coord}");
+                            //Debug.Log($"[{i}] mypos: {x}, {y} | {coord} [{template} : {tileSet1}]");
                         }
 
-                    }
-                    //remove
-                    else if (template == null)
-                    {
-                        vd3.Remove(coord);
-                    }
+                        //remove pre-existing first.
+                        if (vd3.ContainsKey(cod.tileset))
+                        {
+                            Destroy(vd3[worldPos].gameObject);
+                        }
+
+                        //replacing existing
+                        if (template != null)
+                        {
+                            instantiated = CreateCliffObject(template, worldPos, $"Tile_{worldPos.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
+
+                            if (vd3.ContainsKey(worldPos))
+                            {
+                                vd3[worldPos] = instantiated;
+                                cliffObjects.Add(instantiated);
+                                DEBUG_result = 1;
+                            }
+                            else
+                            {
+                                vd3.Add(worldPos, instantiated);
+                                //keyedCoord.Add(coord);
+                                cliffObjects.Add(instantiated);
+                                DEBUG_result = 2;
+                            }
+
+                            if (DEBUG_lastSecondChecked != Time.time.ToInt())
+                            {
+                                //Debug.Log($"mypos: {x} {y} | {coord}");
+                            }
+
+                        }
+                        //remove
+                        else if (template == null)
+                        {
+                            vd3.Remove(worldPos);
+                        }
 
 
-                    if (DEBUG_lastSecondChecked != Time.time.ToInt())
-                    {
-                        //Debug.Log($"{i} : ({x}, {y}) ({coord}) [result: {DEBUG_result}] [tileset: {tilesetTarget}]");
+                        if (DEBUG_lastSecondChecked != Time.time.ToInt())
+                        {
+                            //Debug.Log($"{i} : ({x}, {y}) ({coord}) [result: {DEBUG_result}] [tileset: {tilesetTarget}]");
+                        }
                     }
+                   
 
                     indexDir++;
                 }
@@ -435,31 +469,18 @@ namespace ProtoRTS
 
         private List<GameObject> debug_listAllNoNeighborObjs = new List<GameObject>();
 
-        public GameObject CreateCliffObject(GameObject template, Vector3 worldPos, int cliffLevel, string goName)
+        public GameObject CreateCliffObject(GameObject template, Vector3 worldPos, string goName)
         {
-            GameObject parentObject = new GameObject();
-            parentObject.name = $"Parent_{goName}";
 
-            for (int i = 0; i < cliffLevel; i++)
-            {
-                var cliffnewObj = Instantiate(template);
-                Vector3 cliffPos = worldPos;
-                cliffPos.y = i * 4;
 
-                cliffnewObj.transform.position = cliffPos;
-                cliffnewObj.gameObject.name = goName;
-                cliffnewObj.transform.SetParent(parentObject.transform);
+            var cliffnewObj = Instantiate(template);
+            Vector3 cliffPos = worldPos;
 
-                if (DEBUG_ShowNoNeighborCheck)
-                {
-                    //var debugObj1 = Instantiate(DEBUGObject_NoNeighborCheck);
-                    //debugObj1.transform.SetParent(parentObject.transform);
-                    //debugObj1.gameObject.SetActive(true);
-                    //debugObj1.transform.position = cliffPos;
-                }
-            }
+            cliffnewObj.transform.position = cliffPos;
+            cliffnewObj.gameObject.name = goName;
 
-            return parentObject;
+
+            return cliffnewObj;
 
         }
 
@@ -520,230 +541,364 @@ namespace ProtoRTS
 
                 for(int x = 0; x <= maxHeight; x++)
                 {
-                    if (x == 0) continue;
-                    //only allows 8 permutations!
-                    //we have 15 tiles to map with!
-                    //WRONG AGAIN NOOOOOOOOOOO
-                    bool is_south_higher = false;
-                    bool is_southwest_higher = false;
-                    bool is_west_higher = false;
-                    int tempLevel = myPos_cliff.cliffLevel + x;
+                    int south_cliffLV = south.cliffLevel;
+                    int southwest_cliffLV = southwest.cliffLevel;
+                    int west_cliffLV = west.cliffLevel;
+                    int myCliffLV = myPos_cliff.cliffLevel;
 
-                    if (south.cliffLevel >= tempLevel) is_south_higher = true;
-                    if (southwest.cliffLevel >= tempLevel) is_southwest_higher = true;
-                    if (west.cliffLevel >= tempLevel) is_west_higher = true;
-
-                    //Sharp corners
+                    //should 16 permutations
+                    //CORNER
+                    if (south_cliffLV <= x && southwest_cliffLV <= x && west_cliffLV <= x && myCliffLV <= x)
                     {
-                        if (is_south_higher && is_southwest_higher && !is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
-                        }
-
-                        if (is_south_higher && is_southwest_higher && is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
-                        }                
-
-                        if (is_south_higher && is_southwest_higher && !is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
-                        }
-
-                        if (!is_south_higher && is_southwest_higher && is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
-                        }
+                        tilesetList.Add(SO_TerrainPreset.Tileset.Null);
+                    }
+                    if (south_cliffLV > x && southwest_cliffLV <= x && west_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthWest);
+                    }
+                    if (south_cliffLV <= x && southwest_cliffLV > x && west_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthEast);
+                    }
+                    if (south_cliffLV <= x && southwest_cliffLV <= x && west_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthWest);
+                    }
+                    if (south_cliffLV <= x && southwest_cliffLV <= x && west_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthEast);
                     }
 
-                    //Corners
+                    if (south_cliffLV > x && southwest_cliffLV > x && west_cliffLV <= x && myCliffLV <= x)
                     {
-                        if (is_south_higher && !is_southwest_higher && !is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthWest);
-                        }
-
-                        if (!is_south_higher && is_southwest_higher && !is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthEast);
-                        }
-
-                        if (!is_south_higher && !is_southwest_higher && !is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthWest);
-                        }
-
-                        if (!is_south_higher && !is_southwest_higher && is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthEast);
-                        }
+                        tilesetList.Add(SO_TerrainPreset.Tileset.North);
+                    }
+                    if (south_cliffLV <= x && southwest_cliffLV <= x && west_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.South);
+                    }
+                    if (south_cliffLV > x && southwest_cliffLV <= x && west_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.West);
+                    }
+                    if (south_cliffLV <= x && southwest_cliffLV > x && west_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.East);
                     }
 
-                    //flat
+                    //diagonals
+                    if (south_cliffLV <= x && southwest_cliffLV > x && west_cliffLV <= x && myCliffLV > x)
                     {
-
-                        if (is_south_higher && is_southwest_higher && !is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.North);
-                        }
-
-                        if (!is_south_higher && !is_southwest_higher && is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.South);
-                        }
-
-                        if (is_south_higher && !is_southwest_higher && !is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.West);
-                        }
-
-                        if (!is_south_higher && is_southwest_higher && is_west_higher)
-                        {
-                            tilesetList.Add(SO_TerrainPreset.Tileset.East);
-                        }
-
+                        tilesetList.Add(SO_TerrainPreset.Tileset.DiagonalEast);
+                    }
+                    if (south_cliffLV > x && southwest_cliffLV <= x && west_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.DiagonalWest);
                     }
 
+                    //sharp corners
+                    if (south_cliffLV > x && southwest_cliffLV > x && west_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                    }
+                    if (south_cliffLV > x && southwest_cliffLV > x && west_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                    }
+                    if (south_cliffLV > x && southwest_cliffLV <= x && west_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                    }
+                    if (south_cliffLV <= x && southwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                    }
 
-
+                    if (south_cliffLV > x && southwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.Flat);
+                    }            
+ 
 
                     countTile++;
 
                 }
                 
             }
-
-            if (indexDir == 2)
+            else if (dir == Direction_TileCheck.Southeast)
             {
+                int maxHeight = Mathf.Max(new int[] { south.cliffLevel, southeast.cliffLevel, east.cliffLevel, myPos_cliff.cliffLevel });
 
-                if (!west.IsValid() && !northwest.IsValid() && !north.IsValid())
+
+                for (int x = 0; x <= maxHeight; x++)
                 {
-                    tilesetTarget = SO_TerrainPreset.Tileset.CornerNorthWest;
+                    int south_cliffLV = south.cliffLevel;
+                    int southeast_cliffLV = southeast.cliffLevel;
+                    int east_cliffLV = east.cliffLevel;
+                    int myCliffLV = myPos_cliff.cliffLevel;
+
+                    //CORNER
+                    if (south_cliffLV <= x && southeast_cliffLV <= x && east_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.Null);
+                    }
+                    if (south_cliffLV <= x && southeast_cliffLV > x && east_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthWest);
+                    }
+                    if (south_cliffLV > x && southeast_cliffLV <= x && east_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthEast);
+                    }
+                    if (south_cliffLV <= x && southeast_cliffLV <= x && east_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthWest);
+                    }
+                    if (south_cliffLV <= x && southeast_cliffLV <= x && east_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthEast);
+                    }
+
+                    if (south_cliffLV > x && southeast_cliffLV > x && east_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.North);
+                    }
+                    if (south_cliffLV <= x && southeast_cliffLV <= x && east_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.South);
+                    }
+                    if (south_cliffLV <= x && southeast_cliffLV > x && east_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.West);
+                    }
+                    if (south_cliffLV > x && southeast_cliffLV <= x && east_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.East);
+                    }
+
+                    //diagonals
+                    if (south_cliffLV > x && southeast_cliffLV <= x && east_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.DiagonalEast);
+                    }
+                    if (south_cliffLV <= x && southeast_cliffLV > x && east_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.DiagonalWest);
+                    }
+
+                    //sharp corners
+                    if (south_cliffLV > x && southeast_cliffLV > x && east_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                    }
+                    if (south_cliffLV > x && southeast_cliffLV > x && east_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                    }
+                    if (south_cliffLV <= x && southeast_cliffLV > x && east_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                    }
+                    if (south_cliffLV > x && southeast_cliffLV <= x && east_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                    }
+
+                    if (south_cliffLV > x && southeast_cliffLV > x && east_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.Flat);
+                    }
+
+
+                    countTile++;
+
                 }
 
-                if (west.IsValid() && !northwest.IsValid() && !north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.North;
-                }
-
-                if (!west.IsValid() && !northwest.IsValid() && north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.West;
-                }
-
-                if (west.IsValid() && !northwest.IsValid() && north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerNorthWest;
-                }
-
-                if (!west.IsValid() && northwest.IsValid() && !north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.DiagonalWest;
-                }
-
-                if (west.IsValid() && northwest.IsValid() && north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.Flat;
-                }
             }
-            else if (indexDir == 3)
+            else if (dir == Direction_TileCheck.Northwest)
             {
-                if (!east.IsValid() && !northeast.IsValid() && !north.IsValid())
+                int maxHeight = Mathf.Max(new int[] { north.cliffLevel, northwest.cliffLevel, west.cliffLevel, myPos_cliff.cliffLevel });
+
+
+                for (int x = 0; x <= maxHeight; x++)
                 {
-                    tilesetTarget = SO_TerrainPreset.Tileset.CornerNorthEast;
+                    int north_cliffLV = north.cliffLevel;
+                    int northwest_cliffLV = northwest.cliffLevel;
+                    int west_cliffLV = west.cliffLevel;
+                    int myCliffLV = myPos_cliff.cliffLevel;
+
+                    //CORNER
+                    if (north_cliffLV <= x && northwest_cliffLV <= x && west_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.Null);
+                    }
+                    if (north_cliffLV <= x && northwest_cliffLV <= x && west_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthWest);
+                    }
+                    if (north_cliffLV <= x && northwest_cliffLV <= x && west_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthEast);
+                    }
+                    if (north_cliffLV > x && northwest_cliffLV <= x && west_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthWest);
+                    }
+                    if (north_cliffLV <= x && northwest_cliffLV > x && west_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthEast);
+                    }
+
+                    if (north_cliffLV <= x && northwest_cliffLV <= x && west_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.North);
+                    }
+                    if (north_cliffLV > x && northwest_cliffLV > x && west_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.South);
+                    }
+                    if (north_cliffLV > x && northwest_cliffLV <= x && west_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.West);
+                    }
+                    if (north_cliffLV <= x && northwest_cliffLV > x && west_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.East);
+                    }
+
+                    //diagonals
+                    if (north_cliffLV > x && northwest_cliffLV <= x && west_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.DiagonalEast);
+                    }
+                    if (north_cliffLV <= x && northwest_cliffLV > x && west_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.DiagonalWest);
+                    }
+
+                    //sharp corners
+                    if (north_cliffLV > x && northwest_cliffLV <= x && west_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                    }
+                    if (north_cliffLV <= x && northwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                    }
+                    if (north_cliffLV > x && northwest_cliffLV > x && west_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                    }
+                    if (north_cliffLV > x && northwest_cliffLV > x && west_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                    }
+
+                    if (north_cliffLV > x && northwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.Flat);
+                    }
+
+
+                    countTile++;
+
                 }
 
-                if (east.IsValid() && !northeast.IsValid() && !north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.North;
-                }
-
-                if (!east.IsValid() && !northeast.IsValid() && north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.East;
-                }
-
-                if (east.IsValid() && !northeast.IsValid() && north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerNorthEast;
-                }
-
-                if (!east.IsValid() && northeast.IsValid() && !north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.DiagonalEast;
-                }
-
-                if (east.IsValid() && northeast.IsValid() && north.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.Flat;
-                }
             }
-            else if (indexDir == 1)
+            else if (dir == Direction_TileCheck.Northeast)
             {
-                if (!east.IsValid() && !southeast.IsValid() && !south.IsValid())
+                int maxHeight = Mathf.Max(new int[] { north.cliffLevel, northeast.cliffLevel, east.cliffLevel, myPos_cliff.cliffLevel });
+
+
+                for (int x = 0; x <= maxHeight; x++)
                 {
-                    tilesetTarget = SO_TerrainPreset.Tileset.CornerSouthEast;
+                    int north_cliffLV = north.cliffLevel;
+                    int northeast_cliffLV = northeast.cliffLevel;
+                    int east_cliffLV = east.cliffLevel;
+                    int myCliffLV = myPos_cliff.cliffLevel;
+
+                    //CORNER
+                    if (north_cliffLV <= x && northeast_cliffLV <= x && east_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.Null);
+                    }
+                    if (north_cliffLV <= x && northeast_cliffLV <= x && east_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthWest);
+                    }
+                    if (north_cliffLV <= x && northeast_cliffLV <= x && east_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerNorthEast);
+                    }
+                    if (north_cliffLV <= x && northeast_cliffLV > x && east_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthWest);
+                    }
+                    if (north_cliffLV > x && northeast_cliffLV <= x && east_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.CornerSouthEast);
+                    }
+
+                    if (north_cliffLV <= x && northeast_cliffLV <= x && east_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.North);
+                    }
+                    if (north_cliffLV > x && northeast_cliffLV > x && east_cliffLV <= x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.South);
+                    }
+                    if (north_cliffLV <= x && northeast_cliffLV > x && east_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.West);
+                    }
+                    if (north_cliffLV > x && northeast_cliffLV <= x && east_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.East);
+                    }
+
+                    //diagonals
+                    if (north_cliffLV <= x && northeast_cliffLV > x && east_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.DiagonalEast);
+                    }
+                    if (north_cliffLV > x && northeast_cliffLV <= x && east_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.DiagonalWest);
+                    }
+
+                    //sharp corners
+                    if (north_cliffLV <= x && northeast_cliffLV > x && east_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                    }
+                    if (north_cliffLV > x && northeast_cliffLV <= x && east_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                    }
+                    if (north_cliffLV > x && northeast_cliffLV > x && east_cliffLV > x && myCliffLV <= x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                    }
+                    if (north_cliffLV > x && northeast_cliffLV > x && east_cliffLV <= x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                    }
+
+                    if (north_cliffLV > x && northeast_cliffLV > x && east_cliffLV > x && myCliffLV > x)
+                    {
+                        tilesetList.Add(SO_TerrainPreset.Tileset.Flat);
+                    }
+
+
+                    countTile++;
+
                 }
 
-                if (east.IsValid() && !southeast.IsValid() && !south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.South;
-                }
-
-                if (!east.IsValid() && !southeast.IsValid() && south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.East;
-                }
-
-                if (east.IsValid() && !southeast.IsValid() && south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerSouthEast;
-                }
-
-                if (!east.IsValid() && southeast.IsValid() && !south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.DiagonalEast;
-                }
-
-                if (east.IsValid() && southeast.IsValid() && south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.Flat;
-                }
             }
-            else if (indexDir == 0)
-            {
-                if (!west.IsValid() && !southwest.IsValid() && !south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.CornerSouthWest;
-                }
 
-                if (west.IsValid() && !southwest.IsValid() && !south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.South;
-                }
 
-                if (!west.IsValid() && !southwest.IsValid() && south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.West;
-                }
 
-                if (west.IsValid() && !southwest.IsValid() && south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.SharpCornerSouthWest;
-                }
-
-                if (!west.IsValid() && southwest.IsValid() && !south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.DiagonalWest;
-                }
-
-                if (west.IsValid() && southwest.IsValid() && south.IsValid())
-                {
-                    tilesetTarget = SO_TerrainPreset.Tileset.Flat;
-                }
-            }
-
-            return tilesetTarget;
+            return tilesetList.ToArray();
         }
 
         private void Update()

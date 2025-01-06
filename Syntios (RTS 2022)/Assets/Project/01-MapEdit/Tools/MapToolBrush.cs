@@ -18,6 +18,7 @@ namespace ProtoRTS.MapEditor
         public float targetBrushSize = 2;
         public Shape targetShape;
         public bool isCliff = false;
+        public bool DEBUG_DrawCoord = false;
 
         [Header("References")]
         public Material mat_projectorSquare;
@@ -42,20 +43,23 @@ namespace ProtoRTS.MapEditor
 
                 int index = 0;
 
-                foreach(var test in Map.TerrainData.cliffLevel)
+                if (DEBUG_DrawCoord)
                 {
-                    int x = index % Map.TerrainData.size_x;
-                    int y = index / Map.TerrainData.size_y;
-                    index++;
+                    foreach (var test in Map.TerrainData.cliffLevel)
+                    {
+                        int x = index % Map.TerrainData.size_x;
+                        int y = index / Map.TerrainData.size_x;
+                        index++;
 
-                    Vector3 v3 = new Vector3(x * 2, 0, y * 2);
+                        Vector3 v3 = new Vector3(x * 2, 0, y * 2);
 
-                    Vector3 uiPos = Camera.main.WorldToScreenPoint(v3);
-                    uiPos.y = Screen.height - uiPos.y;
+                        Vector3 uiPos = Camera.main.WorldToScreenPoint(v3);
+                        uiPos.y = Screen.height - uiPos.y;
 
-                    if (x > 16) continue;
-                    if (y > 16) continue;
-                    GUI.Label(new Rect(uiPos.x, uiPos.y, 100, 20), $"({x}, {y}) {test}");
+                        if (x > 16) continue;
+                        if (y > 16) continue;
+                        GUI.Label(new Rect(uiPos.x, uiPos.y, 100, 20), $"({x}, {y}) {test}");
+                    }
                 }
             }
         }
