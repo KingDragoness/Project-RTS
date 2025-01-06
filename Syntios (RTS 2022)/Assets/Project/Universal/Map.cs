@@ -257,34 +257,22 @@ namespace ProtoRTS
         }
 
 
-        public struct CliffObjectDat
+        public class CliffObjectDat
         {
             public Vector3 pos;
             public SO_TerrainPreset.Tileset tileset;
+            public GameObject cliffGO;
 
-            public CliffObjectDat(Vector3 pos, SO_TerrainPreset.Tileset tileset)
+            public CliffObjectDat(Vector3 pos, SO_TerrainPreset.Tileset tileset, GameObject cliffGO)
             {
                 this.pos = pos;
                 this.tileset = tileset;
-            }
-
-            public override Vector3 GetHashCode()
-            {
-                return pos;
-            }
-            public override bool Equals(object obj)
-            {
-                return Equals(obj as pos);
-            }
-
-            public bool Equals(Foo obj)
-            {
-                return obj != null && obj.FooID == this.FooID;
+                this.cliffGO = cliffGO;
             }
         }
 
         public bool DEBUG_SeeCliff = false;
-        [ShowInInspector] Dictionary<CliffObjectDat, GameObject> vd3 = new Dictionary<CliffObjectDat, GameObject>();
+        [ShowInInspector] List<CliffObjectDat> vd3 = new List<CliffObjectDat>();
         [ShowInInspector] private List<GameObject> cliffObjects = new List<GameObject>();
         private int DEBUG_lastSecondChecked = 0;
 
@@ -399,7 +387,6 @@ namespace ProtoRTS
                         var template = MyPreset.GetManmadeCliff(tileSet1);
                         int DEBUG_result = 0;
 
-                        CliffObjectDat cod = new CliffObjectDat(worldPos, tileSet1);
 
 
                         if (DEBUG_lastSecondChecked != Time.time.ToInt())
@@ -408,28 +395,40 @@ namespace ProtoRTS
                         }
 
                         //remove pre-existing first.
-                        if (vd3.ContainsKey(cod.tileset))
-                        {
-                            Destroy(vd3[worldPos].gameObject);
-                        }
+                        var cliffSimilar = vd3.Find(x => x.pos == worldPos);
 
                         //replacing existing
                         if (template != null)
                         {
-                            instantiated = CreateCliffObject(template, worldPos, $"Tile_{worldPos.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
 
-                            if (vd3.ContainsKey(worldPos))
+
+                            if (cliffSimilar != null)
                             {
-                                vd3[worldPos] = instantiated;
-                                cliffObjects.Add(instantiated);
-                                DEBUG_result = 1;
+                                if (cliffSimilar.tileset == tileSet1)
+                                {
+                                    //ignore
+                                    DEBUG_result = 1;
+                                }
+                                else
+                                {
+                                    Destroy(cliffSimilar.cliffGO);
+
+
+                                    instantiated = CreateCliffObject(template, worldPos, $"Tile_{worldPos.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
+                                    cliffSimilar.cliffGO = instantiated;
+                                    DEBUG_result = 2;
+
+                                }
+
                             }
                             else
                             {
-                                vd3.Add(worldPos, instantiated);
-                                //keyedCoord.Add(coord);
-                                cliffObjects.Add(instantiated);
-                                DEBUG_result = 2;
+
+                                instantiated = CreateCliffObject(template, worldPos, $"Tile_{worldPos.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
+                                CliffObjectDat cod = new CliffObjectDat(worldPos, tileSet1, instantiated);
+
+                                vd3.Add(cod);
+                                DEBUG_result = 3;
                             }
 
                             if (DEBUG_lastSecondChecked != Time.time.ToInt())
@@ -441,7 +440,11 @@ namespace ProtoRTS
                         //remove
                         else if (template == null)
                         {
-                            vd3.Remove(worldPos);
+
+                            if (cliffSimilar != null)
+                            {
+                                if (cliffSimilar.cliffGO != null) Destroy(cliffSimilar.cliffGO);
+                            }
                         }
 
 
@@ -463,7 +466,7 @@ namespace ProtoRTS
 
             if (Time.time % 2 == 0) DEBUG_lastSecondChecked = Time.time.ToInt();
 
-            vd3 = vd3.Where(f => f.Value != null).ToDictionary(x => x.Key, x => x.Value);
+            vd3.RemoveAll(f => f.cliffGO == null);
             cliffObjects.RemoveAll(x => x == null);
         }
 
