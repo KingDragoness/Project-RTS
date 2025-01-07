@@ -52,6 +52,8 @@ namespace ProtoRTS.MapEditor
                         index++;
 
                         Vector3 v3 = new Vector3(x * 2, 0, y * 2);
+                        v3.x += 2;
+                        v3.z += 2;
 
                         Vector3 uiPos = Camera.main.WorldToScreenPoint(v3);
                         uiPos.y = Screen.height - uiPos.y;
@@ -93,8 +95,8 @@ namespace ProtoRTS.MapEditor
 
                 if (isCliff)
                 {
-                    pos.x = Mathf.Round(pos.x / 2f) * 2f;
-                    pos.z = Mathf.Round(pos.z / 2f) * 2f;
+                    //pos.x = Mathf.Round(pos.x / 2f) * 2f;
+                    //pos.z = Mathf.Round(pos.z / 2f) * 2f;
                 }
 
                 brushPosition = hit.point;

@@ -348,16 +348,6 @@ namespace ProtoRTS
                     myPos + offsetPos4
                 };
 
-                //check type
-                bool north = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.North, myPos).hasNeighbor;
-                bool south = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.South, myPos).hasNeighbor;
-                bool west = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.West, myPos).hasNeighbor;
-                bool east = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.East, myPos).hasNeighbor;
-                bool northwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthWest, myPos).hasNeighbor;
-                bool northeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.NorthEast, myPos).hasNeighbor;
-                bool southwest = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthWest, myPos).hasNeighbor;
-                bool southeast = _terrainData.IsNeighborValid(SyntiosTerrainData.DirectionNeighbor.SouthEast, myPos).hasNeighbor;
-
 
                 int indexDir = 0;
 
@@ -366,16 +356,7 @@ namespace ProtoRTS
                 {
                     GameObject instantiated = null;
                     var tilesetList= GetTileSet(myPos, indexDir, coord);
-
-                    //big problem because this is shared 
-                    //causing valid neighbours to be set null
-                    //it must check the surrounding to be valid
-                    //IT WAS FIGHTING FOR THE SAME FUCKING CELL
-                    if (_terrainData.cliffLevel[i] < 1)
-                    {
-                        //tilesetTarget = SO_TerrainPreset.Tileset.Null;
-                    }
-
+                    
                     for(int d1 = 0; d1 < tilesetList.Length; d1++)
                     {
                         var tileSet1 = tilesetList[d1];
@@ -387,23 +368,20 @@ namespace ProtoRTS
                         var template = MyPreset.GetManmadeCliff(tileSet1);
                         int DEBUG_result = 0;
 
-
-
-                        if (DEBUG_lastSecondChecked != Time.time.ToInt())
-                        {
-                            //Debug.Log($"[{i}] mypos: {x}, {y} | {coord} [{template} : {tileSet1}]");
-                        }
-
-                        //remove pre-existing first.
                         var cliffSimilar = vd3.Find(x => x.pos == worldPos);
 
                         //replacing existing
                         if (template != null)
                         {
-
+                            //if (DEBUG_OutputTest && countDEBUG_tileset % 4 == 1 && indexDir == 0)
+                            //{
+                            //    Debug.Log($"mypos: {myPos} dir: {indexDir} | [TILE: {tilesetList[0]} / {tileSet1}]");
+                            //}
 
                             if (cliffSimilar != null)
                             {
+
+
                                 if (cliffSimilar.tileset == tileSet1)
                                 {
                                     //ignore
@@ -413,13 +391,14 @@ namespace ProtoRTS
                                 {
                                     Destroy(cliffSimilar.cliffGO);
 
-
                                     instantiated = CreateCliffObject(template, worldPos, $"Tile_{worldPos.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
                                     cliffSimilar.cliffGO = instantiated;
+                                    cliffSimilar.tileset = tileSet1;
                                     DEBUG_result = 2;
 
                                 }
 
+                         
                             }
                             else
                             {
@@ -515,6 +494,9 @@ namespace ProtoRTS
             Northeast
         }
 
+        [FoldoutGroup("DEBUG")] public bool DEBUG_OutputTest = false;
+        private int countDEBUG_tileset = 0;
+
         //there is a problem here
         //Array because it returns depends on the cliff levels (3 means it returns 3 objects)
         public SO_TerrainPreset.Tileset[] GetTileSet(Vector2Int myPos, int indexDir, Vector2Int coord, bool printDEBUG = false)
@@ -537,6 +519,11 @@ namespace ProtoRTS
 
             int countTile = 0;
 
+            if (DEBUG_OutputTest)
+            {
+                countDEBUG_tileset++;
+            }
+
             if (dir == Direction_TileCheck.Southwest)
             {
                 int maxHeight = Mathf.Max(new int[] { south.cliffLevel, southwest.cliffLevel, west.cliffLevel, myPos_cliff.cliffLevel});
@@ -548,6 +535,8 @@ namespace ProtoRTS
                     int southwest_cliffLV = southwest.cliffLevel;
                     int west_cliffLV = west.cliffLevel;
                     int myCliffLV = myPos_cliff.cliffLevel;
+
+               
 
                     //should 16 permutations
                     //CORNER
@@ -620,8 +609,9 @@ namespace ProtoRTS
                     if (south_cliffLV > x && southwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
                     {
                         tilesetList.Add(SO_TerrainPreset.Tileset.Flat);
-                    }            
- 
+                    }
+
+                   
 
                     countTile++;
 

@@ -4253,6 +4253,7 @@ MonoBehaviour:
   targetBrushSize: 2
   targetShape: 0
   isCliff: 0
+  DEBUG_DrawCoord: 1
   mat_projectorSquare: {fileID: 2100000, guid: 69fb8242690f3d641b95beb4d569e0c6, type: 2}
   mat_projectorCircle: {fileID: 2100000, guid: 2e738fe83644fc54f94270cb4c6bf856, type: 2}
   brushProjector: {fileID: 600833228}
@@ -10534,11 +10535,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 258178841998990040, guid: e60c835d5584b834b9ce106005f72700,
-        type: 3}
-      propertyPath: field of view
-      value: 19
-      objectReference: {fileID: 0}
     - target: {fileID: 1005817333253558763, guid: e60c835d5584b834b9ce106005f72700,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -10593,31 +10589,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RTSCamera
-      objectReference: {fileID: 0}
-    - target: {fileID: 6572565834936518985, guid: e60c835d5584b834b9ce106005f72700,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 99
-      objectReference: {fileID: 0}
-    - target: {fileID: 6572565834936518985, guid: e60c835d5584b834b9ce106005f72700,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071685
-      objectReference: {fileID: 0}
-    - target: {fileID: 6572565834936518985, guid: e60c835d5584b834b9ce106005f72700,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.707045
-      objectReference: {fileID: 0}
-    - target: {fileID: 6572565834936518985, guid: e60c835d5584b834b9ce106005f72700,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6572565834936518985, guid: e60c835d5584b834b9ce106005f72700,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6572565834936518985, guid: e60c835d5584b834b9ce106005f72700,
         type: 3}
