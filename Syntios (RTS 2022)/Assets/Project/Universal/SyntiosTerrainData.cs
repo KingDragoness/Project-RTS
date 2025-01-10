@@ -164,6 +164,18 @@ namespace ProtoRTS
 		}
 
 		[FoldoutGroup("DEBUG")]
+		[Button("SetHeight Data")]
+		public void SetHeight(byte heightTarget)
+		{
+			for (int x = 0; x < cliffLevel.Length; x++)
+			{
+				cliffLevel[x] = heightTarget;
+			}
+
+		}
+
+
+		[FoldoutGroup("DEBUG")]
 		[Button("Randomized Data")]
 		public void RandomizedData()
 		{

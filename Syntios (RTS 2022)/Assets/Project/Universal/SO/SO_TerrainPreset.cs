@@ -40,7 +40,11 @@ namespace ProtoRTS
 			SharpCornerNorthEast,
 			SharpCornerSouthWest,
 			SharpCornerSouthEast,
-			Flat
+			Flat,
+			Corner78NorthWest,
+			Corner78NorthEast,
+			Corner78SouthWest,
+			Corner78SouthEast
 		}
 
 		public string PresetID = "Earth";
@@ -224,6 +228,22 @@ namespace ProtoRTS
 			else if (dir == Tileset.Flat)
 			{
 				return manmadeCliffs[9];
+			}
+			else if (dir == Tileset.Corner78NorthWest)
+            {
+				return manmadeCliffs[15];
+			}
+			else if (dir == Tileset.Corner78NorthEast)
+			{
+				return manmadeCliffs[17];
+			}
+			else if (dir == Tileset.Corner78SouthWest)
+			{
+				return manmadeCliffs[16];
+			}
+			else if (dir == Tileset.Corner78SouthEast)
+			{
+				return manmadeCliffs[18];
 			}
 
 			//corner

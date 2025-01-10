@@ -262,6 +262,8 @@ namespace ProtoRTS
             public Vector3 pos;
             public SO_TerrainPreset.Tileset tileset;
             public GameObject cliffGO;
+            public bool isToBeDestroyed = false;
+            public bool isBase = false;
 
             public CliffObjectDat(Vector3 pos, SO_TerrainPreset.Tileset tileset, GameObject cliffGO)
             {
@@ -370,20 +372,17 @@ namespace ProtoRTS
 
                         var cliffSimilar = vd3.Find(x => x.pos == worldPos);
 
+
                         //replacing existing
                         if (template != null)
                         {
-                            //if (DEBUG_OutputTest && countDEBUG_tileset % 4 == 1 && indexDir == 0)
-                            //{
-                            //    Debug.Log($"mypos: {myPos} dir: {indexDir} | [TILE: {tilesetList[0]} / {tileSet1}]");
-                            //}
-
                             if (cliffSimilar != null)
                             {
 
 
                                 if (cliffSimilar.tileset == tileSet1)
                                 {
+                                    cliffSimilar.pos = worldPos;
                                     //ignore
                                     DEBUG_result = 1;
                                 }
@@ -391,9 +390,11 @@ namespace ProtoRTS
                                 {
                                     Destroy(cliffSimilar.cliffGO);
 
-                                    instantiated = CreateCliffObject(template, worldPos, $"Tile_{worldPos.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
+                                    instantiated = CreateCliffObject(template, worldPos, $"Tile_{myPos}y{worldPos.y.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
                                     cliffSimilar.cliffGO = instantiated;
+                                    cliffSimilar.pos = worldPos;
                                     cliffSimilar.tileset = tileSet1;
+                                    if (d1 == 0) cliffSimilar.isBase = true; else cliffSimilar.isBase = false;
                                     DEBUG_result = 2;
 
                                 }
@@ -403,8 +404,9 @@ namespace ProtoRTS
                             else
                             {
 
-                                instantiated = CreateCliffObject(template, worldPos, $"Tile_{worldPos.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
+                                instantiated = CreateCliffObject(template, worldPos, $"Tile_{myPos}y{worldPos.y.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
                                 CliffObjectDat cod = new CliffObjectDat(worldPos, tileSet1, instantiated);
+                                if (d1 == 0) cod.isBase = true; else cod.isBase = false;
 
                                 vd3.Add(cod);
                                 DEBUG_result = 3;
@@ -422,7 +424,11 @@ namespace ProtoRTS
 
                             if (cliffSimilar != null)
                             {
-                                if (cliffSimilar.cliffGO != null) Destroy(cliffSimilar.cliffGO);
+                                if (cliffSimilar.cliffGO != null && cliffSimilar.isToBeDestroyed == false)
+                                {
+                                    cliffSimilar.isToBeDestroyed = true;
+                                    Destroy(cliffSimilar.cliffGO);
+                                }
                             }
                         }
 
@@ -442,6 +448,29 @@ namespace ProtoRTS
                     //Debug.Log($"{i} : ({x}, {y})");
                 }
             }
+
+
+            //removing hanging cliff objects
+            foreach (var cliffObj in vd3)
+            {
+                //if (cliffObj.isToBeDestroyed == true) continue;
+                if (cliffObj.cliffGO == null) continue;
+                Vector3 myPos = cliffObj.pos;
+                myPos.y = 0;
+                var baseCliff = vd3.Find(x => x.pos == myPos && x.isBase && x.isToBeDestroyed == false);
+
+                if (baseCliff != null)
+                {
+                   // Debug.Log($"{baseCliff.cliffGO.gameObject.name} {baseCliff.pos} ||| {cliffObj.cliffGO.gameObject.name} {cliffObj.pos}");
+                }
+
+                if (baseCliff == null)
+                {
+                    Destroy(cliffObj.cliffGO);
+                   // Debug.Log($"DELETING: {cliffObj.pos}");
+                }
+            }
+
 
             if (Time.time % 2 == 0) DEBUG_lastSecondChecked = Time.time.ToInt();
 
@@ -472,17 +501,52 @@ namespace ProtoRTS
 
         #endregion
 
-        public Vector2Int IndexDirOffset(int indexDir)
+
+        #region Functions
+        public Vector2Int GetDirOffset(Direction_TileCheck dir, Direction_TileCheck coordDir)
         {
             Vector2Int offsetPos1 = new Vector2Int(0, 0);
             Vector2Int offsetPos2 = new Vector2Int(1, 0);
             Vector2Int offsetPos3 = new Vector2Int(0, 1);
             Vector2Int offsetPos4 = new Vector2Int(1, 1);
 
-            if (indexDir == 0) return offsetPos1;
-            if (indexDir == 1) return offsetPos2;
-            if (indexDir == 2) return offsetPos3;
-            if (indexDir == 3) return offsetPos4;
+            if (coordDir == Direction_TileCheck.Northeast)
+            {
+                Vector2Int offset_byNeighbor = new Vector2Int(0, 0);
+                offsetPos1 -= offset_byNeighbor;
+                offsetPos2 -= offset_byNeighbor;
+                offsetPos3 -= offset_byNeighbor;
+                offsetPos4 -= offset_byNeighbor;
+            }
+            else if (coordDir == Direction_TileCheck.Northwest)
+            {
+                Vector2Int offset_byNeighbor = new Vector2Int(1, 0);
+                offsetPos1 -= offset_byNeighbor;
+                offsetPos2 -= offset_byNeighbor;
+                offsetPos3 -= offset_byNeighbor;
+                offsetPos4 -= offset_byNeighbor;
+            }
+            else if (coordDir == Direction_TileCheck.Southeast)
+            {
+                Vector2Int offset_byNeighbor = new Vector2Int(0, 1);
+                offsetPos1 -= offset_byNeighbor;
+                offsetPos2 -= offset_byNeighbor;
+                offsetPos3 -= offset_byNeighbor;
+                offsetPos4 -= offset_byNeighbor;
+            }
+            else if (coordDir == Direction_TileCheck.Southwest)
+            {
+                Vector2Int offset_byNeighbor = new Vector2Int(1, 1);
+                offsetPos1 -= offset_byNeighbor;
+                offsetPos2 -= offset_byNeighbor;
+                offsetPos3 -= offset_byNeighbor;
+                offsetPos4 -= offset_byNeighbor;
+            }
+
+            if (dir == Direction_TileCheck.Southwest) return offsetPos1;
+            if (dir == Direction_TileCheck.Southeast) return offsetPos2;
+            if (dir == Direction_TileCheck.Northwest) return offsetPos3;
+            if (dir == Direction_TileCheck.Northeast) return offsetPos4;
             return offsetPos1;
         }
 
@@ -591,19 +655,63 @@ namespace ProtoRTS
                     //sharp corners
                     if (south_cliffLV > x && southwest_cliffLV > x && west_cliffLV <= x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Northwest, dir);
+                        var corner_Northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, cornerPos);
+                        var corner_Southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, cornerPos);
+
+                        if (corner_Northeast.cliffLevel > x && corner_Southwest.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78NorthWest);
+                        }
                     }
                     if (south_cliffLV > x && southwest_cliffLV > x && west_cliffLV > x && myCliffLV <= x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Northeast, dir);
+                        var corner_Northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, cornerPos);
+                        var corner_Southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, cornerPos);
+
+                        if (corner_Northwest.cliffLevel > x && corner_Southeast.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78NorthEast);
+                        }
                     }
                     if (south_cliffLV > x && southwest_cliffLV <= x && west_cliffLV > x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Southwest, dir);
+                        var corner_Northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, cornerPos);
+                        var corner_Southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, cornerPos);
+
+                        if (corner_Northwest.cliffLevel > x && corner_Southeast.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78SouthWest);
+                        }
                     }
                     if (south_cliffLV <= x && southwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Southeast, dir);
+                        var corner_Northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, cornerPos);
+                        var corner_Southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, cornerPos);
+
+                        if (corner_Northeast.cliffLevel > x && corner_Southwest.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78SouthEast);
+                        }
                     }
 
                     if (south_cliffLV > x && southwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
@@ -682,19 +790,63 @@ namespace ProtoRTS
                     //sharp corners
                     if (south_cliffLV > x && southeast_cliffLV > x && east_cliffLV > x && myCliffLV <= x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Northwest, dir);
+                        var corner_Northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, cornerPos);
+                        var corner_Southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, cornerPos);
+
+                        if (corner_Northeast.cliffLevel > x && corner_Southwest.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78NorthWest);
+                        }
                     }
                     if (south_cliffLV > x && southeast_cliffLV > x && east_cliffLV <= x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Northeast, dir);
+                        var corner_Northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, cornerPos);
+                        var corner_Southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, cornerPos);
+
+                        if (corner_Northwest.cliffLevel > x && corner_Southeast.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78NorthEast);
+                        }
                     }
                     if (south_cliffLV <= x && southeast_cliffLV > x && east_cliffLV > x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Southwest, dir);
+                        var corner_Northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, cornerPos);
+                        var corner_Southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, cornerPos);
+
+                        if (corner_Northwest.cliffLevel > x && corner_Southeast.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78SouthWest);
+                        }
                     }
                     if (south_cliffLV > x && southeast_cliffLV <= x && east_cliffLV > x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Southeast, dir);
+                        var corner_Northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, cornerPos);
+                        var corner_Southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, cornerPos);
+
+                        if (corner_Northeast.cliffLevel > x && corner_Southwest.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78SouthEast);
+                        }
                     }
 
                     if (south_cliffLV > x && southeast_cliffLV > x && east_cliffLV > x && myCliffLV > x)
@@ -772,19 +924,63 @@ namespace ProtoRTS
                     //sharp corners
                     if (north_cliffLV > x && northwest_cliffLV <= x && west_cliffLV > x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Northwest, dir);
+                        var corner_Northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, cornerPos);
+                        var corner_Southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, cornerPos);
+
+                        if (corner_Northeast.cliffLevel > x && corner_Southwest.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78NorthWest);
+                        }
                     }
                     if (north_cliffLV <= x && northwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Northeast, dir);
+                        var corner_Northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, cornerPos);
+                        var corner_Southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, cornerPos);
+
+                        if (corner_Northwest.cliffLevel > x && corner_Southeast.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78NorthEast);
+                        }
                     }
                     if (north_cliffLV > x && northwest_cliffLV > x && west_cliffLV <= x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Southwest, dir);
+                        var corner_Northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, cornerPos);
+                        var corner_Southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, cornerPos);
+
+                        if (corner_Northwest.cliffLevel > x && corner_Southeast.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78SouthWest);
+                        }
                     }
                     if (north_cliffLV > x && northwest_cliffLV > x && west_cliffLV > x && myCliffLV <= x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Southeast, dir);
+                        var corner_Northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, cornerPos);
+                        var corner_Southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, cornerPos);
+
+                        if (corner_Northeast.cliffLevel > x && corner_Southwest.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78SouthEast);
+                        }
                     }
 
                     if (north_cliffLV > x && northwest_cliffLV > x && west_cliffLV > x && myCliffLV > x)
@@ -862,19 +1058,67 @@ namespace ProtoRTS
                     //sharp corners
                     if (north_cliffLV <= x && northeast_cliffLV > x && east_cliffLV > x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Northwest, dir);
+                        var corner_Northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, cornerPos);
+                        var corner_Southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, cornerPos);
+
+                        if (corner_Northeast.cliffLevel > x && corner_Southwest.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthWest);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78NorthWest);
+                        }
+
                     }
                     if (north_cliffLV > x && northeast_cliffLV <= x && east_cliffLV > x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Northeast, dir);
+                        var corner_Northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, cornerPos);
+                        var corner_Southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, cornerPos);
+
+                        if (corner_Northwest.cliffLevel > x && corner_Southeast.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerNorthEast);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78NorthEast);
+                        }
+
                     }
                     if (north_cliffLV > x && northeast_cliffLV > x && east_cliffLV > x && myCliffLV <= x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Southwest, dir);
+                        var corner_Northwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthWest, cornerPos);
+                        var corner_Southeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthEast, cornerPos);
+
+                        if (corner_Northwest.cliffLevel > x && corner_Southeast.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthWest);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78SouthWest);
+                        }
+
                     }
                     if (north_cliffLV > x && northeast_cliffLV > x && east_cliffLV <= x && myCliffLV > x)
                     {
-                        tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        var cornerPos = myPos + GetDirOffset(Direction_TileCheck.Southeast, dir);
+                        var corner_Northeast = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.NorthEast, cornerPos);
+                        var corner_Southwest = _terrainData.GetNeighbor(SyntiosTerrainData.DirectionNeighbor.SouthWest, cornerPos);
+
+                        if (corner_Northeast.cliffLevel > x && corner_Southwest.cliffLevel > x)
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.SharpCornerSouthEast);
+                        }
+                        else
+                        {
+                            tilesetList.Add(SO_TerrainPreset.Tileset.Corner78SouthEast);
+                        }
+
                     }
 
                     if (north_cliffLV > x && northeast_cliffLV > x && east_cliffLV > x && myCliffLV > x)
@@ -893,6 +1137,7 @@ namespace ProtoRTS
 
             return tilesetList.ToArray();
         }
+        #endregion
 
         private void Update()
         {

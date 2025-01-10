@@ -46,4 +46,8 @@ MonoBehaviour:
   - {fileID: 462820149733609648, guid: e9e2d9cbd2f5cd0419d0d73ce63d349a, type: 3}
   - {fileID: 4892625721245932557, guid: a6ccf3a2457110f49b871ec57dbbb160, type: 3}
   - {fileID: 3322267142006155482, guid: f9df300367601324bb54cb2f6f77da38, type: 3}
+  - {fileID: 1264614341824272216, guid: 10007e2b322c5e34493b7bdfa06f284f, type: 3}
+  - {fileID: 6669635141485355936, guid: f7925f3f7a8a0d14180f8c2f444d550a, type: 3}
+  - {fileID: 928430421338362725, guid: bfcd48b08498bd24792ea5933bef4740, type: 3}
+  - {fileID: 6444622857777550444, guid: 15b2dd01fe2858147befa2d3b09e33ed, type: 3}
   naturalCliffs: []
