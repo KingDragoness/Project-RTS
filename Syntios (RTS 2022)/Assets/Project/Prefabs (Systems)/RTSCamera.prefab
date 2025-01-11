@@ -201,12 +201,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MainCamera: {fileID: 258178841998990040}
   bait_noX: {fileID: 19731080500946889}
+  minimumHeight: 20
+  maximumHeight: 100
   ySpeed: 65
   layer_Terrain:
     serializedVersion: 2
     m_Bits: 64
+  mapBorder: 8
   Offset: {x: 16, y: 0, z: 16}
-  speedPan: 60
+  speedPan: 45
   speedZoom: 65
   rotateSpeed: 35
   screenDistX: 48

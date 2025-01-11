@@ -14,6 +14,8 @@ namespace ProtoRTS
 
         public Camera MainCamera;
         public Transform bait_noX;
+        public int minimumHeight = 20;
+        public int maximumHeight = 100;
         public float ySpeed = 25f;
         public LayerMask layer_Terrain;
         public float mapBorder = 8f;
@@ -88,9 +90,19 @@ namespace ProtoRTS
         private void Scrollwheel()
         {
             var mouseScroll = Input.GetAxis("Mouse ScrollWheel");
-            var deltaZoom = transform.forward * mouseScroll * speedZoom;
+            var deltaZoom = Vector3.up * mouseScroll * speedZoom;
 
+            Vector3 result = MainCamera.transform.position + deltaZoom;
+            if (result.y < minimumHeight)
+            {
+                result.y = minimumHeight;
+            }
+            if (result.y > maximumHeight)
+            {
+                result.y = maximumHeight;
+            }
 
+            MainCamera.transform.position = result;
         }
 
         public static void SetPositionByMinimap(Vector3 position)
@@ -137,7 +149,7 @@ namespace ProtoRTS
                 }
 
                 Vector3 pos = transform.position;
-                pos.y = y_position / 1.6f;
+                pos.y = y_position;
 
                 //if (pos.y >= 8) pos.y = 8f;
 
@@ -146,7 +158,7 @@ namespace ProtoRTS
             }
 
 
-            transform.position += delta * speedPan * Time.deltaTime;
+            transform.position += delta * speedPan * (MainCamera.transform.position.y / minimumHeight) * Time.deltaTime;
         }
 
         private void ClampPosition()

@@ -44,6 +44,9 @@ namespace ProtoRTS.MapEditor
 			
 		}
 
+		private byte original_pixelPos_cliffTarget;
+
+
 		private void Update()
 		{
 			_refreshTime -= Time.deltaTime;
@@ -63,6 +66,9 @@ namespace ProtoRTS.MapEditor
 			{
 				if (MainUI.GetEventSystemRaycastResults().Count == 0)
 				{
+					var v3_pos = WorldPosToCliffmapPos(Brush.BrushPosition);
+					original_pixelPos_cliffTarget = SampleCurrentCliffmapHeight(v3_pos);
+
 					_allowMouseToEdit = true;
 				}
 				else
@@ -99,6 +105,7 @@ namespace ProtoRTS.MapEditor
 			}
 		}
 
+
 		private void Update_BrushingCliff()
 		{
 			int pixelWidthBrush = brushSize;
@@ -108,6 +115,26 @@ namespace ProtoRTS.MapEditor
 			Vector2Int pixelPosCenter = WorldPosToCliffmapPos(Brush.BrushPosition);
 			Vector2Int pixelPosOrigin = WorldPosToCliffmapPos(posOrigin);
 
+			byte targetHeight = original_pixelPos_cliffTarget;
+
+			if (currentOperation == Operation.SameLevel)
+            {
+				
+            }
+			else if (currentOperation == Operation.Raise)
+			{
+				if (targetHeight < 16)
+                {
+					targetHeight++;
+				}
+			}
+			else if (currentOperation == Operation.Lower)
+			{
+				if (targetHeight > 0)
+				{
+					targetHeight--;
+				}
+			}
 
 			int countDebug = 0;
 
@@ -162,22 +189,16 @@ namespace ProtoRTS.MapEditor
 
 				countDebug++;
 
-				if (currentOperation == Operation.Raise)
-                {
-					BrushCliff(currentIndex, cliffLevelTarget);
-				}
-                else if (currentOperation == Operation.Lower)
-                {
-					BrushCliff(currentIndex, 0);
-				}
+				BrushCliff(currentIndex, targetHeight);
+
 
 			}
 
 
 
-            //Map.instance.UpdateCliffMap();
+			//Map.instance.UpdateCliffMap();
 
-            {
+			{
 				//bigger refresh
 				int refreshRadius = ((brushSize + 2) * 2) + 4;
 				float refresh_halfSize = refreshRadius / 2f;
@@ -199,11 +220,14 @@ namespace ProtoRTS.MapEditor
 
 		public void BrushCliff(int currentIndex, byte height)
 		{
-
 			Map.TerrainData.cliffLevel[currentIndex] = height;
+		}
 
+		public byte SampleCurrentCliffmapHeight(Vector2Int pixelPos)
+        {
+			int index_cm = HeightmapPosToIndex(pixelPos);
 
-
+			return Map.TerrainData.cliffLevel[index_cm];
 		}
 
 		private void OnEnable()

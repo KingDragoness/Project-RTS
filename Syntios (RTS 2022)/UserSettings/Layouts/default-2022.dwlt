@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 989
   m_ShowMode: 4
-  m_Title: Game
+  m_Title: Inspector
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 12171
+  controlID: 60
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -145,7 +145,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 12172
+  controlID: 61
   draggingID: 0
 --- !u!114 &7
 MonoBehaviour:
@@ -171,7 +171,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 50}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 12173
+  controlID: 62
   draggingID: 0
 --- !u!114 &8
 MonoBehaviour:
@@ -351,7 +351,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 247}
     m_SelectedIDs: 76a00000
     m_LastClickedID: 41078
-    m_ExpandedIDs: 000000001892000024920000269200002892000000ca9a3b
+    m_ExpandedIDs: 000000009a910000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -379,7 +379,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 
+    m_ExpandedIDs: 000000009a910000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -571,10 +571,10 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 11}
-      m_SelectedIDs: 74f7ffff
-      m_LastClickedID: -2188
-      m_ExpandedIDs: 845df7ff5861f7ffc861f7ff627df7ff1ae0f7ff6cebf7ff2032faffe033fafffe4ffaffd87cfaff1c88faff6c8dfaff9091faff5897faffd898faff408bfbffcc8bfbff009bfbffe2d4fbff0a39fcff7491fcff9204fdff0095fdff7476feffdc2affff682bffffd82bffffe62bffff1e2cffff6e2dffffa62dffff862efffffa39ffff6049ffff124bffff3652fffff053ffff0c54ffffc281ffffde81ffffc288fffffcf8ffff30faffffd6faffff86880000f8880000068a0000
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: d6faffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1005,7 +1005,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: -0.16019486, y: -0.15396331, z: 0.025290238, w: -0.9746791}
     speed: 2
-    m_Value: {x: -0.16019438, y: -0.15396285, z: 0.025290163, w: -0.9746762}
+    m_Value: {x: -0.16019486, y: -0.1539633, z: 0.025290238, w: -0.97467905}
   m_Size:
     m_Target: 13.537031
     speed: 2
@@ -1290,7 +1290,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 478}
     m_SelectedIDs: 76a00000
     m_LastClickedID: 41078
-    m_ExpandedIDs: 00000000189200001a9200001c9200001e92000020920000229200002492000026920000289200002a92000072a0000000ca9a3b
+    m_ExpandedIDs: 000000009a910000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1318,7 +1318,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000189200001a9200001c9200001e92000020920000229200002492000026920000289200002a92000000ca9a3b
+    m_ExpandedIDs: 000000009a910000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1409,7 +1409,7 @@ MonoBehaviour:
     m_LastAppliedPresetName: Default
     m_SaveData: []
     m_OverlaysVisible: 1
-  m_Recording: 0
+  m_Recording: 1
   m_ActiveNativePlatformSupportModuleName: 
   m_AllModules:
   - rid: 7451645946156023808

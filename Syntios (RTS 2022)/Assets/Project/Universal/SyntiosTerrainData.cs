@@ -108,12 +108,22 @@ namespace ProtoRTS
 		/// <returns></returns>
 		public int GetIndex(int x, int y)
 		{
-			if (x > size_x) throw new System.Exception("Invalid X coord!");
-			if (y > size_y) throw new System.Exception("Invalid Y coord!");
+			if (x >= size_x) throw new System.Exception("Invalid X coord!");
+			if (y >= size_y) throw new System.Exception("Invalid Y coord!");
 			if (x < 0) throw new System.Exception("Invalid X coord!");
 			if (y < 0) throw new System.Exception("Invalid Y coord!");
 
 			return x + (size_x * y);
+		}
+
+		public bool IsIndexOutsideArray(int x, int y)
+        {
+			if (x >= size_x) return true;
+			if (y >= size_y) return true;
+			if (x < 0) return true;
+			if (y < 0) return true;
+
+			return false;
 		}
 
 		public int GetSplatmapIndex(int x, int y)
@@ -143,6 +153,10 @@ namespace ProtoRTS
 			terrain_layer7 = new byte[SplatmapLength]; //splat2 b
 			terrain_layer8 = new byte[SplatmapLength]; //splat2 a
 
+			for(int x = 0; x < cliffLevel.Length; x++)
+            {
+				cliffLevel[x] = 1;
+            }
 		}
 
 		[FoldoutGroup("DEBUG")]

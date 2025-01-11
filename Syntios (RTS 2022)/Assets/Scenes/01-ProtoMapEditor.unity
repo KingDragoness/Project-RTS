@@ -4257,7 +4257,7 @@ MonoBehaviour:
   targetBrushSize: 2
   targetShape: 0
   isCliff: 0
-  DEBUG_DrawCoord: 1
+  DEBUG_DrawCoord: 0
   mat_projectorSquare: {fileID: 2100000, guid: 69fb8242690f3d641b95beb4d569e0c6, type: 2}
   mat_projectorCircle: {fileID: 2100000, guid: 2e738fe83644fc54f94270cb4c6bf856, type: 2}
   brushProjector: {fileID: 600833228}
@@ -6794,7 +6794,7 @@ PrefabInstance:
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_y
-      value: 64
+      value: 144
       objectReference: {fileID: 0}
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
@@ -7915,7 +7915,7 @@ MonoBehaviour:
   hardness: 0.9
   brushSize: 4
   brushStrength: 45
-  refreshRate: 20
+  refreshRate: 10
   isMaskByDistance: 0
   circle_cutoff: 30
   DEBUG_start: {fileID: 28420765}

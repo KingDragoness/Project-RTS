@@ -12,13 +12,46 @@ namespace ProtoRTS
     public class Map : MonoBehaviour
     {
 
+        public class CliffObjectDat
+        {
+            public Vector2Int pos;
+            public SO_TerrainPreset.Tileset[] tileset;
+            public GameObject[] allCliffs = new GameObject[1];
+
+            public CliffObjectDat(Vector2Int pos, SO_TerrainPreset.Tileset tileset)
+            {
+                this.pos = pos;
+                this.tileset = new SO_TerrainPreset.Tileset[1] { tileset };
+            }
+
+            public bool ExactSameSet(SO_TerrainPreset.Tileset[] toCompare)
+            {
+                if (toCompare.Length != tileset.Length) return false;
+
+                int i = 0;
+                foreach(var tile in tileset)
+                {
+                    if (tile != toCompare[i]) return false;
+                    i++;
+                }
+
+                return true;
+            }
+        }
+
         public List<SO_TerrainPreset> allVanillaTerrainPresets = new List<SO_TerrainPreset>();
         [Space]
         [SerializeField] private SyntiosTerrainData _terrainData;
 
+        [Header("Maps")]
         [FoldoutGroup("DEBUG")] public bool DEBUG_dontInitializeData;
+        [FoldoutGroup("DEBUG")] public bool DEBUG_autoUpdateOnStart = true; //disabled on map editor
         [FoldoutGroup("DEBUG")] public bool DEBUG_ShowNoNeighborCheck = false;
+        [FoldoutGroup("DEBUG")] public bool DEBUG_SeeCliff = false;
         [FoldoutGroup("DEBUG")] public GameObject DEBUGObject_NoNeighborCheck;
+        [FoldoutGroup("DEBUG")] private int DEBUG_lastSecondChecked = 0;
+        [FoldoutGroup("DEBUG")] [ShowInInspector] [ReadOnly] private CliffObjectDat[] allCliffObjectResultData;
+
         [FoldoutGroup("References")] public AstarPath aStarPath;
         [FoldoutGroup("References")] public MeshRenderer DEBUG_MeshTerrain;
         [FoldoutGroup("References")] [SerializeField] private Shader terrainShader;
@@ -31,6 +64,10 @@ namespace ProtoRTS
         [SerializeField] [ReadOnly] private Texture2D generatedSplatmap2;
         private Color32[] color_splat1 = new Color32[0];
         private Color32[] color_splat2 = new Color32[0];
+
+
+
+        [ShowInInspector] List<CliffObjectDat> vd3 = new List<CliffObjectDat>();
 
         /// <summary>
         /// Retrieve the generated material terrain shader.
@@ -72,7 +109,7 @@ namespace ProtoRTS
         private void Start()
         {
             InitializeMap();
-
+            
             var gridGraph = AstarPath.active.data.gridGraph;
             int width = (_terrainData.size_x * 2) / 2;
             int depth = (_terrainData.size_y * 2) / 2;
@@ -101,9 +138,30 @@ namespace ProtoRTS
 
         private void InitializeMap()
         {
+            allCliffObjectResultData = new CliffObjectDat[_terrainData.size_x * _terrainData.size_y];
+
+            int index = 0;
+            Vector2Int cliffmapPos = new Vector2Int();
+
+            for (int x = 0; x < _terrainData.size_x; x++)
+            {
+                for (int y = 0; y < _terrainData.size_y; y++)
+                {
+                    cliffmapPos = new Vector2Int(x, y);
+                    allCliffObjectResultData[index] = new CliffObjectDat(cliffmapPos, SO_TerrainPreset.Tileset.Null);
+                    index++;
+                }
+            }
+
             GenerateMaterial();
             if (DEBUG_dontInitializeData == false) _terrainData.InitializeData();
             DEBUG_MeshTerrain.material = generatedTerrainMaterial;
+
+            if (DEBUG_autoUpdateOnStart)
+            {
+                UpdateTerrainMap();
+                UpdateCliffMap();
+            }
         }
 
 
@@ -257,27 +315,6 @@ namespace ProtoRTS
         }
 
 
-        public class CliffObjectDat
-        {
-            public Vector3 pos;
-            public SO_TerrainPreset.Tileset tileset;
-            public GameObject cliffGO;
-            public bool isToBeDestroyed = false;
-            public bool isBase = false;
-
-            public CliffObjectDat(Vector3 pos, SO_TerrainPreset.Tileset tileset, GameObject cliffGO)
-            {
-                this.pos = pos;
-                this.tileset = tileset;
-                this.cliffGO = cliffGO;
-            }
-        }
-
-        public bool DEBUG_SeeCliff = false;
-        [ShowInInspector] List<CliffObjectDat> vd3 = new List<CliffObjectDat>();
-        [ShowInInspector] private List<GameObject> cliffObjects = new List<GameObject>();
-        private int DEBUG_lastSecondChecked = 0;
-
         [FoldoutGroup("DEBUG")]
         [Button("UpdateCliffMap")]
 
@@ -295,37 +332,19 @@ namespace ProtoRTS
             Vector2Int offsetPos3 = new Vector2Int(0, 1);
             Vector2Int offsetPos4 = new Vector2Int(1, 1);
 
-            startX = Mathf.Clamp(startX, 0, _terrainData.size_x);
-            startY = Mathf.Clamp(startY, 0, _terrainData.size_y);
+            startX = Mathf.Clamp(startX, 0, _terrainData.size_x-1);
+            startY = Mathf.Clamp(startY, 0, _terrainData.size_y-1);
 
             int startingIndex = _terrainData.GetIndex(startX, startY);
             int finalIndex = _terrainData.cliffLevel.Length;
 
-            int boxEndX = Mathf.Clamp(startX + width, 0, _terrainData.size_x);
-            int boxEndY = Mathf.Clamp(startY + height, 0, _terrainData.size_y);
+            int boxEndX = Mathf.Clamp(startX + width, 0, _terrainData.size_x-1);
+            int boxEndY = Mathf.Clamp(startY + height, 0, _terrainData.size_y-1);
 
 
             if (width < 255 && height < 255) finalIndex = _terrainData.GetIndex(boxEndX, boxEndY);
             finalIndex = Mathf.Clamp(finalIndex, 0, _terrainData.TotalLength);
 
-            foreach (var noNeighbor in debug_listAllNoNeighborObjs)
-            {
-                Destroy(noNeighbor.gameObject);
-            }
-            debug_listAllNoNeighborObjs.Clear();
-
-            {
-                //foreach (var cliffObj in vd3)
-                //{
-                //    if (cliffObj.Value != null) Destroy(cliffObj.Value.gameObject);
-                //}
-
-                //vd3.Clear();
-                //cliffObjects.Clear();
-
-            }
-
-            //Debug.Log($"{startX}, {startY} | ({boxEndX}, {boxEndY})");
 
             int indexToPrintDebug = Random.Range(startingIndex, finalIndex);
             string allIndexes = "";
@@ -356,10 +375,39 @@ namespace ProtoRTS
                 //atlas coord
                 foreach (var coord in myPosArray)
                 {
+                    if (_terrainData.IsIndexOutsideArray(coord.x, coord.y) == true) continue;
+
                     GameObject instantiated = null;
-                    var tilesetList= GetTileSet(myPos, indexDir, coord);
-                    
-                    for(int d1 = 0; d1 < tilesetList.Length; d1++)
+                    var tilesetList = GetTileSet(myPos, indexDir, coord);
+                    int index_coord = _terrainData.GetIndex(coord.x, coord.y);
+
+
+                    CliffObjectDat cliffObjTarget = allCliffObjectResultData[index_coord]; //always exist
+                    bool isExactSameset = cliffObjTarget.ExactSameSet(tilesetList);
+
+                    if (!isExactSameset)
+                    {
+                        foreach (var cliff in cliffObjTarget.allCliffs)
+                        {
+                            if (cliff != null)
+                                Destroy(cliff);
+                        }
+                    }
+                    else
+                    {
+                        indexDir++;
+                        //SKIP
+                        continue;
+                    }
+
+                    cliffObjTarget.tileset = new SO_TerrainPreset.Tileset[tilesetList.Length];
+                    cliffObjTarget.allCliffs = new GameObject[tilesetList.Length];
+                    cliffObjTarget.pos = coord;
+
+
+                    int thisList = cliffObjTarget.allCliffs.Length;
+
+                    for (int d1 = 0; d1 < tilesetList.Length; d1++)
                     {
                         var tileSet1 = tilesetList[d1];
 
@@ -370,129 +418,68 @@ namespace ProtoRTS
                         var template = MyPreset.GetManmadeCliff(tileSet1);
                         int DEBUG_result = 0;
 
-                        var cliffSimilar = vd3.Find(x => x.pos == worldPos);
 
-
-                        //replacing existing
                         if (template != null)
                         {
-                            if (cliffSimilar != null)
-                            {
 
+                            instantiated = CreateCliffObject(template, worldPos, $"Tile_{myPos}y{worldPos.y.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
+                            cliffObjTarget.allCliffs[d1] = instantiated;
+                            cliffObjTarget.tileset[d1] = tileSet1;
 
-                                if (cliffSimilar.tileset == tileSet1)
-                                {
-                                    cliffSimilar.pos = worldPos;
-                                    //ignore
-                                    DEBUG_result = 1;
-                                }
-                                else
-                                {
-                                    Destroy(cliffSimilar.cliffGO);
-
-                                    instantiated = CreateCliffObject(template, worldPos, $"Tile_{myPos}y{worldPos.y.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
-                                    cliffSimilar.cliffGO = instantiated;
-                                    cliffSimilar.pos = worldPos;
-                                    cliffSimilar.tileset = tileSet1;
-                                    if (d1 == 0) cliffSimilar.isBase = true; else cliffSimilar.isBase = false;
-                                    DEBUG_result = 2;
-
-                                }
-
-                         
-                            }
-                            else
-                            {
-
-                                instantiated = CreateCliffObject(template, worldPos, $"Tile_{myPos}y{worldPos.y.ToInt()}_{tileSet1}({(Direction_TileCheck)indexDir})[{d1}]");
-                                CliffObjectDat cod = new CliffObjectDat(worldPos, tileSet1, instantiated);
-                                if (d1 == 0) cod.isBase = true; else cod.isBase = false;
-
-                                vd3.Add(cod);
-                                DEBUG_result = 3;
-                            }
-
-                            if (DEBUG_lastSecondChecked != Time.time.ToInt())
-                            {
-                                //Debug.Log($"mypos: {x} {y} | {coord}");
-                            }
 
                         }
-                        //remove
-                        else if (template == null)
-                        {
 
-                            if (cliffSimilar != null)
-                            {
-                                if (cliffSimilar.cliffGO != null && cliffSimilar.isToBeDestroyed == false)
-                                {
-                                    cliffSimilar.isToBeDestroyed = true;
-                                    Destroy(cliffSimilar.cliffGO);
-                                }
-                            }
-                        }
-
-
-                        if (DEBUG_lastSecondChecked != Time.time.ToInt())
-                        {
-                            //Debug.Log($"{i} : ({x}, {y}) ({coord}) [result: {DEBUG_result}] [tileset: {tilesetTarget}]");
-                        }
                     }
-                   
+
+                    if (DEBUG_lastSecondChecked != Time.time.ToInt())
+                    {
+                        //Debug.Log($"mypos: {x} {y} | {coord}");
+                    }
 
                     indexDir++;
                 }
 
-                if (DEBUG_lastSecondChecked != Time.time.ToInt())
-                {
-                    //Debug.Log($"{i} : ({x}, {y})");
-                }
             }
 
 
             //removing hanging cliff objects
-            foreach (var cliffObj in vd3)
-            {
-                //if (cliffObj.isToBeDestroyed == true) continue;
-                if (cliffObj.cliffGO == null) continue;
-                Vector3 myPos = cliffObj.pos;
-                myPos.y = 0;
-                var baseCliff = vd3.Find(x => x.pos == myPos && x.isBase && x.isToBeDestroyed == false);
+            //foreach (var cliffObj in vd3)
+            //{
+            //    //if (cliffObj.isToBeDestroyed == true) continue;
+            //    if (cliffObj.cliffGO == null) continue;
+            //    Vector3 myPos = cliffObj.pos;
+            //    myPos.y = 0;
+            //    var baseCliff = vd3.Find(x => x.pos == myPos && x.isBase && x.isToBeDestroyed == false);
 
-                if (baseCliff != null)
-                {
-                   // Debug.Log($"{baseCliff.cliffGO.gameObject.name} {baseCliff.pos} ||| {cliffObj.cliffGO.gameObject.name} {cliffObj.pos}");
-                }
+            //    if (baseCliff != null)
+            //    {
+            //       // Debug.Log($"{baseCliff.cliffGO.gameObject.name} {baseCliff.pos} ||| {cliffObj.cliffGO.gameObject.name} {cliffObj.pos}");
+            //    }
 
-                if (baseCliff == null)
-                {
-                    Destroy(cliffObj.cliffGO);
-                   // Debug.Log($"DELETING: {cliffObj.pos}");
-                }
-            }
+            //    if (baseCliff == null)
+            //    {
+            //        Destroy(cliffObj.cliffGO);
+            //       // Debug.Log($"DELETING: {cliffObj.pos}");
+            //    }
+            //}
 
 
             if (Time.time % 2 == 0) DEBUG_lastSecondChecked = Time.time.ToInt();
 
-            vd3.RemoveAll(f => f.cliffGO == null);
-            cliffObjects.RemoveAll(x => x == null);
+            //vd3.RemoveAll(f => f.cliffGO == null);
         }
 
         private List<GameObject> debug_listAllNoNeighborObjs = new List<GameObject>();
 
         public GameObject CreateCliffObject(GameObject template, Vector3 worldPos, string goName)
         {
-
-
             var cliffnewObj = Instantiate(template);
             Vector3 cliffPos = worldPos;
 
             cliffnewObj.transform.position = cliffPos;
             cliffnewObj.gameObject.name = goName;
 
-
             return cliffnewObj;
-
         }
 
 
@@ -591,9 +578,10 @@ namespace ProtoRTS
             if (dir == Direction_TileCheck.Southwest)
             {
                 int maxHeight = Mathf.Max(new int[] { south.cliffLevel, southwest.cliffLevel, west.cliffLevel, myPos_cliff.cliffLevel});
-       
+                maxHeight = Mathf.Clamp(maxHeight, 0, 16);
 
-                for(int x = 0; x <= maxHeight; x++)
+
+                for (int x = 0; x <= maxHeight; x++)
                 {
                     int south_cliffLV = south.cliffLevel;
                     int southwest_cliffLV = southwest.cliffLevel;
@@ -719,7 +707,7 @@ namespace ProtoRTS
                         tilesetList.Add(SO_TerrainPreset.Tileset.Flat);
                     }
 
-                   
+
 
                     countTile++;
 
@@ -729,7 +717,7 @@ namespace ProtoRTS
             else if (dir == Direction_TileCheck.Southeast)
             {
                 int maxHeight = Mathf.Max(new int[] { south.cliffLevel, southeast.cliffLevel, east.cliffLevel, myPos_cliff.cliffLevel });
-
+                maxHeight = Mathf.Clamp(maxHeight, 0, 16);
 
                 for (int x = 0; x <= maxHeight; x++)
                 {
@@ -863,6 +851,7 @@ namespace ProtoRTS
             else if (dir == Direction_TileCheck.Northwest)
             {
                 int maxHeight = Mathf.Max(new int[] { north.cliffLevel, northwest.cliffLevel, west.cliffLevel, myPos_cliff.cliffLevel });
+                maxHeight = Mathf.Clamp(maxHeight, 0, 16);
 
 
                 for (int x = 0; x <= maxHeight; x++)
@@ -997,6 +986,7 @@ namespace ProtoRTS
             else if (dir == Direction_TileCheck.Northeast)
             {
                 int maxHeight = Mathf.Max(new int[] { north.cliffLevel, northeast.cliffLevel, east.cliffLevel, myPos_cliff.cliffLevel });
+                maxHeight = Mathf.Clamp(maxHeight, 0, 16);
 
 
                 for (int x = 0; x <= maxHeight; x++)
