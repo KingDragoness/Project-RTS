@@ -6771,11 +6771,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3355188664619224047, guid: a77010b9b4facd643b4df1aaba37396c,
-        type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 3481285380138300693, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: m_Name
@@ -6789,12 +6784,12 @@ PrefabInstance:
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_x
-      value: 96
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_y
-      value: 144
+      value: 96
       objectReference: {fileID: 0}
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
@@ -6855,6 +6850,13 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8092231727602259646, guid: a77010b9b4facd643b4df1aaba37396c,
+        type: 3}
+      propertyPath: m_Text
+      value: '> ENTER to enter command and ''help'' to show command list.
+
+'
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

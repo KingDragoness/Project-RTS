@@ -40,6 +40,15 @@ namespace ProtoRTS
 
         }
 
+        private void Update()
+        {
+            if (Input.GetKeyUp(KeyCode.BackQuote))
+            {
+                var console = DevConsole.Instance.consoleInputObject;
+                console.SetActive(!console.gameObject.activeSelf);
+            }
+        }
+
 
     }
 }

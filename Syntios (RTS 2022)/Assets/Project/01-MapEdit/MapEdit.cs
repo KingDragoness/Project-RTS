@@ -52,20 +52,17 @@ namespace ProtoRTS.MapEditor
 		}
 
 		[FoldoutGroup("DEBUG")] [Button("Save Game")]
-        public void SaveGame(string path = "")
+        public void SaveGame(string name = "")
         {
-            string pathSave = path;
-            bool isSameLevel = true;
+            string pathSave = "";
 
-            if (path == "") pathSave = MapEditorPath + "/TEST_terrainPreAlpha.map";
+            pathSave = MapEditorPath + $"/{name}.map";
 
 
             string jsonTypeNameAll = JsonConvert.SerializeObject(Map.TerrainData, Formatting.None, JsonSettings());
 
 
             File.WriteAllText(pathSave, jsonTypeNameAll);
-   
-
         }
 
         public static JsonSerializerSettings JsonSettings()

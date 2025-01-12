@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 using Unity.Collections;
 using Sirenix.OdinInspector;
 using Pathfinding;
+using Newtonsoft.Json;
 using ReadOnlyAttribute = Sirenix.OdinInspector.ReadOnlyAttribute;
 
 namespace ProtoRTS
@@ -37,6 +39,15 @@ namespace ProtoRTS
 
                 return true;
             }
+
+            public void WipeCliffs()
+            {
+                foreach(var cliff in allCliffs)
+                {
+                    if (cliff != null)
+                        Destroy(cliff.gameObject);
+                }
+            }
         }
 
         public List<SO_TerrainPreset> allVanillaTerrainPresets = new List<SO_TerrainPreset>();
@@ -65,6 +76,7 @@ namespace ProtoRTS
         private Color32[] color_splat1 = new Color32[0];
         private Color32[] color_splat2 = new Color32[0];
 
+        public static readonly string MapEditorPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "/My Games/Syntios/_protoTerrain";
 
 
         [ShowInInspector] List<CliffObjectDat> vd3 = new List<CliffObjectDat>();
@@ -97,6 +109,16 @@ namespace ProtoRTS
         }
 
 
+        public SO_TerrainPreset MyPreset
+        {
+            get
+            {
+                return allVanillaTerrainPresets.Find(x => x.PresetID == _terrainData.ID);
+            }
+        }
+
+
+
         public static Map instance;
 
         private void Awake()
@@ -108,8 +130,101 @@ namespace ProtoRTS
 
         private void Start()
         {
-            InitializeMap();
-            
+            BootMap_Start();
+            if (DEBUG_dontInitializeData == false) _terrainData.InitializeData();
+            GenerateMaterial();
+
+            if (DEBUG_autoUpdateOnStart)
+            {
+                UpdateTerrainMap();
+                UpdateCliffMap();
+            }
+
+            UpdateNavMesh();
+        }
+
+        public static string lastLoadedValidmap = "";
+
+        #region Map Loading
+        public void LoadMapFromProtoDir(string mapName)
+        {
+            var loadedTerrainDat = UnpackTerrainDat(MapEditorPath + $"/{mapName}.map");
+
+            if (loadedTerrainDat == null)
+            {
+                throw new System.Exception("Map loading failed!");
+            }
+
+            _terrainData = loadedTerrainDat;
+            lastLoadedValidmap = mapName;
+            //Reload cliff results
+            {
+                if (allCliffObjectResultData != null)
+                {
+                    for (int x = 0; x < allCliffObjectResultData.Length; x++)
+                    {
+                        allCliffObjectResultData[x].WipeCliffs();
+                    }
+                }
+
+                allCliffObjectResultData = new CliffObjectDat[_terrainData.size_x * _terrainData.size_y];
+
+                int index = 0;
+                Vector2Int cliffmapPos = new Vector2Int();
+
+                for (int x = 0; x < _terrainData.size_x; x++)
+                {
+                    for (int y = 0; y < _terrainData.size_y; y++)
+                    {
+                        cliffmapPos = new Vector2Int(x, y);
+                        allCliffObjectResultData[index] = new CliffObjectDat(cliffmapPos, SO_TerrainPreset.Tileset.Null);
+                        index++;
+                    }
+                }
+
+            }
+
+            GenerateMaterial();
+            UpdateTerrainMap();
+            UpdateCliffMap();
+            UpdateNavMesh();
+
+        }
+
+        public SyntiosTerrainData UnpackTerrainDat(string path)
+        {
+            SyntiosTerrainData result = null;
+            JsonSerializerSettings settings = JsonSettings();
+
+            try
+            {
+                result = JsonConvert.DeserializeObject<SyntiosTerrainData>(File.ReadAllText(path), settings);
+            }
+            catch
+            {
+                Debug.LogError("Failed load!");
+                DevConsole.Instance.SendConsoleMessage("Map file cannot be loaded!");
+            }
+
+            return result;
+        }
+
+        public static JsonSerializerSettings JsonSettings()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.All,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            };
+
+            return settings;
+
+        }
+
+        public void UpdateNavMesh()
+        {
+
             var gridGraph = AstarPath.active.data.gridGraph;
             int width = (_terrainData.size_x * 2) / 2;
             int depth = (_terrainData.size_y * 2) / 2;
@@ -125,19 +240,22 @@ namespace ProtoRTS
             AstarPath.active.Scan(gridGraph);
         }
 
-
-
-        public SO_TerrainPreset MyPreset
+        private void BootMap_Start()
         {
-            get
+            var textureSplatTest = _sourceTerrainMat.GetTexture("_SplatMap");
+            var textureSplatTest2 = _sourceTerrainMat.GetTexture("_SplatMap2");
+
+            Shader.SetGlobalTexture("_SplatMap", textureSplatTest);
+            Shader.SetGlobalTexture("_SplatMap2", textureSplatTest2);
+
+            if (allCliffObjectResultData != null)
             {
-                return allVanillaTerrainPresets.Find(x => x.PresetID == _terrainData.ID);
+                for (int x = 0; x < allCliffObjectResultData.Length; x++)
+                {
+                    allCliffObjectResultData[x].WipeCliffs();
+                }
             }
-        }
 
-
-        private void InitializeMap()
-        {
             allCliffObjectResultData = new CliffObjectDat[_terrainData.size_x * _terrainData.size_y];
 
             int index = 0;
@@ -153,15 +271,7 @@ namespace ProtoRTS
                 }
             }
 
-            GenerateMaterial();
-            if (DEBUG_dontInitializeData == false) _terrainData.InitializeData();
-            DEBUG_MeshTerrain.material = generatedTerrainMaterial;
 
-            if (DEBUG_autoUpdateOnStart)
-            {
-                UpdateTerrainMap();
-                UpdateCliffMap();
-            }
         }
 
 
@@ -169,11 +279,7 @@ namespace ProtoRTS
         {
             generatedTerrainMaterial = new Material(_sourceTerrainMat);
             generatedTerrainMaterial.name = "GeneratedTerrainMat";
-            var textureSplatTest = _sourceTerrainMat.GetTexture("_SplatMap");
-            var textureSplatTest2 = _sourceTerrainMat.GetTexture("_SplatMap2");
 
-            Shader.SetGlobalTexture("_SplatMap", textureSplatTest);
-            Shader.SetGlobalTexture("_SplatMap2", textureSplatTest2);
 
             generatedTerrainMaterial.SetTexture("_GroundTexture", MyPreset.ground);
             generatedTerrainMaterial.SetTexture("_TextureA", MyPreset.layer1);
@@ -185,8 +291,11 @@ namespace ProtoRTS
             generatedTerrainMaterial.SetTexture("_TextureG", MyPreset.layer7);
             generatedTerrainMaterial.SetTexture("_TextureH", MyPreset.layer8);
             generatedTerrainMaterial.SetVector("_MapSize", new Vector4(_terrainData.size_x, _terrainData.size_y));
+            DEBUG_MeshTerrain.material = generatedTerrainMaterial;
 
         }
+
+        #endregion
 
 
         #region Generate Terrain
@@ -478,6 +587,23 @@ namespace ProtoRTS
 
             cliffnewObj.transform.position = cliffPos;
             cliffnewObj.gameObject.name = goName;
+            MeshRenderer[] meshRenders = cliffnewObj.GetComponentsInChildren<MeshRenderer>();
+
+            foreach(var meshRndr in meshRenders)
+            {
+
+                for (int x = 0; x < meshRndr.sharedMaterials.Length; x++)
+                {
+                    var demArrays = meshRndr.sharedMaterials;
+
+                    if (demArrays[x] == _sourceTerrainMat)
+                    {
+                        demArrays[x] = generatedTerrainMaterial;
+                    }
+
+                    meshRndr.sharedMaterials = demArrays;
+                }
+            }
 
             return cliffnewObj;
         }

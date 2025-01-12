@@ -195,8 +195,10 @@ namespace ProtoRTS.MapEditor
 			}
 
 
+            //draw pyramid underneath/add on the edges
+            {
 
-			//Map.instance.UpdateCliffMap();
+            }
 
 			{
 				//bigger refresh
