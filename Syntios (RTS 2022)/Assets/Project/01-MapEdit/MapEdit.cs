@@ -59,7 +59,7 @@ namespace ProtoRTS.MapEditor
             pathSave = MapEditorPath + $"/{name}.map";
 
 
-            string jsonTypeNameAll = JsonConvert.SerializeObject(Map.TerrainData, Formatting.None, JsonSettings());
+            string jsonTypeNameAll = JsonConvert.SerializeObject(Map.TerrainData, Formatting.Indented, JsonSettings());
 
 
             File.WriteAllText(pathSave, jsonTypeNameAll);

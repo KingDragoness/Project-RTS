@@ -23,6 +23,7 @@ namespace ProtoRTS
         public static SyntiosEngine Instance;
 
         public static Unit.Player CurrentFaction { get => Instance.currentFaction; }
+        public static Gamemode CurrentMode { get => Instance.CurrentGamemode; }
 
         private void Awake()
         {

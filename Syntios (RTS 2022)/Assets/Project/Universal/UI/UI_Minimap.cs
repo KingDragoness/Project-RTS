@@ -38,7 +38,15 @@ namespace ProtoRTS
             myCanvas = GetComponentInParent<Canvas>();
             RefreshMapData();
             texture_minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
+        }
 
+        private void OnEnable()
+        {
+            SyntiosEvents.Game_ReloadMap += RefreshMapData;
+        }
+        private void OnDisable()
+        {
+            SyntiosEvents.Game_ReloadMap -= RefreshMapData;
         }
 
         private void RefreshMapData()

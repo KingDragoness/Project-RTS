@@ -151,7 +151,10 @@ namespace ProtoRTS
                 Vector3 pos = transform.position;
                 pos.y = y_position;
 
-                //if (pos.y >= 8) pos.y = 8f;
+                if (SyntiosEngine.CurrentMode == Gamemode.Game)
+                {
+                    if (pos.y >= 8) pos.y = 8f;
+                }
 
                 delta.y = gameObject.transform.position.y - pos.y;
                 delta.y = -delta.y * ySpeed * 0.0025f;

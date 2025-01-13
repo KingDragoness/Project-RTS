@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestWorld
   m_EditorClassIdentifier: 
   PresetID: Earth
-  ground: {fileID: 2800000, guid: 5452a649a030cda4f8647ba2a959a768, type: 3}
+  ground: {fileID: 2800000, guid: 6ec76ac714077a24c82031ab94fd72f6, type: 3}
   layer1_name: Earth Grass
   layer1: {fileID: 2800000, guid: aa5b6799afb1cea4e96edb378a0fe66e, type: 3}
   layer2_name: Black Soil
@@ -50,4 +50,23 @@ MonoBehaviour:
   - {fileID: 6669635141485355936, guid: f7925f3f7a8a0d14180f8c2f444d550a, type: 3}
   - {fileID: 928430421338362725, guid: bfcd48b08498bd24792ea5933bef4740, type: 3}
   - {fileID: 6444622857777550444, guid: 15b2dd01fe2858147befa2d3b09e33ed, type: 3}
-  naturalCliffs: []
+  naturalCliffs:
+  - {fileID: 2163341330715882817, guid: 08156ae5512fe514eae81832f0c3e288, type: 3}
+  - {fileID: 8254722396045257559, guid: 8cafcbfd3efec5f41a03a1c6ed1a3c88, type: 3}
+  - {fileID: 2562215863757054647, guid: 01358bccf9eb3614f9d71e8cb36f4af8, type: 3}
+  - {fileID: 1491946910884663888, guid: d7366a3e023a0774c882825f15ffa674, type: 3}
+  - {fileID: 8625490015549599641, guid: 62c5f6fc2b03d584e836cda574287048, type: 3}
+  - {fileID: 2563129740096254584, guid: 77a66c351d538744cb555f06c16dcda9, type: 3}
+  - {fileID: 8630164900031330045, guid: b5e4e5377ba97864d89f3503acf180ff, type: 3}
+  - {fileID: 8542689091842525805, guid: 454789086d06d3445bbcc26bb42ddc09, type: 3}
+  - {fileID: 6102688503652382945, guid: fcb194dbc04940842ba9c08245219f46, type: 3}
+  - {fileID: 7296384343978023454, guid: beafd1b921d11914881254c398eae15b, type: 3}
+  - {fileID: 6426825181626617831, guid: 215ee1dd7385a62439efb7df51c6d843, type: 3}
+  - {fileID: 6419642177159989388, guid: 0055fda8f4aa4b64db5c9260cc2fb42f, type: 3}
+  - {fileID: 8263113115840171608, guid: 73f2b36c0e35e6b4dab3a5e80b746da2, type: 3}
+  - {fileID: 1432681877370296055, guid: e80042bf7ea67c84fab96df1379d81ad, type: 3}
+  - {fileID: 4919243960485768385, guid: 2197f43fc6c60e6489e97af4c03892fe, type: 3}
+  - {fileID: 1272873657842812860, guid: 8f7a10cc22f539040a31ce0610e41c46, type: 3}
+  - {fileID: 6420936646980793613, guid: f99140768987ba240b75abbb747849ed, type: 3}
+  - {fileID: 450519281355022828, guid: d518d881b25991a4bb171c65ba91923c, type: 3}
+  - {fileID: 7461936307065453622, guid: 0af8033881d5ec74ba71ecaa5ba24ed8, type: 3}

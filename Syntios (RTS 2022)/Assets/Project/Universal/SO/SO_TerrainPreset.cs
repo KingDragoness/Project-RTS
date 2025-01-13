@@ -249,5 +249,90 @@ namespace ProtoRTS
 			//corner
 			return null;
 		}
+
+
+		public GameObject GetOrganicCliff(Tileset dir)
+		{
+			//based origin
+			if (dir == Tileset.CornerNorthWest)
+			{
+				return naturalCliffs[0];
+			}
+			else if (dir == Tileset.CornerSouthEast)
+			{
+				return naturalCliffs[2];
+			}
+			else if (dir == Tileset.CornerNorthEast)
+			{
+				return naturalCliffs[11];
+			}
+			else if (dir == Tileset.CornerSouthWest)
+			{
+				return naturalCliffs[3];
+			}
+			else if (dir == Tileset.North)
+			{
+				return naturalCliffs[14];
+			}
+			else if (dir == Tileset.South)
+			{
+				return naturalCliffs[4];
+			}
+			else if (dir == Tileset.East)
+			{
+				return naturalCliffs[6];
+			}
+			else if (dir == Tileset.West)
+			{
+				return naturalCliffs[12];
+			}
+			else if (dir == Tileset.DiagonalEast)
+			{
+				return naturalCliffs[1];
+			}
+			else if (dir == Tileset.DiagonalWest)
+			{
+				return naturalCliffs[7];
+			}
+			else if (dir == Tileset.SharpCornerNorthWest)
+			{
+				return naturalCliffs[8];
+			}
+			else if (dir == Tileset.SharpCornerNorthEast)
+			{
+				return naturalCliffs[13];
+			}
+			else if (dir == Tileset.SharpCornerSouthWest)
+			{
+				return naturalCliffs[5];
+			}
+			else if (dir == Tileset.SharpCornerSouthEast)
+			{
+				return naturalCliffs[10];
+			}
+			else if (dir == Tileset.Flat)
+			{
+				return naturalCliffs[9];
+			}
+			else if (dir == Tileset.Corner78NorthWest)
+			{
+				return naturalCliffs[15];
+			}
+			else if (dir == Tileset.Corner78NorthEast)
+			{
+				return naturalCliffs[17];
+			}
+			else if (dir == Tileset.Corner78SouthWest)
+			{
+				return naturalCliffs[16];
+			}
+			else if (dir == Tileset.Corner78SouthEast)
+			{
+				return naturalCliffs[18];
+			}
+
+			//corner
+			return null;
+		}
 	}
 }

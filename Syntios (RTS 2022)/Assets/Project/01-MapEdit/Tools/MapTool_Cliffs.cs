@@ -223,6 +223,7 @@ namespace ProtoRTS.MapEditor
 		public void BrushCliff(int currentIndex, byte height)
 		{
 			Map.TerrainData.cliffLevel[currentIndex] = height;
+			Map.TerrainData.manmadeCliffs[currentIndex] = isManmade;
 		}
 
 		public byte SampleCurrentCliffmapHeight(Vector2Int pixelPos)

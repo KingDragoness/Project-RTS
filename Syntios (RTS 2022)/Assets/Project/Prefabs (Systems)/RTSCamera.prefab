@@ -203,7 +203,7 @@ MonoBehaviour:
   bait_noX: {fileID: 19731080500946889}
   minimumHeight: 20
   maximumHeight: 100
-  ySpeed: 65
+  ySpeed: 50
   layer_Terrain:
     serializedVersion: 2
     m_Bits: 64

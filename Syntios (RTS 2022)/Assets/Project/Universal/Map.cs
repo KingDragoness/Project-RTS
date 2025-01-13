@@ -141,6 +141,7 @@ namespace ProtoRTS
             }
 
             UpdateNavMesh();
+            SyntiosEvents.Game_ReloadMap?.Invoke();
         }
 
         public static string lastLoadedValidmap = "";
@@ -187,8 +188,14 @@ namespace ProtoRTS
             GenerateMaterial();
             UpdateTerrainMap();
             UpdateCliffMap();
-            UpdateNavMesh();
+            StartCoroutine(RETARD_UpdateNavmesh());
+            SyntiosEvents.Game_ReloadMap?.Invoke();
+        }
 
+        IEnumerator RETARD_UpdateNavmesh()
+        {
+            yield return null;
+            UpdateNavMesh();
         }
 
         public SyntiosTerrainData UnpackTerrainDat(string path)
@@ -226,15 +233,14 @@ namespace ProtoRTS
         {
 
             var gridGraph = AstarPath.active.data.gridGraph;
-            int width = (_terrainData.size_x * 2) / 2;
-            int depth = (_terrainData.size_y * 2) / 2;
-            width -= 2;
-            depth -= 2;
-            var center = WorldPosCenter;
-            center.x += 1 * 2;
-            center.z += 0 * 2;
+            int width = (_terrainData.size_x * 2) / 1;
+            int depth = (_terrainData.size_y * 2) / 1;
 
-            gridGraph.SetDimensions(width, depth, 2);
+            var center = WorldPosCenter;
+            center.x += 0;
+            center.z += 0;
+
+            gridGraph.SetDimensions(width, depth, 1);
             gridGraph.center = center;
 
             AstarPath.active.Scan(gridGraph);
@@ -524,7 +530,16 @@ namespace ProtoRTS
                         worldPos.x = (coord.x * 2);
                         worldPos.y = d1 * 4;
                         worldPos.z = (coord.y * 2);
-                        var template = MyPreset.GetManmadeCliff(tileSet1);
+                        GameObject template = null;
+
+                        if (_terrainData.manmadeCliffs[i])
+                        {
+                            template = MyPreset.GetManmadeCliff(tileSet1);
+                        }
+                        else
+                        {
+                            template = MyPreset.GetOrganicCliff(tileSet1);
+                        }
                         int DEBUG_result = 0;
 
 
