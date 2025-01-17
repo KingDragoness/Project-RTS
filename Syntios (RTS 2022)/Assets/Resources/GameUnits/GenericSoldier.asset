@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd0dd0db53ec194cb76883cd4a64e47, type: 3}
+  m_Name: GenericSoldier
+  m_EditorClassIdentifier: 
+  ID: GenSoldier
+  NameDisplay: 21st Century Soldier
+  Rank: 
+  Radius: 0.5
+  LineOfSight: 9
+  spriteWireframe: {fileID: 21300000, guid: 07cfa059d1e011d4e8a1d2b63943e584, type: 3}
+  MaxHP: 35
+  HasEnergy: 0
+  IsUntouchable: 0
+  AllUnitTags: 0100000005000000
+  port_Importance: -150
+  port_Idles: []
+  port_Talkings: []
+  voiceline_Ready:
+  - {fileID: 8300000, guid: 92e43032af4bb534fb31370f2264bcff, type: 3}
+  voiceline_Move:
+  - {fileID: 8300000, guid: 92e43032af4bb534fb31370f2264bcff, type: 3}

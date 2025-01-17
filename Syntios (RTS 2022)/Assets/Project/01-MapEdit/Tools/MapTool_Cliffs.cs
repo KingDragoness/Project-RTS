@@ -37,14 +37,15 @@ namespace ProtoRTS.MapEditor
 
 		private float _refreshTime = 1f;
 		private bool _allowMouseToEdit = false;
+		private byte original_pixelPos_cliffTarget;
+
 
 
 		private void Start()
 		{
-			
+	
 		}
 
-		private byte original_pixelPos_cliffTarget;
 
 
 		private void Update()

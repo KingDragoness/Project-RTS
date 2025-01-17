@@ -620,6 +620,8 @@ namespace ProtoRTS
                 }
             }
 
+            cliffnewObj.transform.SetParent(terrainParent);
+
             return cliffnewObj;
         }
 

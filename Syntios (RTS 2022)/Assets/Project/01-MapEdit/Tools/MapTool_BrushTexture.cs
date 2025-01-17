@@ -16,6 +16,12 @@ namespace ProtoRTS.MapEditor
             Uniform
         }
 
+        public enum BrushOps
+        {
+            Additive,
+            Set
+        }
+
         /// <summary>
         /// Minimum 256 x 256
         /// 
@@ -30,13 +36,47 @@ namespace ProtoRTS.MapEditor
         [Range(-1,7)] public int brushCurrent = -1;
         [Range(5, 128)] public int brushStrength = 45;
 
+        public bool isPerlinNoise = false;
         public bool isMaskByDistance = false;
         public int circle_cutoff = 30;
+        [FoldoutGroup("Noise")] public float scale = 1.0F;
+        [FoldoutGroup("Noise")] public float perlinMultiplier = 0.1f;
 
 
-   
+        [ShowInInspector] [ReadOnly] private Texture2D _noiseTex;
+        private int splatmap_pixel = 1024;
+        private int brush_noiseMapPixel = 64;
+        private Color[] _pix;
+
         private float _refreshTime = 1f;
         private bool _allowMouseToEdit = false;
+
+
+        private void Start()
+        {
+            _noiseTex = new Texture2D(brush_noiseMapPixel, brush_noiseMapPixel);
+            _pix = new Color[brush_noiseMapPixel * brush_noiseMapPixel];
+            GenerateNoise(0,0);
+        }
+
+        private void GenerateNoise(float xAxis, float yAxis)
+        {
+            for (float y = 0.0F; y < brush_noiseMapPixel; y++)
+            {
+                for (float x = 0.0F; x < brush_noiseMapPixel; x++)
+                {
+                    float xCoord = xAxis + x / brush_noiseMapPixel * scale;
+                    float yCoord = yAxis + y / brush_noiseMapPixel * scale;
+                    float sample = Mathf.PerlinNoise(xCoord, yCoord);
+                    _pix[(int)y * brush_noiseMapPixel + (int)x] = new Color(sample, sample, sample);
+                }
+            }
+
+            // Copy the pixel data to the texture and load it into the GPU.
+            _noiseTex.SetPixels(_pix);
+            _noiseTex.Apply();
+        }
+
 
         private void Update()
         {
@@ -105,6 +145,7 @@ namespace ProtoRTS.MapEditor
             Vector2Int pixelPosOrigin = new Vector2Int();
 
             pixelPosOrigin = WorldPosToPixelPos(posOrigin);
+            GenerateNoise(0, 0);
 
             int countDebug = 0;
 
@@ -117,9 +158,9 @@ namespace ProtoRTS.MapEditor
                 pixelPos.x += x/2;
                 pixelPos.y += y/2;
 
-                if (pixelPos.x >= 1024) continue;
+                if (pixelPos.x >= splatmap_pixel) continue;
                 if (pixelPos.x < 0) continue;
-                if (pixelPos.y >= 1024) continue;
+                if (pixelPos.y >= splatmap_pixel) continue;
                 if (pixelPos.y < 0) continue;
 
                 int currentIndex = PixelPosToIndex(pixelPos);
@@ -143,7 +184,18 @@ namespace ProtoRTS.MapEditor
                     countDebug++;
                 }
 
-                BrushTerrain(currentIndex, brushCurrent, strength_i);
+                if (isPerlinNoise)
+                {
+                    Color colPixel = _pix[IndexOfBrush(x, y)];
+
+                    float rawValue = strength_i * colPixel.r * (perlinMultiplier * 10f);
+                    rawValue = Mathf.Clamp(rawValue, 0, 255);
+                    strength_i = (byte)rawValue;
+                }
+
+                BrushTerrain(currentIndex, brushCurrent, strength_i, BrushOps.Additive);
+
+
             }
 
             //Map.UpdateTerrainMap();
@@ -151,20 +203,25 @@ namespace ProtoRTS.MapEditor
 
         }
 
-        public void BrushTerrain(int currentIndex, int brush, byte strength)
+        public int IndexOfBrush(int x, int y)
         {
-            //Map.TerrainData.terrain_layer1[currentIndex] = 0;
-            //Map.TerrainData.terrain_layer2[currentIndex] = 0;
-            //Map.TerrainData.terrain_layer3[currentIndex] = 0;
-            //Map.TerrainData.terrain_layer4[currentIndex] = 0;
-            //Map.TerrainData.terrain_layer5[currentIndex] = 0;
-            //Map.TerrainData.terrain_layer6[currentIndex] = 0;
-            //Map.TerrainData.terrain_layer7[currentIndex] = 0;
-            //Map.TerrainData.terrain_layer8[currentIndex] = 0;
+            return x + (y * brush_noiseMapPixel);
+        }
 
-            float delta = 10 + (brushStrength * 2 / refreshRate);
+        public void BrushTerrain(int currentIndex, int brush, byte strength, BrushOps brushOps)
+        {
+
+            float delta = 1 + (brushStrength * 4f / refreshRate);
             float current = Map.TerrainData.GetTerrainLayer_str(brush, currentIndex);
             float target = Map.TerrainData.GetTerrainLayer_str(brush, currentIndex) + strength;
+
+            if (brushOps == BrushOps.Set)
+            {
+                if (target > strength)
+                {
+                    target = strength;
+                }
+            }
 
             float f = current;
 
@@ -189,7 +246,7 @@ namespace ProtoRTS.MapEditor
                     }
                     float f2 = Map.TerrainData.GetTerrainLayer_str(x, currentIndex);
 
-                    f2 -= (brushStrength * 2 / refreshRate);
+                    f2 -= (brushStrength * 4f / refreshRate);
                     f2 = Mathf.Clamp(f2, 0, 255);
                     Map.TerrainData.SetTerrainLayer(x, currentIndex, f2);
 
@@ -203,7 +260,7 @@ namespace ProtoRTS.MapEditor
                     float f2 = Map.TerrainData.GetTerrainLayer_str(x, currentIndex);
 
                     f2 -= delta;
-                    f2 = Mathf.Clamp(f2, 0, clampOpacity);
+                    f2 = Mathf.Clamp(f2, 0, 255);
                     Map.TerrainData.SetTerrainLayer(x, currentIndex, f2);
 
                 }

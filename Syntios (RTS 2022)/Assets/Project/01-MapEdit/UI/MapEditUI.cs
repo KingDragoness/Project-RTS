@@ -27,6 +27,9 @@ namespace ProtoRTS.MapEditor
 		[FoldoutGroup("Brush: Texture/Settings")] public Toggle tg_Texture_Shape_Diagonal;
 		[FoldoutGroup("Brush: Texture/Settings")] public Slider slider_Texture_BrushSize;
 		[FoldoutGroup("Brush: Texture/Settings")] public Slider slider_Texture_BrushStrength;
+		[FoldoutGroup("Brush: Texture/Settings")] public Toggle tg_Texture_PerlinNoise;
+		[FoldoutGroup("Brush: Texture/Perlin Noise")] public Slider slider_Texture_PerlinMult;
+		[FoldoutGroup("Brush: Texture/Perlin Noise")] public GameObject panel_PerlinNoise;
 
 		[FoldoutGroup("Brush: Cliffs")] public Text label_CliffsOperation;
 		[FoldoutGroup("Brush: Cliffs")] public GameObject uiPanel_Cliffs;
@@ -157,20 +160,20 @@ namespace ProtoRTS.MapEditor
 
 
 			if (MapEdit.instance.BrushTexture.currentOperation == MapTool_BrushTexture.Operation.None)
-            {
+			{
 				uiPanel_Texture_brushSettings.gameObject.SetActive(false);
 			}
 			else
-            {
+			{
 				label_Texture_Layer.text = $"<b>Layer:</b>";
 				uiPanel_Texture_brushSettings.gameObject.SetActive(true);
 
 				//has texture
-                {
+				{
 					int index = GetIndexToggle(allTextureToggles) - 1;
 
 					if (index != -2)
-                    {
+					{
 						label_Texture_Layer.text = $"<b>Layer:</b> {preset.GetLayerName(index)}";
 						MapEdit.instance.BrushTexture.brushCurrent = index;
 					}
@@ -178,9 +181,9 @@ namespace ProtoRTS.MapEditor
 				}
 
 				//shape
-                {
+				{
 					if (tg_Texture_Shape_Circle.isOn)
-                    {
+					{
 						MapEdit.instance.BrushTexture.isMaskByDistance = true;
 
 					}
@@ -189,6 +192,27 @@ namespace ProtoRTS.MapEditor
 						MapEdit.instance.BrushTexture.isMaskByDistance = false;
 
 					}
+
+					if (tg_Texture_PerlinNoise.isOn)
+					{
+						MapEdit.instance.BrushTexture.isPerlinNoise = true;
+
+					}
+					else
+					{
+						MapEdit.instance.BrushTexture.isPerlinNoise = false;
+
+					}
+				}
+
+				if (MapEdit.instance.BrushTexture.isPerlinNoise)
+                {
+					panel_PerlinNoise.gameObject.EnableGameobject(true);
+					MapEdit.instance.BrushTexture.perlinMultiplier = slider_Texture_PerlinMult.value;
+				}
+                else
+                {
+					panel_PerlinNoise.gameObject.EnableGameobject(false);
 				}
 
 				MapEdit.instance.BrushTexture.brushSize = slider_Texture_BrushSize.value.ToInt();

@@ -126,7 +126,8 @@ namespace ProtoRTS
             private Color32[] allColors_1;
 
             //cached
-            int cachedStartIndex = 0;
+            int cachedStartIndex = 0; //the one with max size 256
+            int cachedStartIndex_cliffmap = 0; //the one with variable size
             int ch_x = 0;
             int ch_y = 0;
             int[] cached_LocalIndexes;
@@ -153,7 +154,7 @@ namespace ProtoRTS
             public void GenerateTexture()
             {
                 int speedDeltaChangeTexture = 32;
-                byte fowCol_Explored = 45;
+                byte fowCol_Explored = 30;
                 byte byte_Delta = 19;
 
                 for (int x = 0; x < 255; x++)
@@ -184,7 +185,7 @@ namespace ProtoRTS
                             if (allColors_1[index].r < fowCol_Explored)
                             {
                                 if ((allColors_1[index].r + byte_Delta) > fowCol_Explored)
-                                    byte_Delta = System.Convert.ToByte(38 - allColors_1[index].r);
+                                    byte_Delta = System.Convert.ToByte(fowCol_Explored - allColors_1[index].r);
 
                                 allColors_1[index].r += byte_Delta;
                             }
@@ -201,7 +202,7 @@ namespace ProtoRTS
                         }
                         else
                         {
-                            allColors[index] = new Color32(0, 0, 0, 235);
+                            allColors[index] = new Color32(0, 0, 0, 245);
 
                             if (allColors_1[index].r > 0)
                             {
@@ -231,17 +232,16 @@ namespace ProtoRTS
             }
 
 
-            public void WriteBuffer(Vector2Int globalOffset, Vector2Int localOrigin, Vector2Int sizeDraw, CirclePixels circlePixel)
+            public void WriteBuffer(Vector2Int globalOffset, Vector2Int localOrigin, Vector2Int sizeDraw, CirclePixels circlePixel, float posYUnit)
             {
                 //every y, store indexes what X to draw. [2 * 256: + 0,1,2,3,4,5] [0 * 256: + 2,3,4]
                 //IDEA only
 
                 cachedStartIndex = globalOffset.x + (globalOffset.y * 256);
                 circlePixel.GetLocalIndexes(localOrigin, sizeDraw);
-                cached_LocalIndexes = circlePixel.CachedIndexes;
+                cached_LocalIndexes = circlePixel.CachedIndexes; 
 
                 int maxCount = circlePixel.MaxCount;
-                int unitPosY = 1;
                 int myIndex = 0;
 
                 for (int c = 0; c < maxCount; c++)
@@ -253,12 +253,22 @@ namespace ProtoRTS
                     ch_x = FOWScript.X_table_indexes[myIndex];
                     ch_y = FOWScript.Y_table_indexes[myIndex];
 
-                    //if already written skips
+                    //if already written, skips
                     if (activePoints[ch_x, ch_y]) continue;
 
-                    if (Map.TerrainData.cliffLevel.Length > myIndex)
+                    int index_cliffmap = ch_x + (ch_y * Map.TerrainData.size_x);
+
+                    // Debug.Log($"{Map.TerrainData.cliffLevel.Length} > {index_cliffmap} = {cachedStartIndex} + {cached_LocalIndexes[c]} [{c}]");
+
+                    if (Map.TerrainData.cliffLevel.Length > index_cliffmap)
                     {
-                        if (FOWScript.GetHeightmap[myIndex] - 128 > (unitPosY * 4)) break; //-128 for sbyte 
+                       // if (c == 5)
+                            //Debug.Log($"{FOWScript.GetCliffLV[index_cliffmap] * 4} >= {posYUnit + 0.5f} at [{ch_x}, {ch_y}]");
+
+                        if (FOWScript.GetCliffLV[index_cliffmap] * 4f >= posYUnit + 0.5f)
+                        {
+                            continue;
+                        }
                     }
                
                     activePoints[ch_x, ch_y] = true;
@@ -284,7 +294,7 @@ namespace ProtoRTS
                 //check unit height
                 if (Map.TerrainData.cliffLevel.Length > _index)
                 {
-                    if (FOWScript.GetHeightmap[_index] - 128 > (unitPosY * 4)) return; //-128 for sbyte 
+                    if (FOWScript.GetCliffLV[_index] - 128 > (unitPosY * 4)) return; //-128 for sbyte 
                 }
 
                 ch_x = FOWScript.X_table_indexes[_index];
@@ -341,7 +351,7 @@ namespace ProtoRTS
         private float _timerUpdateFOW = 0.1f;
         private static FOWScript Instance;
 
-        public static byte[] GetHeightmap
+        public static byte[] GetCliffLV
         {
             get
             {
@@ -485,7 +495,7 @@ namespace ProtoRTS
 
             //Debug.Log($"Rect: ({points_rect[0]} < {points_rect[3]} | {points_rect[1]} < {points_rect[2]}) = Draw: ({xDrawLength}, {yDrawLength}) | Origin pattern: ({startDrawCircle_x}, {startDrawCircle_y})");
 
-            fowMap.WriteBuffer(originPos, new Vector2Int(startDrawCircle_x, startDrawCircle_y), new Vector2Int(xDrawLength, yDrawLength), myCirclePattern);
+            fowMap.WriteBuffer(originPos, new Vector2Int(startDrawCircle_x, startDrawCircle_y), new Vector2Int(xDrawLength, yDrawLength), myCirclePattern, unit.transform.position.y);
 
 
             //foreach (var pxToDraw in indexesToDraw)

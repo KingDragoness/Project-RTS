@@ -37,7 +37,6 @@ namespace ProtoRTS
         {
             myCanvas = GetComponentInParent<Canvas>();
             RefreshMapData();
-            texture_minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
         }
 
         private void OnEnable()
@@ -51,6 +50,7 @@ namespace ProtoRTS
 
         private void RefreshMapData()
         {
+
             if (Map.MapSize.x > Map.MapSize.y)
             {
                 float rescale = Map.MapSize.y / Map.MapSize.x;
@@ -74,6 +74,9 @@ namespace ProtoRTS
 
                 ui_Map.sizeDelta = v2;
             }
+
+            texture_minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
+
         }
 
         private void OnDrawGizmosSelected()

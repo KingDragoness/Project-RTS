@@ -157,7 +157,7 @@ Material:
     - _BorderMap: 8
     - _BumpDepth: 0.58
     - _BumpScale: 1
-    - _ContrastCloud: 1
+    - _ContrastCloud: 0.6
     - _Cutoff: 0.5
     - _Depth: 0.57
     - _DetailNormalMapScale: 1
@@ -178,7 +178,7 @@ Material:
     - _PrioE: 0.1
     - _PrioF: 1
     - _PrioG: 1
-    - _PrioGround: 1
+    - _PrioGround: 0.25
     - _PrioH: 1
     - _RimPower: 5
     - _Shininess: 15
@@ -198,5 +198,5 @@ Material:
     - _MapSize: {r: 64, g: 64, b: 0, a: 0}
     - _RimColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
     - _SpecColor: {r: 1, g: 1, b: 1, a: 1}
-    - _UnexploredFog: {r: 0.08627451, g: 0.08627451, b: 0.08627451, a: 1}
+    - _UnexploredFog: {r: 0.028301895, g: 0.028301895, b: 0.028301895, a: 1}
   m_BuildTextureStacks: []
