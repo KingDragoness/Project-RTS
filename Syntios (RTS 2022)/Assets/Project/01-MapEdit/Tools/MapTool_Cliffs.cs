@@ -139,10 +139,6 @@ namespace ProtoRTS.MapEditor
 
 			int countDebug = 0;
 
-			//Debug.Log($"Size: {totalLength} | {pixelPosOrigin}");
-			//Debug.Log($"Cliffmap origin: {pixelPosOrigin} | worldOrigin: {posOrigin}");
-
-
 			for (int i = 0; i < totalLength; i++)
 			{
 				int x = i % pixelWidthBrush;
@@ -192,7 +188,37 @@ namespace ProtoRTS.MapEditor
 
 				BrushCliff(currentIndex, targetHeight);
 
+			}
 
+			//manmade/organic cliffs (pixel width brush + 2)
+			//cT = cliffType
+            {
+				int pixelWidth_cT = brushSize + 2;
+				int totalLength_cT = (brushSize + 2) * (brushSize + 2);
+				float halfSize_cT = (brushSize + 2f) / 2f;
+
+				for (int i = 0; i < totalLength_cT; i++)
+				{
+					int x = i % pixelWidth_cT;
+					int y = Mathf.FloorToInt(i / pixelWidth_cT);
+					Vector2Int pixelPos = new Vector2Int(pixelPosOrigin.x, pixelPosOrigin.y);
+
+					pixelPos.x -= halfSize_cT.ToInt();
+					pixelPos.y -= halfSize_cT.ToInt();
+
+					pixelPos.x += x;
+					pixelPos.y += y;
+
+					if (pixelPos.x >= Map.TerrainData.size_x) continue;
+					if (pixelPos.x < 0) continue;
+					if (pixelPos.y >= Map.TerrainData.size_y) continue;
+					if (pixelPos.y < 0) continue;
+
+					int currentIndex = HeightmapPosToIndex(pixelPos);
+
+					SetOrganicManmade(currentIndex);
+
+				}
 			}
 
 
@@ -224,6 +250,10 @@ namespace ProtoRTS.MapEditor
 		public void BrushCliff(int currentIndex, byte height)
 		{
 			Map.TerrainData.cliffLevel[currentIndex] = height;
+		}
+
+		public void SetOrganicManmade(int currentIndex)
+        {
 			Map.TerrainData.manmadeCliffs[currentIndex] = isManmade;
 		}
 

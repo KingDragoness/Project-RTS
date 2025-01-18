@@ -41,6 +41,7 @@ namespace ProtoRTS.MapEditor
 		[FoldoutGroup("Brush: Cliffs/Settings")] public Toggle tg_Cliffs_Shape_Rect;
 		[FoldoutGroup("Brush: Cliffs/Settings")] public Toggle tg_Cliffs_Shape_Diagonal;
 		[FoldoutGroup("Brush: Cliffs/Settings")] public Slider slider_Cliffs_BrushSize;
+		[FoldoutGroup("Brush: Cliffs/Settings")] public Toggle tg_Cliffs_Manmade;
 
 		private void Start()
 		{
@@ -270,6 +271,14 @@ namespace ProtoRTS.MapEditor
 					}
 				}
 
+				if (tg_Cliffs_Manmade.isOn)
+				{
+					MapEdit.instance.BrushCliffs.isManmade = true;
+				}
+                else
+                {
+					MapEdit.instance.BrushCliffs.isManmade = false;
+				}
 				MapEdit.instance.BrushCliffs.brushSize = slider_Cliffs_BrushSize.value.ToInt();
 
 			}

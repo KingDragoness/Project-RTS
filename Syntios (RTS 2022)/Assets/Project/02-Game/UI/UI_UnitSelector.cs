@@ -271,19 +271,46 @@ namespace ProtoRTS.Game
         public void PlayVoice(GameUnit gameUnit, bool isIdle = true)
         {
             AudioClip voice = null;
+            int tries = 0;
+            bool isValid = false;
 
             if (isIdle)
             {
                 if (gameUnit.Class.voiceline_Ready.Length > 0)
                 {
-                    voice = gameUnit.Class.voiceline_Ready[Random.Range(0, gameUnit.Class.voiceline_Ready.Length)];
+                    while (isValid == false)
+                    {
+                        voice = gameUnit.Class.voiceline_Ready[Random.Range(0, gameUnit.Class.voiceline_Ready.Length)];
+
+                        if (voice != portraitAudioSource.clip)
+                        {
+                            isValid = true;
+                            break;
+                        }
+
+                        if (tries > 255) break;
+                        tries++;
+                    }
                 }
             }
             else
             {
                 if (gameUnit.Class.voiceline_Move.Length > 0)
                 {
-                    voice = gameUnit.Class.voiceline_Move[Random.Range(0, gameUnit.Class.voiceline_Move.Length)];
+                    while (isValid == false)
+                    {
+                        voice = gameUnit.Class.voiceline_Move[Random.Range(0, gameUnit.Class.voiceline_Move.Length)];
+
+                        if (voice != portraitAudioSource.clip)
+                        {
+                            isValid = true;
+                            break;
+                        }
+
+                        if (tries > 255) break;
+                        tries++;
+                    }
+
                 }
             }
 

@@ -299,6 +299,21 @@ namespace ProtoRTS
             generatedTerrainMaterial.SetVector("_MapSize", new Vector4(_terrainData.size_x, _terrainData.size_y));
             DEBUG_MeshTerrain.material = generatedTerrainMaterial;
 
+            //set global
+            {
+                float f_SplatmapScale = _sourceTerrainMat.GetFloat("_SplatmapScale");
+                float f_FOWmapScale = _sourceTerrainMat.GetFloat("_FOWmapScale");
+                float f_FOWSampleRadiusBlur = _sourceTerrainMat.GetFloat("_FOWSampleRadiusBlur");
+                float f_border = _sourceTerrainMat.GetFloat("_BorderMap");
+                var cloudTexture = _sourceTerrainMat.GetTexture("_CloudFog");
+                Shader.SetGlobalFloat("_SplatmapScale", f_SplatmapScale);
+                Shader.SetGlobalFloat("_FOWmapScale", f_FOWmapScale);
+                Shader.SetGlobalFloat("_FOWSampleRadiusBlur", f_FOWSampleRadiusBlur);
+                Shader.SetGlobalFloat("_BorderMap", f_border);
+                Shader.SetGlobalTexture("_CloudFog", cloudTexture);
+                Shader.SetGlobalVector("_MapSize", new Vector4(_terrainData.size_x, _terrainData.size_y));
+
+            }
         }
 
         #endregion
