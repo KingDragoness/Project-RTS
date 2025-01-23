@@ -53,6 +53,30 @@ namespace ProtoRTS
         }
     }
 
+    public class CC_LoadScene : CC_Base
+    {
+        public override string CommandName { get { return "loadlevel"; } }
+        public override string Description { get { return "Load level [int index]."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try 
+            {
+                if (int.TryParse(args[0], out int levelIndex))
+                {
+
+                    Application.LoadLevel(levelIndex);
+                }
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage("loadlevel <int index> | Level index not valid!");
+            }
+        }
+    }
+
+
     public class CC_LoadMap : CC_Base
     {
         public override string CommandName { get { return "lm"; } }

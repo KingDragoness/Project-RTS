@@ -54,12 +54,18 @@ namespace ProtoRTS
             return new_coordInstructions;
         }
 
+        private int[] cached_xTable;
+        private int[] cached_yTable;
 
         //if circle is 7x7 and loc origin is at 4,4
         //retrieve all indexes between 4,4 and 7,7
         public void GetLocalIndexes(Vector2Int localOffset, Vector2Int sizeDraw)
         {
             int PixelLOS = LineOfSight * 2;
+
+            if (cached_xTable == null) cached_xTable = FOWScript.X_table_indexes;
+            if (cached_yTable == null) cached_yTable = FOWScript.Y_table_indexes;
+
             if (_cachedIndexes == null)
             {
                 _cachedIndexes = new int[32 * 32];
@@ -86,8 +92,8 @@ namespace ProtoRTS
             int _id = 0;
             foreach (var ctd in coordToDraw_256px)
             {
-                int y = FOWScript.Y_table_indexes[ctd]; //(ctd / 256);
-                int x = FOWScript.X_table_indexes[ctd];//(ctd % 256);
+                int y = cached_xTable[ctd]; //(ctd / 256);
+                int x = cached_yTable[ctd];//(ctd % 256);
                 int myIndex = x + (y * 256);
 
                 if (x > start_x && y > start_y && x < end_x && y < end_y)
@@ -132,6 +138,27 @@ namespace ProtoRTS
             int ch_y = 0;
             int[] cached_LocalIndexes;
 
+            int[] cached_xTable;
+            int[] cached_yTable;
+
+            private int[] X_Table
+            {
+                get
+                {
+                    if (cached_xTable == null) cached_xTable = FOWScript.X_table_indexes;
+                    return cached_xTable;
+                }
+            }
+
+            private int[] Y_Table
+            {
+                get
+                {
+                    if (cached_yTable == null) cached_yTable = FOWScript.Y_table_indexes;
+                    return cached_yTable;
+                }
+            }
+
             public FOWMap(Unit.Player faction, bool[,] activePoints, bool[,] exploredPoints)
             {
                 this.faction = faction;
@@ -166,7 +193,11 @@ namespace ProtoRTS
 
                         if (activePoints[x, y])
                         {
-                            allColors[index] = new Color32(255, 255, 255, 5);
+                            allColors[index].r = 255;
+                            allColors[index].g = 255;
+                            allColors[index].b = 255;
+                            allColors[index].a = 5;
+
 
                             if (allColors_1[index].r < 255)
                             {
@@ -180,7 +211,11 @@ namespace ProtoRTS
                         }
                         else if (exploredPoints[x, y])
                         {
-                            allColors[index] = new Color32(fowCol_Explored, fowCol_Explored, fowCol_Explored, 100);
+                            allColors[index].r = fowCol_Explored;
+                            allColors[index].g = fowCol_Explored;
+                            allColors[index].b = fowCol_Explored;
+                            allColors[index].a = 100;
+
 
                             if (allColors_1[index].r < fowCol_Explored)
                             {
@@ -202,7 +237,10 @@ namespace ProtoRTS
                         }
                         else
                         {
-                            allColors[index] = new Color32(0, 0, 0, 245);
+                            allColors[index].r = 0;
+                            allColors[index].g = 0;
+                            allColors[index].b = 0;
+                            allColors[index].a = 245;
 
                             if (allColors_1[index].r > 0)
                             {
@@ -239,7 +277,10 @@ namespace ProtoRTS
 
                 cachedStartIndex = globalOffset.x + (globalOffset.y * 256);
                 circlePixel.GetLocalIndexes(localOrigin, sizeDraw);
-                cached_LocalIndexes = circlePixel.CachedIndexes; 
+                cached_LocalIndexes = circlePixel.CachedIndexes;
+
+                int x_center = globalOffset.x + (sizeDraw.x / 2);
+                int y_center = globalOffset.y + (sizeDraw.y / 2);
 
                 int maxCount = circlePixel.MaxCount;
                 int myIndex = 0;
@@ -250,25 +291,30 @@ namespace ProtoRTS
                     if (cached_LocalIndexes[c] == 0) continue;
                     if (myIndex < 0) continue;
 
-                    ch_x = FOWScript.X_table_indexes[myIndex];
-                    ch_y = FOWScript.Y_table_indexes[myIndex];
+                    ch_x = X_Table[myIndex];
+                    ch_y = Y_Table[myIndex];
 
                     //if already written, skips
                     if (activePoints[ch_x, ch_y]) continue;
 
                     int index_cliffmap = ch_x + (ch_y * Map.TerrainData.size_x);
 
-                    // Debug.Log($"{Map.TerrainData.cliffLevel.Length} > {index_cliffmap} = {cachedStartIndex} + {cached_LocalIndexes[c]} [{c}]");
 
                     if (Map.TerrainData.cliffLevel.Length > index_cliffmap)
                     {
-                       // if (c == 5)
-                            //Debug.Log($"{FOWScript.GetCliffLV[index_cliffmap] * 4} >= {posYUnit + 0.5f} at [{ch_x}, {ch_y}]");
-
                         if (FOWScript.GetCliffLV[index_cliffmap] * 4f >= posYUnit + 0.5f)
                         {
                             continue;
                         }
+                    }
+
+                    //occlusion cliffmap
+                    {
+                        bool isBlocked = IsBlocked(ch_x, ch_y, x_center, y_center, posYUnit);
+
+                        //if (c == 2 | c == 3) Debug.Log($"{isBlocked} ({ch_x}, {ch_y})");
+
+                        if (isBlocked) continue;
                     }
                
                     activePoints[ch_x, ch_y] = true;
@@ -276,7 +322,49 @@ namespace ProtoRTS
 
                     //ExplorePoint(myIndex, unitPosY: 1);
                 }
+            }
 
+            public bool IsBlocked(int x_current, int y_current, int x_center, int y_center, float posYUnit)
+            {
+                int x_sample1 = Mathf.Lerp(x_current, x_center, 0.2f).ToInt(); //x_current + (x_center - x_current) / 2;
+                int y_sample1 = Mathf.Lerp(y_current, y_center, 0.2f).ToInt(); //y_current + (y_center - y_current) / 2;
+
+                int x_sample2 = Mathf.Lerp(x_current, x_center, 0.8f).ToInt();
+                int y_sample2 = Mathf.Lerp(y_current, y_center, 0.8f).ToInt();
+
+                int x_sample3 = Mathf.Lerp(x_current, x_center, 0.5f).ToInt();
+                int y_sample3 = Mathf.Lerp(y_current, y_center, 0.5f).ToInt();
+
+
+                int index_cliffmap1 = x_sample1 + (y_sample1 * Map.TerrainData.size_x);
+                int index_cliffmap2 = x_sample2 + (y_sample2 * Map.TerrainData.size_x);
+                int index_cliffmap3 = x_sample3 + (y_sample3 * Map.TerrainData.size_x);
+
+                if (Map.TerrainData.cliffLevel.Length > index_cliffmap1 && index_cliffmap1 > 0)
+                {
+                    if (FOWScript.GetCliffLV[index_cliffmap1] * 4f >= posYUnit + 0.5f)
+                    {
+                        return true;
+                    }
+                }
+
+                if (Map.TerrainData.cliffLevel.Length > index_cliffmap2 && index_cliffmap2 > 0)
+                {
+                    if (FOWScript.GetCliffLV[index_cliffmap2] * 4f >= posYUnit + 0.5f)
+                    {
+                        return true;
+                    }
+                }
+
+                if (Map.TerrainData.cliffLevel.Length > index_cliffmap3 && index_cliffmap3 > 0)
+                {
+                    if (FOWScript.GetCliffLV[index_cliffmap3] * 4f >= posYUnit + 0.5f)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
             [Button("Explore this point")]
@@ -297,8 +385,8 @@ namespace ProtoRTS
                     if (FOWScript.GetCliffLV[_index] - 128 > (unitPosY * 4)) return; //-128 for sbyte 
                 }
 
-                ch_x = FOWScript.X_table_indexes[_index];
-                ch_y = FOWScript.Y_table_indexes[_index];
+                ch_x = X_Table[_index];
+                ch_y = Y_Table[_index];
                 activePoints[ch_x, ch_y] = true;
                 exploredPoints[ch_x, ch_y] = true;
 
@@ -307,11 +395,13 @@ namespace ProtoRTS
 
             public bool IsPointActive(int _index)
             {
-                int x = FOWScript.X_table_indexes[_index]; //_index % 256;
-                int y = FOWScript.Y_table_indexes[_index]; //_index / 256;
+                int x = X_Table[_index]; //_index % 256;
+                int y = Y_Table[_index]; //_index / 256;
 
                 return activePoints[x, y];
             }
+
+           
 
             [Button("DEBUG explore some area")]
             public void DEBUG_ExplorePoint()

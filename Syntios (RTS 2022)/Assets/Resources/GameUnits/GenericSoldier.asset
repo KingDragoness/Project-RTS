@@ -16,7 +16,7 @@ MonoBehaviour:
   NameDisplay: 21st Century Soldier
   Rank: 
   Radius: 0.5
-  LineOfSight: 9
+  LineOfSight: 10
   spriteWireframe: {fileID: 21300000, guid: 07cfa059d1e011d4e8a1d2b63943e584, type: 3}
   MaxHP: 35
   HasEnergy: 0
