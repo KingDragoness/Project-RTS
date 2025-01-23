@@ -96,6 +96,71 @@ namespace ProtoRTS
         }
     }
 
+    public class CC_SummonAllToHere : CC_Base
+    {
+        public override string CommandName { get { return "summonall"; } }
+        public override string Description { get { return "Summon all units to mouse's targeted position."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            int layer = LayerMask.GetMask("Terrain");
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            Vector3 pointSpawn;
+
+            if (Physics.Raycast(ray, out hit, 500f, layer, QueryTriggerInteraction.Ignore))
+            {
+                pointSpawn = hit.point + new Vector3(0,1,0);
+                Debug.Log(ray);
+
+                foreach (var unit in SyntiosEngine.Instance.ListedGameUnits)
+                {
+                    unit.transform.position = pointSpawn;
+                }
+
+            }
+
+            DevConsole.Instance.SendConsoleMessage("Attempting summon all units to one point.");
+
+        }
+    }
+
+
+    public class CC_SummonSelectedToHere : CC_Base
+    {
+        public override string CommandName { get { return "summon"; } }
+        public override string Description { get { return "Summon selected units to mouse's targeted position."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            int layer = LayerMask.GetMask("Terrain");
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            Vector3 pointSpawn;
+
+            if (Physics.Raycast(ray, out hit, 500f, layer, QueryTriggerInteraction.Ignore))
+            {
+                pointSpawn = hit.point + new Vector3(0, 1, 0);
+                Debug.Log(ray);
+
+                foreach (var unit in Selection.AllSelectedUnits)
+                {
+                    unit.transform.position = pointSpawn;
+                }
+
+            }
+
+            DevConsole.Instance.SendConsoleMessage("Attempting summon all units to one point.");
+
+        }
+    }
+
+
+
     public class CC_Reloadmap : CC_Base
     {
         public override string CommandName { get { return "rm"; } }

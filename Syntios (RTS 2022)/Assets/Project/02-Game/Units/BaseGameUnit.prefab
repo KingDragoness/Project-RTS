@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7068976686415573386}
   - component: {fileID: 9109924655286209173}
   - component: {fileID: 1343909883869624340}
+  - component: {fileID: 2124894209588541681}
   m_Layer: 2
   m_Name: BaseGameUnit
   m_TagString: Untagged
@@ -53,6 +54,7 @@ MonoBehaviour:
   stat_Energy: 0
   stat_faction: 1
   target: {x: 0, y: 0, z: 0}
+  targetY: 0
   followerEntity: {fileID: 0}
   rvoController: {fileID: 1343909883869624340}
   ai: {fileID: 9109924655286209173}
@@ -101,7 +103,7 @@ MonoBehaviour:
   height: 5
   canMove: 1
   maxSpeed: 7
-  gravity: {x: NaN, y: NaN, z: NaN}
+  gravity: {x: 0, y: 0, z: 0}
   groundMask:
     serializedVersion: 2
     m_Bits: 64
@@ -125,6 +127,8 @@ MonoBehaviour:
     maximumPeriod: 1
     visualizeSensitivity: 0
   targetCompatibility: {fileID: 0}
+  enforcePositionY: 0
+  targetPositionY: 0
   maxAcceleration: -2.5
   rotationSpeed: 300
   slowdownDistance: 3
@@ -160,3 +164,19 @@ MonoBehaviour:
   wallAvoidFalloff: 1
   priority: 0.7
   debug: 0
+--- !u!114 &2124894209588541681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3009204139791718263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77f586f285b3847808d79083bd19ef1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1073741824
+  quality: 0
+  splitAtEveryPortal: 0
+  accountForGridPenalties: 0

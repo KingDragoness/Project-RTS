@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0.1006141, g: 0.16511224, b: 0.1792453, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.006
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.3019608, g: 0.27450982, b: 0.24705882, a: 1}
@@ -7591,12 +7591,12 @@ PrefabInstance:
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_x
-      value: 64
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}
       propertyPath: _terrainData.size_y
-      value: 128
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 5446527929565187946, guid: a77010b9b4facd643b4df1aaba37396c,
         type: 3}

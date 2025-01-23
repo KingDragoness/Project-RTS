@@ -232,7 +232,7 @@ namespace ProtoRTS
         public void UpdateNavMesh()
         {
 
-            var gridGraph = AstarPath.active.data.gridGraph;
+            var recastGraph = AstarPath.active.data.recastGraph;
             int width = (_terrainData.size_x * 2) / 1;
             int depth = (_terrainData.size_y * 2) / 1;
 
@@ -240,10 +240,20 @@ namespace ProtoRTS
             center.x += 0;
             center.z += 0;
 
-            gridGraph.SetDimensions(width, depth, 1);
-            gridGraph.center = center;
+            recastGraph.cellSize = 1;
+            recastGraph.forcedBoundsSize = new Vector3(width, 100, depth);
+            recastGraph.forcedBoundsCenter = center;
+            //gridGraph.SetDimensions(width, depth, 1);
+            //gridGraph.center = center;
 
-            AstarPath.active.Scan(gridGraph);
+            AstarPath.active.Scan(recastGraph);
+        }
+
+        public float GetPositionY(Vector3 realpos)
+        {
+            var recastGraph = AstarPath.active.data.recastGraph;
+            var nn = recastGraph.GetNearest(realpos, constraint: NNConstraint.Walkable);
+            return nn.position.y;
         }
 
         private void BootMap_Start()

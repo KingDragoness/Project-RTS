@@ -74,12 +74,18 @@ namespace ProtoRTS
 
             Scrollwheel();
             ClampPosition();
+            UpdateFogColor();
 
             if (Input.GetMouseButtonUp(2))
             {
                 isDisablePanning = false;
             }
 
+        }
+
+        private void UpdateFogColor()
+        {
+            //MainCamera.backgroundColor = RenderSettings.fogColor;
         }
 
         private void GetCameraPositionY()

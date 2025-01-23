@@ -11,6 +11,7 @@ namespace ProtoRTS
 	public class GameUnit : AbstractUnit
 	{
 		public Vector3 target;
+		public float targetY = 0;
 		[FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
 		[FoldoutGroup("References")] public RVOController rvoController; //change to modular
 		[FoldoutGroup("References")] public AIPath ai; //change to modular
@@ -62,10 +63,13 @@ namespace ProtoRTS
 
         void Update()
 		{
+
 			if (followerEntity != null)
 			{
 				followerEntity.SetDestination(target);
 			}
+
+			
 			ai.destination = target;
 
 

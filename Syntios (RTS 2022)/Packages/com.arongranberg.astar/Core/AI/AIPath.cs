@@ -59,6 +59,10 @@ namespace Pathfinding {
 	[AddComponentMenu("Pathfinding/AI/AIPath (2D,3D)")]
 	[UniqueComponent(tag = "ai")]
 	public partial class AIPath : AIBase, IAstarAI {
+
+
+		public bool enforcePositionY = false;
+		public float targetPositionY = 0;
 		/// <summary>
 		/// How quickly the agent accelerates.
 		/// Positive values represent an acceleration in world units per second squared.
@@ -438,6 +442,8 @@ namespace Pathfinding {
 			// Set how much the agent wants to move during this frame
 			var delta2D = lastDeltaPosition = CalculateDeltaToMoveThisFrame(currentPosition, distanceToEnd, deltaTime);
 			nextPosition = currentPosition + movementPlane.ToWorld(delta2D, verticalVelocity * deltaTime);
+
+
 			CalculateNextRotation(speedLimitFactor, avoidingOtherAgents, out nextRotation);
 		}
 
@@ -494,7 +500,22 @@ namespace Pathfinding {
 					// Return the new position, but ignore any changes in the y coordinate from the ClampToNavmesh method as the y coordinates in the navmesh are rarely very accurate
 					return position + movementPlane.ToWorld(difference);
 				}
+
+				if (true)
+				{
+					targetPositionY = nearestOnNavmesh.position.y;
+	
+					if (targetPositionY > position.y)
+					{
+						position.y += 0.1f;
+					}
+					if (targetPositionY < position.y)
+					{
+						position.y -= 0.1f;
+					}
+				}
 			}
+
 
 			positionChanged = false;
 			return position;
