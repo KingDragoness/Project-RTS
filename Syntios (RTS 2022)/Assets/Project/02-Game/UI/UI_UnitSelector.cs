@@ -33,6 +33,15 @@ namespace ProtoRTS.Game
             SyntiosEvents.UI_NewSelection += event_UI_NewSelection;
             SyntiosEvents.UI_DeselectAll += event_UI_DeselectAll;
             SyntiosEvents.UI_OrderMove += event_UI_OrderMove;
+            SyntiosEvents.UI_ReselectUpdate += event_UI_ReselectUpdate;
+        }
+
+        private void OnDestroy()
+        {
+            SyntiosEvents.UI_NewSelection -= event_UI_NewSelection;
+            SyntiosEvents.UI_DeselectAll -= event_UI_DeselectAll;
+            SyntiosEvents.UI_OrderMove -= event_UI_OrderMove;
+            SyntiosEvents.UI_ReselectUpdate -= event_UI_ReselectUpdate;
         }
 
         private void Start()
@@ -56,6 +65,14 @@ namespace ProtoRTS.Game
             UI.CommandPanel.RefreshUI();
             SwitchedIdlePortrait(null);
             _disallowTotalRefresh = false;
+        }
+
+        private void event_UI_ReselectUpdate()
+        {
+            var gameunit = Selection.GetPortraitedUnit;
+            SwitchedIdlePortrait(gameunit);
+            UI.CommandPanel.RefreshUI();
+            UI.UnitSelection.RefreshUI();
         }
 
         private void event_UI_OrderMove(GameUnit gameunit)

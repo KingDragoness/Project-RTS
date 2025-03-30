@@ -4,6 +4,7 @@ using UnityEngine;
 using Pathfinding;
 using Pathfinding.RVO;
 using Sirenix.OdinInspector;
+using System;
 
 namespace ProtoRTS
 {
@@ -12,11 +13,12 @@ namespace ProtoRTS
 	{
 		public Vector3 target;
 		public float targetY = 0;
+		[FoldoutGroup("References")] public MeshRenderer[] modelView;
 		[FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
 		[FoldoutGroup("References")] public RVOController rvoController; //change to modular
 		[FoldoutGroup("References")] public AIPath ai; //change to modular
 
-
+		private bool _isVisibleFromFOW = false;
 
 
 
@@ -29,6 +31,7 @@ namespace ProtoRTS
             }
         }
 
+        public bool IsVisibleFromFOW { get => _isVisibleFromFOW;  }
 
         private void Start()
 		{
@@ -44,6 +47,7 @@ namespace ProtoRTS
 			{
 			}
 			ai.onSearchPath += Update;
+			Tick.OnTick += OnTickUnit;
 
 		}
 
@@ -58,7 +62,7 @@ namespace ProtoRTS
 
         private void OnDestroy()
         {
-			SyntiosEngine.Instance.ListedGameUnits.Remove(this);
+			SyntiosEngine.Instance.RemoveUnit(this);
         }
 
         void Update()
@@ -70,16 +74,49 @@ namespace ProtoRTS
 			}
 
 			
-			ai.destination = target;
 
 
 		}
+
+		private void OnTickUnit()
+		{
+			ai.destination = target;
+		}
+
 
 		public void SetUnitStat()
         {
 			stat_HP = _class.MaxHP;
         }
 
+		public void KillUnit()
+        {
+			stat_HP = 0;
+			Destroy(gameObject);
+        }
 
+		public void HideModel()
+        {
+			_isVisibleFromFOW = false;
+			foreach (var meshRrndr in modelView) meshRrndr.enabled = false;
+
+		}
+
+		public void ShowModel()
+        {
+			_isVisibleFromFOW = true;
+			foreach (var meshRrndr in modelView) meshRrndr.enabled = true;
+
+		}
+
+		[FoldoutGroup("DEBUG")]
+		[Button("Collect Mesh Renderers")]
+		public void DEBUG_CollectMeshRenderers()
+        {
+			var meshRenderers = gameObject.GetComponentsInChildren<MeshRenderer>();
+
+			modelView = meshRenderers;
+
+		}
 	}
 }

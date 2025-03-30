@@ -57,6 +57,8 @@ MonoBehaviour:
   stat_faction: 1
   target: {x: 0, y: 0, z: 0}
   targetY: 0
+  modelView:
+  - {fileID: 6350380256281939132}
   followerEntity: {fileID: 0}
   rvoController: {fileID: 6528910487834864001}
   ai: {fileID: 5615413358465768408}

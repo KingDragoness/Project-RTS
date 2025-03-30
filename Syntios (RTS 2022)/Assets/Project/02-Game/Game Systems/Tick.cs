@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
-namespace ProtoRTS.Game
+namespace ProtoRTS
 {
 	public class Tick : MonoBehaviour
 	{

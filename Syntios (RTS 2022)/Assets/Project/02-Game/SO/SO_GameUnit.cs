@@ -22,6 +22,7 @@ namespace ProtoRTS
 		[Range(2,16)] public int LineOfSight = 7;
 		public Sprite spriteWireframe;
 		public int MaxHP = 40;
+		[Range(0, 10)] public int SupplyCount = 1;
 		public bool HasEnergy = false;
 		public bool IsUntouchable = false; //for scarab or missiles
 

@@ -43,13 +43,32 @@ namespace ProtoRTS.Game
 			for (int x = index_0; x < index_length; x++)
             {
 				var unit = SyntiosEngine.Instance.ListedGameUnits[x];
-				
 
-            }
+                if (unit.stat_faction != SyntiosEngine.CurrentFaction)
+                {
+                    if (FOWScript.IsCoordRevealed(unit.transform.position))
+                    {
+                        unit.ShowModel();
+                    }
+                    else
+                    {
+                        unit.HideModel();
+                    }
+                }
+                else
+                {
+					unit.ShowModel();
+				}
+			}
+
+            indexHeightClamping++;
+			if (index_length >= SyntiosEngine.Instance.ListedGameUnits.Count)
+			{
+				indexHeightClamping = 0;
+			}
 
 
-			
-        }
-	
+		}
+
 	}
 }

@@ -55,6 +55,12 @@ namespace ProtoRTS
 		public static Color Player3_Color = new Color(0f, 1f, 0f, 1f);
 		public static Color Player4_Color = new Color(0.7f, 0f, 0.7f, 1f);
 
+
+		
+		public static void Clear()
+        {
+
+        }
 	}
 
 }

@@ -127,6 +127,19 @@ namespace ProtoRTS
         }
     }
 
+    public class CC_ResetCamHeight : CC_Base
+    {
+        public override string CommandName { get { return "reseth"; } }
+        public override string Description { get { return "Resets camera's height."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            RTSCamera.RestoreHeight();
+
+        }
+    }
+
 
     public class CC_SummonSelectedToHere : CC_Base
     {
@@ -159,6 +172,41 @@ namespace ProtoRTS
         }
     }
 
+
+    public class CC_KillOneSelected : CC_Base
+    {
+        public override string CommandName { get { return "kill"; } }
+        public override string Description { get { return "Randomly kills one selected unit."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            foreach (var unit in Selection.AllSelectedUnits)
+            {
+                unit.KillUnit();
+                break;
+            }
+
+        }
+    }
+
+    public class CC_KillSelected : CC_Base
+    {
+        public override string CommandName { get { return "killall"; } }
+        public override string Description { get { return "Kill all selected units."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            foreach (var unit in Selection.AllSelectedUnits)
+            {
+                unit.KillUnit();
+            }
+
+            DevConsole.Instance.SendConsoleMessage($"{Selection.AllSelectedUnits.Count} units are killed.");
+
+        }
+    }
 
 
     public class CC_Reloadmap : CC_Base

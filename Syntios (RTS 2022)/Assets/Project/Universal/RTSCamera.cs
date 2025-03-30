@@ -33,6 +33,9 @@ namespace ProtoRTS
         private Vector3 lastMouseMiddle_delta = new Vector3();
 
         private Transform originalParent;
+        float scrollWheel_targetY = 0f;
+        float terrain_targetY = 0f;
+        float original_yPos = 0;
 
         private static RTSCamera instance;
 
@@ -52,12 +55,24 @@ namespace ProtoRTS
         private void Start()
         {
             originalParent = transform.parent;
+            scrollWheel_targetY = MainCamera.transform.position.y;
+            original_yPos = scrollWheel_targetY;
             //transform.position = Center;
+
+            if (SyntiosEngine.CurrentMode == Gamemode.Game)
+            {
+                maximumHeight = 70;
+            }
         }
 
         void OnDrawGizmosSelected()
         {
 
+        }
+
+        public static void RestoreHeight()
+        {
+            instance.scrollWheel_targetY = instance.original_yPos;
         }
 
         private void Update()
@@ -71,6 +86,7 @@ namespace ProtoRTS
                 ScreenPan();
 
             }
+
 
             Scrollwheel();
             ClampPosition();
@@ -93,6 +109,7 @@ namespace ProtoRTS
 
         }
 
+
         private void Scrollwheel()
         {
             var mouseScroll = Input.GetAxis("Mouse ScrollWheel");
@@ -108,7 +125,14 @@ namespace ProtoRTS
                 result.y = maximumHeight;
             }
 
-            MainCamera.transform.position = result;
+            scrollWheel_targetY += deltaZoom.y;
+            if (scrollWheel_targetY < minimumHeight) scrollWheel_targetY = minimumHeight;
+            if (scrollWheel_targetY > maximumHeight) scrollWheel_targetY = maximumHeight;
+
+            Vector3 targeted = MainCamera.transform.position;
+            targeted.y = scrollWheel_targetY + terrain_targetY;
+
+            MainCamera.transform.position = Vector3.MoveTowards(MainCamera.transform.position, targeted, ySpeed * Time.deltaTime);
         }
 
         public static void SetPositionByMinimap(Vector3 position)
@@ -164,6 +188,9 @@ namespace ProtoRTS
 
                 delta.y = gameObject.transform.position.y - pos.y;
                 delta.y = -delta.y * ySpeed * 0.0025f;
+
+
+                terrain_targetY += (pos.y - terrain_targetY) * Time.deltaTime * ySpeed;
             }
 
 

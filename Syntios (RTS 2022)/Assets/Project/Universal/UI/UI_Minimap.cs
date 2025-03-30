@@ -296,6 +296,8 @@ namespace ProtoRTS
 
             foreach (var gameUnit in SyntiosEngine.Instance.ListedGameUnits)
             {
+                if (gameUnit.IsVisibleFromFOW == false) continue;
+
                 Vector2Int posCenter = ConvertWorldPosToMinimapPos(gameUnit.transform.position);
                 Color c = Unit.GetColor(gameUnit.stat_faction);
                 int radius = RadiusUnitInMiniMap(gameUnit.Class.Radius);

@@ -397,7 +397,6 @@ namespace ProtoRTS
             {
                 int x = X_Table[_index]; //_index % 256;
                 int y = Y_Table[_index]; //_index / 256;
-
                 return activePoints[x, y];
             }
 
@@ -669,6 +668,26 @@ namespace ProtoRTS
             return x + (y * 256);
         }
 
+        public static bool IsCoordRevealed(Vector3 pos)
+        {
+            var pixelPos = Instance.WorldPosToMapPixel(pos);
+
+            int index = Instance.PixelPosToIndex(pixelPos, false);
+
+            if (index == -1)
+            {
+                return false;
+            }
+            else if (index >= 65536)
+            {
+                return false;
+            }
+
+            var fowFaction = GetFOW(SyntiosEngine.CurrentFaction);
+            bool activePoint = fowFaction.activePoints[pixelPos.x, pixelPos.y];
+            return activePoint;
+        }
+
         //unused, only for testing
         public int[] GetAllIndexesInsideBox(Vector2Int pos, int sizeX, int sizeY)
         {
@@ -696,7 +715,12 @@ namespace ProtoRTS
             if (pos.x > 255 && clampable == false) return -1;
             if (pos.y > 255 && clampable == false) return -1;
 
-            if (clampable && (pos.x < 0 && pos.x > 255) && (pos.y < 0 && pos.y > 255))
+            if (clampable)
+            {
+                int index = (Mathf.Clamp(pos.y, 0,255) * 255) + Mathf.Clamp(pos.x, 0, 255);
+                return index;
+            }
+            else if (!clampable && (pos.x >= 0 && pos.x <= 255) && (pos.y >= 0 && pos.y <= 255))
             {
                 int index = (pos.y * 255) + (pos.x);
                 return index;
