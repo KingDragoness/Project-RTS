@@ -68,6 +68,15 @@ namespace ProtoRTS
         [FoldoutGroup("References")] [SerializeField] private Shader terrainShader;
         [FoldoutGroup("References")] [SerializeField] private Material _sourceTerrainMat;
 
+        [FoldoutGroup("Faction Color")] public Color color_FactionNeutral;
+        [FoldoutGroup("Faction Color")] public Color color_Faction1;
+        [FoldoutGroup("Faction Color")] public Color color_Faction2;
+        [FoldoutGroup("Faction Color")] public Color color_Faction3;
+        [FoldoutGroup("Faction Color")] public Color color_Faction4;
+        [FoldoutGroup("Faction Color")] public Color color_Faction5;
+        [FoldoutGroup("Faction Color")] public Color color_Faction6;
+        [FoldoutGroup("Faction Color")] public Color color_Faction7;
+        [FoldoutGroup("Faction Color")] public Color color_Faction8;
 
         [DisableInEditorMode] [SerializeField] private Material generatedTerrainMaterial;
         private Transform terrainParent;
@@ -1296,6 +1305,20 @@ namespace ProtoRTS
             return tilesetList.ToArray();
         }
         #endregion
+
+        public Color GetColorFaction(Unit.Player faction)
+        {
+            if (faction == Unit.Player.Player1) return color_Faction1;
+            if (faction == Unit.Player.Player2) return color_Faction2;
+            if (faction == Unit.Player.Player3) return color_Faction3;
+            if (faction == Unit.Player.Player4) return color_Faction4;
+            if (faction == Unit.Player.Player5) return color_Faction5;
+            if (faction == Unit.Player.Player6) return color_Faction6;
+            if (faction == Unit.Player.Player7) return color_Faction7;
+            if (faction == Unit.Player.Player8) return color_Faction8;
+
+            return color_FactionNeutral;
+        }
 
         private void Update()
         {

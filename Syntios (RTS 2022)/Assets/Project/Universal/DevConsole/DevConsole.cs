@@ -15,6 +15,7 @@ namespace ProtoRTS
 		public InputField inputField;
 		public Text consoleText;
         public GameObject consoleInputObject;
+        public GameObject DevMenu;
 
         public delegate bool OnExecuteCommand(string commandName, string[] args); //Return success
         public static event OnExecuteCommand onExecuteCommand;
@@ -74,6 +75,11 @@ namespace ProtoRTS
                 inputField.SetTextWithoutNotify(historyCommands[index]);
             }
 
+            if (Input.GetKeyUp(KeyCode.D) && Input.GetKey(KeyCode.LeftShift))
+            {
+                ToggleDevMenu();
+            }
+
             if (Input.GetKeyUp(KeyCode.DownArrow))
             {
                 index--;
@@ -85,7 +91,13 @@ namespace ProtoRTS
             }
         }
 
-        private void CommandInput(string command)
+        public void ToggleDevMenu()
+        {
+            DevMenu.gameObject.EnableGameobject(!DevMenu.gameObject.activeSelf);
+
+        }
+
+        public void CommandInput(string command)
         {
             string[] inputSplit = command.Split(' ');
 

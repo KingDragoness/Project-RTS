@@ -100,7 +100,7 @@ Shader "Syntios/SyntiosUnitShader"
         void surf (Input IN, inout SurfaceOutput o)
         {
             // Albedo comes from a texture tinted by color
-            fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color * 2;
+            float4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color * 2;
 
             //FOG OF WAR
             {
@@ -204,11 +204,12 @@ Shader "Syntios/SyntiosUnitShader"
             //FACTION COLOR
             {
                 fixed4 mask = tex2D(_FactionMask, IN.uv_MainTex);
-                fixed4 col_faction = mask * _FactionColor;
+                float4 col_faction = mask * _FactionColor;
 
-                if (mask.r > 0.04)
+                if (mask.r > 0.01)
                 {
-                    c.rgb *= 0 + (col_faction * 5);
+                    c.rgb *= 0 + ((col_faction) * 5) + c;
+                    c.rgb /= 2;
                 }
             }
 

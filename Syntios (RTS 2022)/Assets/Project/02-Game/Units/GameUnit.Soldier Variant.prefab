@@ -175,6 +175,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: aa91fb0a109b532429a2850ea89a2fa5,
         type: 2}
+    - target: {fileID: 8127373176595696534, guid: 8daea61ec8550634db5f53d8c8564150,
+        type: 3}
+      propertyPath: modelView.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8127373176595696534, guid: 8daea61ec8550634db5f53d8c8564150,
+        type: 3}
+      propertyPath: modelView.Array.data[0]
+      value: 
+      objectReference: {fileID: 2689073234861781357}
     - target: {fileID: 9109924655286209173, guid: 8daea61ec8550634db5f53d8c8564150,
         type: 3}
       propertyPath: radius

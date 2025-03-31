@@ -53,6 +53,25 @@ namespace ProtoRTS
         }
     }
 
+    public class CC_Devmenu : CC_Base
+    {
+        public override string CommandName { get { return "dev"; } }
+        public override string Description { get { return "Open/close the developer menu."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+                DevConsole.Instance.ToggleDevMenu();
+            }
+            catch
+            {
+
+            }
+        }
+    }
+
     public class CC_LoadScene : CC_Base
     {
         public override string CommandName { get { return "loadlevel"; } }

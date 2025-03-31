@@ -37,9 +37,20 @@ namespace ProtoRTS
 		{
 			SyntiosEngine.Instance.AddNewUnit(this);
 			SetUnitStat();
+            DynamicAssetStorage.Instance.RegisterCustomMaterial_GameUnit(this);
+			DynamicAssetStorage.Instance.OverrideCustomMaterial_GameUnit(this);
 		}
 
-		void OnEnable()
+  
+		public string ID
+		{
+			get
+			{
+				return Class.ID;
+			}
+		}
+
+        void OnEnable()
 		{
 			target = transform.position;
 
@@ -72,9 +83,6 @@ namespace ProtoRTS
 			{
 				followerEntity.SetDestination(target);
 			}
-
-			
-
 
 		}
 

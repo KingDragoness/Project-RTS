@@ -162,7 +162,7 @@ Material:
     - _Depth: 0.57
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FOWSampleRadiusBlur: 0.001
+    - _FOWSampleRadiusBlur: 0.0008
     - _FOWmapScale: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
