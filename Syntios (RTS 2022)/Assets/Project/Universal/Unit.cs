@@ -24,7 +24,18 @@ namespace ProtoRTS
 			Structure
         }
 
-		public enum Player
+		public enum Race
+		{
+			Neutral,
+            Test,
+			Mobius,
+			Sovzi,
+			Sixtus,
+			Dionary,
+			Titan
+        }
+
+        public enum Player
         {
 			neutral,
 			Player1,
@@ -38,6 +49,13 @@ namespace ProtoRTS
 			Player9,//unused
 			Observer = 100
         }
+
+		public enum TypePlayer
+		{
+			Player,
+			Enemy,
+			Neutral		
+		}
 
 		public static Color GetColor(Player player)
         {

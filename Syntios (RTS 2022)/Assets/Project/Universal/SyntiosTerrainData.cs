@@ -48,7 +48,7 @@ namespace ProtoRTS
 			Self
 		}
 
-		public string ID = "Earth";
+		public string presetID = "Earth";
 		//256 * 256 = 65.536
 		[Range(32, 256)] public int size_x = 64;
 		[Range(32, 256)] public int size_y = 64;

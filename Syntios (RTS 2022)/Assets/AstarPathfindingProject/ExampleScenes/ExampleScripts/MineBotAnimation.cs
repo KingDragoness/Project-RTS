@@ -68,6 +68,8 @@ namespace Pathfinding.Examples {
 
 			// Speed relative to the character size
 			anim.SetFloat("NormalizedSpeed", relVelocity.magnitude / anim.transform.lossyScale.x);
-		}
-	}
+            //anim.SetFloat("CycleOffset", Random.Range(0f,0.02f));
+
+        }
+    }
 }

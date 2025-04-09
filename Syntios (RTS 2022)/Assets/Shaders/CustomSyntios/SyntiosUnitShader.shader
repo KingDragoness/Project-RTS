@@ -6,7 +6,7 @@ Shader "Syntios/SyntiosUnitShader"
         _FactionColor("Faction Color", Color) = (0.9,0.02,0.02)
         _MainTex ("Albedo (RGB)", 2D) = "white" {}
         _FactionMask("Mask for Faction Color", 2D) = "white" {}
-        _Glossiness ("Smoothness", Range(0,1)) = 0.5
+        _Glossiness ("Smoothness", Range(0,2)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
         _BumpMap("Bumpmap", 2D) = "bump" {}
 
@@ -19,7 +19,7 @@ Shader "Syntios/SyntiosUnitShader"
         // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
         #pragma exclude_renderers gles
         // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Lambert vertex:vert fullforwardshadows
+        #pragma surface surf Standard Lambert vertex:vert fullforwardshadows
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
@@ -97,10 +97,11 @@ Shader "Syntios/SyntiosUnitShader"
         }
 
 
-        void surf (Input IN, inout SurfaceOutput o)
+        void surf (Input IN, inout SurfaceOutputStandard o)
         {
             // Albedo comes from a texture tinted by color
             float4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color * 2;
+            float fowPow = 1;
 
             //FOG OF WAR
             {
@@ -123,7 +124,6 @@ Shader "Syntios/SyntiosUnitShader"
                 sum += tex2D(_FOWMap, half2(_fowUV.x, _fowUV.y + _FOWSampleRadiusBlur));
 
                 sum /= (totalSample + 3);
-                //sum.r = clamp(sum.r, 0, 1);
 
                 float2 fogFOW = _fowUV * 11;
                 float2 fogFOW_1 = _fowUV * 4.44;
@@ -135,7 +135,8 @@ Shader "Syntios/SyntiosUnitShader"
                 sum.r += tex2DStochastic(_CloudFog, fogFOW).r;
                 sum.r += tex2DStochastic(_CloudFog, fogFOW_1).r;
 
-                c *= sum.r;
+                c *= sum.r * 1.3;
+                fowPow = sum.r * 1.3;
 
             }
 
@@ -209,7 +210,7 @@ Shader "Syntios/SyntiosUnitShader"
                 if (mask.r > 0.01)
                 {
                     c.rgb *= 0 + ((col_faction) * 5) + c;
-                    c.rgb /= 2;
+                    //c.rgb /= 2;
                 }
             }
 
@@ -217,9 +218,9 @@ Shader "Syntios/SyntiosUnitShader"
             o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
 
             // Metallic and smoothness come from slider variables
-       /*     o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Alpha = c.a;*/
+            o.Metallic = _Metallic;
+            o.Smoothness = _Glossiness * fowPow;
+            o.Alpha = c.a;
 
 
         }

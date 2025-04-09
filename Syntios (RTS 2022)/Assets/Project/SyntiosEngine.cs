@@ -19,7 +19,7 @@ namespace ProtoRTS
     [System.Serializable]
     public class FactionSheet
     {
-        public List<GameUnit> ListedGameUnits = new List<GameUnit>();
+        [ShowInInspector] public List<GameUnit> ListedGameUnits = new List<GameUnit>();
         public Unit.Player Faction;
         public int Mineral = 0;
         public int Energy = 0;
@@ -44,6 +44,27 @@ namespace ProtoRTS
                 return _supplyCount; 
             }
         }
+
+        public SaveData.FactionSheetData GetSaveData()
+        {
+            SaveData.FactionSheetData dat = new SaveData.FactionSheetData();
+            dat.Faction = Faction;
+            dat.Mineral = Mineral;
+            dat.Energy = Energy;
+
+            var fow = FOWScript.GetFOW(Faction);
+
+            if (fow != null)
+            {
+                dat.exploredPoints = fow.exploredPoints;
+                dat.activePoints = fow.activePoints;
+            }
+
+
+            return dat;
+        }
+
+    
     }
 
     public class SyntiosEngine : MonoBehaviour
@@ -51,6 +72,7 @@ namespace ProtoRTS
 
 		public List<GameUnit> ListedGameUnits = new List<GameUnit>();
         public Gamemode CurrentGamemode;
+        [SerializeField] private SaveData _saveDat;
         private List<FactionSheet> allFactions = new List<FactionSheet>();
         [SerializeField] private Unit.Player currentFaction;
 
@@ -62,25 +84,18 @@ namespace ProtoRTS
 
         public static Unit.Player CurrentFaction { get => Instance.currentFaction; }
         public static Gamemode CurrentMode { get => Instance.CurrentGamemode; }
-
+        public static SaveData SaveData { get => Instance._saveDat; set => Instance._saveDat = value; }
+        public static readonly string SavePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "/My Games/Syntios/Saves";
 
         private void Awake()
         {
             Instance = this;
+
         }
 
         private void Start()
         {
-            allFactions.Add(new FactionSheet(Unit.Player.neutral));
-            allFactions.Add(new FactionSheet(Unit.Player.Player1));
-            allFactions.Add(new FactionSheet(Unit.Player.Player2));
-            allFactions.Add(new FactionSheet(Unit.Player.Player3));
-            allFactions.Add(new FactionSheet(Unit.Player.Player4));
-            allFactions.Add(new FactionSheet(Unit.Player.Player5));
-            allFactions.Add(new FactionSheet(Unit.Player.Player6));
-            allFactions.Add(new FactionSheet(Unit.Player.Player7));
-            allFactions.Add(new FactionSheet(Unit.Player.Player8));
-            allFactions.Add(new FactionSheet(Unit.Player.Player9));
+
 
         }
 

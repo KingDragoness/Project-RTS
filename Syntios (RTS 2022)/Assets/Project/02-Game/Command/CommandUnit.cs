@@ -9,6 +9,7 @@ namespace ProtoRTS.Game
 	public class CommandUnit : MonoBehaviour
 	{
 
+		public Transform lastCursorT;
 		public bool DEBUG_DrawCircle = false;
 
 		private Formation[] allFormations = new Formation[1];
@@ -59,6 +60,11 @@ namespace ProtoRTS.Game
 
 			foreach (var unit in Selection.AllSelectedUnits)
 			{
+				if (SyntiosEngine.CurrentFaction != unit.stat_faction)
+				{
+					continue;
+				}
+
 				var gameUnit = unit.GetComponent<GameUnit>();
 				int curr_column = Mathf.FloorToInt(index / rows_col);
 				int curr_row = (index % rows_col);
@@ -102,8 +108,8 @@ namespace ProtoRTS.Game
 				#endregion
 
 				gameUnit.target = positionTarget;
-
-				index++;
+                lastCursorT.transform.position = positionTarget;	
+                index++;
 			}
 		}
 

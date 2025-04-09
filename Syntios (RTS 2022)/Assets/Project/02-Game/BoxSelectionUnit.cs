@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using System.Linq;
 
 namespace ProtoRTS
 {
@@ -14,7 +15,7 @@ namespace ProtoRTS
         [FoldoutGroup("Selection")] public float DoubleClickTime = 0.3f;
 
 
-        public GameObject circleOutline_Green;
+        //public GameObject circleOutline_Green;
         Camera myCam;
 
         [SerializeField]
@@ -212,8 +213,12 @@ namespace ProtoRTS
 
         void SelectOneUnit(GameUnit unit)
         {
+            if (Selection.AllSelectedUnits.Count > 0 && unit.IsPlayerUnit() == false) return;
+            if (!FOWScript.IsCoordRevealed(unit.transform.position) && unit.IsPlayerUnit() == false) return;
+
+
             Selection.SelectUnit(unit);
-            unit.SelectedUnit(circleOutline_Green.transform);
+            unit.SelectedUnit();
 
             if (Selection.GetPortraitedUnit != null)
             {
@@ -236,7 +241,7 @@ namespace ProtoRTS
                 if (vpPos.x >= 0f && vpPos.x <= 1f && vpPos.y >= 0.2f && vpPos.y <= 1f && vpPos.z > 0f)
                 {
                     Selection.SelectUnit(unit);
-                    unit.SelectedUnit(circleOutline_Green.transform);
+                    unit.SelectedUnit();
                 }
 
             }
@@ -256,6 +261,7 @@ namespace ProtoRTS
             Rect rect = new Rect();
             Vector3 pos1 = startPosition;
             Vector3 pos2 = endPosition;
+            Vector3 centerPos = (startPosition + endPosition) / 2f;
 
             Vector3 camPos1 = myCam.WorldToScreenPoint(pos1);
             Vector3 camPos2 = myCam.WorldToScreenPoint(pos2);
@@ -283,10 +289,23 @@ namespace ProtoRTS
 
             rect.min = camPos1;
             rect.max = camPos2;
+            bool allowBoxSelectOtherFaction = false;
 
-            foreach (var unit in everyUnit)
+            if (rect.size.x < 999 && rect.size.y < 999)
             {
-                if (unit.stat_faction != SyntiosEngine.CurrentFaction) continue;
+                allowBoxSelectOtherFaction = true;
+            }
+
+            var currentFaction = SyntiosEngine.CurrentFaction;
+
+            List<GameUnit> playerUnits = new List<GameUnit>();
+
+            playerUnits = everyUnit.ToList().FindAll(s => s.stat_faction == currentFaction);
+           
+            //1st PASS: Player but only game unit
+            foreach (var unit in playerUnits)
+            {
+                if (unit.Class.AllUnitTags.Contains(Unit.Tag.Structure)) continue;
 
                 var upRad = unit.transform.position + Vector3.forward * unit.Class.Radius;
                 var downRad = unit.transform.position + -Vector3.forward * unit.Class.Radius;
@@ -296,29 +315,144 @@ namespace ProtoRTS
                 if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
                 {
                     Selection.SelectUnit(unit);
-                    unit.SelectedUnit(circleOutline_Green.transform);
+                    unit.SelectedUnit();
                 }
                 else if (rect.Contains(myCam.WorldToScreenPoint(upRad)))
                 {
                     Selection.SelectUnit(unit);
-                    unit.SelectedUnit(circleOutline_Green.transform);
+                    unit.SelectedUnit();
                 }
                 else if (rect.Contains(myCam.WorldToScreenPoint(downRad)))
                 {
                     Selection.SelectUnit(unit);
-                    unit.SelectedUnit(circleOutline_Green.transform);
+                    unit.SelectedUnit();
                 }
                 else if (rect.Contains(myCam.WorldToScreenPoint(leftRad)))
                 {
                     Selection.SelectUnit(unit);
-                    unit.SelectedUnit(circleOutline_Green.transform);
+                    unit.SelectedUnit();
                 }
                 else if (rect.Contains(myCam.WorldToScreenPoint(rightRad)))
                 {
                     Selection.SelectUnit(unit);
-                    unit.SelectedUnit(circleOutline_Green.transform);
+                    unit.SelectedUnit();
+                }
+
+            }
+
+            //2nd PASS: structure
+            if (Selection.AllSelectedUnits.Count == 0)
+            {
+                foreach (var unit in playerUnits)
+                {
+                    if (!unit.Class.AllUnitTags.Contains(Unit.Tag.Structure)) continue;
+
+                    var upRad = unit.transform.position + Vector3.forward * unit.Class.Radius;
+                    var downRad = unit.transform.position + -Vector3.forward * unit.Class.Radius;
+                    var leftRad = unit.transform.position + -Vector3.right * unit.Class.Radius;
+                    var rightRad = unit.transform.position + Vector3.right * unit.Class.Radius;
+
+                    if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(upRad)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(downRad)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(leftRad)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(rightRad)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+
                 }
             }
+
+
+            //3rd PASS: Neutral/Enemy
+            if (Selection.AllSelectedUnits.Count == 0)
+            {
+                List<GameUnit> byClosestUnit = new List<GameUnit>();
+                byClosestUnit.AddRange(everyUnit.ToList());
+                byClosestUnit = byClosestUnit.OrderBy((d) => (d.transform.position - centerPos).sqrMagnitude).ToList();
+
+                foreach (var unit in byClosestUnit)
+                {
+                    if (Selection.AllSelectedUnits.Count > 0)
+                    {
+                        break;
+                    }
+                    if (!FOWScript.IsCoordRevealed(unit.transform.position))
+                    {
+                        continue;
+                    }
+                    if (unit.Class.AllUnitTags.Contains(Unit.Tag.Structure)) continue;
+
+
+                    if (unit.stat_faction == currentFaction)
+                    { 
+                        continue;
+                    }
+                    else if (unit.stat_faction != currentFaction)
+                    {
+                        if (allowBoxSelectOtherFaction)
+                        {
+
+                        }
+                        else if (allowBoxSelectOtherFaction == false)
+                        {
+                            continue;
+                        }
+                    }
+
+
+                    var upRad = unit.transform.position + Vector3.forward * unit.Class.Radius;
+                    var downRad = unit.transform.position + -Vector3.forward * unit.Class.Radius;
+                    var leftRad = unit.transform.position + -Vector3.right * unit.Class.Radius;
+                    var rightRad = unit.transform.position + Vector3.right * unit.Class.Radius;
+
+                    if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(upRad)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(downRad)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(leftRad)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(rightRad)))
+                    {
+                        Selection.SelectUnit(unit);
+                        unit.SelectedUnit();
+                    }
+
+                }
+            }
+           
 
 
             if (Selection.GetPortraitedUnit != null)

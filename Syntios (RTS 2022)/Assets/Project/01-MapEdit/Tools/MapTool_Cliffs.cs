@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Unity.Entities.UniversalDelegates;
 
 namespace ProtoRTS.MapEditor
 {
@@ -33,9 +34,10 @@ namespace ProtoRTS.MapEditor
 		public int circle_cutoff = 30;
 		[FoldoutGroup("DEBUG")] public GameObject DEBUG_start;
 		[FoldoutGroup("DEBUG")] public GameObject DEBUG_end;
+        [FoldoutGroup("DEBUG")] public GameObject DEBUG_mm_start; //manmade cliff test
+        [FoldoutGroup("DEBUG")] public GameObject DEBUG_mm_end;
 
-
-		private float _refreshTime = 1f;
+        private float _refreshTime = 1f;
 		private bool _allowMouseToEdit = false;
 		private byte original_pixelPos_cliffTarget;
 
@@ -193,9 +195,12 @@ namespace ProtoRTS.MapEditor
 			//manmade/organic cliffs (pixel width brush + 2)
 			//cT = cliffType
             {
-				int pixelWidth_cT = brushSize + 2;
-				int totalLength_cT = (brushSize + 2) * (brushSize + 2);
-				float halfSize_cT = (brushSize + 2f) / 2f;
+				int oddNumber = 0;
+				if (brushSize % 2 == 1) oddNumber++;
+
+				int pixelWidth_cT = brushSize + oddNumber + 2;
+				int totalLength_cT = (brushSize + oddNumber + 2) * (brushSize + oddNumber + 2);
+				float halfSize_cT = (brushSize + oddNumber + 2f) / 2f;
 
 				for (int i = 0; i < totalLength_cT; i++)
 				{
@@ -217,9 +222,13 @@ namespace ProtoRTS.MapEditor
 					int currentIndex = HeightmapPosToIndex(pixelPos);
 
 					SetOrganicManmade(currentIndex);
+                }
 
-				}
-			}
+				{
+					DebugTestIndex(0, DEBUG_mm_start);
+                    DebugTestIndex(totalLength_cT - 1, DEBUG_mm_end);
+                }
+            }
 
 
             //draw pyramid underneath/add on the edges
@@ -246,6 +255,38 @@ namespace ProtoRTS.MapEditor
 			}
 
 		}
+
+		public void DebugTestIndex(int i, GameObject debugObj)
+		{
+            float halfSize = brushSize / 2f;
+            Vector3 posOrigin = Brush.BrushPosition - new Vector3(halfSize / 2f, 0, halfSize / 2f);
+            Vector2Int pixelPosCenter = WorldPosToCliffmapPos(Brush.BrushPosition);
+            Vector2Int pixelPosOrigin = WorldPosToCliffmapPos(posOrigin);
+
+
+            int pixelWidth_cT = brushSize + 2;
+            int totalLength_cT = (brushSize + 2) * (brushSize + 2);
+            float halfSize_cT = (brushSize + 2f) / 2f;
+
+            int x = i % pixelWidth_cT;
+            int y = Mathf.FloorToInt(i / pixelWidth_cT);
+            Vector2Int pixelPos = new Vector2Int(pixelPosOrigin.x, pixelPosOrigin.y);
+
+            pixelPos.x -= halfSize_cT.ToInt();
+            pixelPos.y -= halfSize_cT.ToInt();
+
+            pixelPos.x += x;
+            pixelPos.y += y;
+
+            if (pixelPos.x >= Map.TerrainData.size_x) return;
+            if (pixelPos.x < 0) return;
+            if (pixelPos.y >= Map.TerrainData.size_y) return;
+            if (pixelPos.y < 0) return;
+
+
+            int currentIndex = HeightmapPosToIndex(pixelPos);
+			debugObj.gameObject.transform.position = new Vector3(pixelPos.x * 2, 0, pixelPos.y * 2f);
+        }
 
 		public void BrushCliff(int currentIndex, byte height)
 		{

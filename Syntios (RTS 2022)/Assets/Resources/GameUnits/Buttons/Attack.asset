@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31f2e99a17451e54b9d46cdb8eef75db, type: 3}
+  m_Name: Attack
+  m_EditorClassIdentifier: 
+  displayName: Attack
+  sprite: {fileID: 21300000, guid: 094bc0a57433a6241a9454aabbf96017, type: 3}
+  tooltip: Orders selected units to move to the target point, fighting nearby enemies
+    along the way. Targeting a unit with the Attack command orders that it be attacked
+    until it is destroyed.
+  allowTint: 1

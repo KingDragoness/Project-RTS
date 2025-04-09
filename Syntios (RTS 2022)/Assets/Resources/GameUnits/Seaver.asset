@@ -33,3 +33,16 @@ MonoBehaviour:
   voiceline_Move:
   - {fileID: 8300000, guid: 3cb9b59a08802074c9e91909bdab27c1, type: 3}
   - {fileID: 8300000, guid: 458ee8e98d1f81a458c91b7c572ed756, type: 3}
+  commandCards:
+  - cardName: default
+    commands:
+    - button: {fileID: 11400000, guid: c62efbfe0e21d34479760900f1102f55, type: 2}
+      position: 0
+    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      position: 1
+    - button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
+      position: 2
+    - button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
+      position: 3
+    - button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
+      position: 4

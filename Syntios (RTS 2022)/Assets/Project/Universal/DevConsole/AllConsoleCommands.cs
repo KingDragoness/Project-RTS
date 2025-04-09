@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using Random = UnityEngine.Random;
+using ProtoRTS.Game;
 
 namespace ProtoRTS
 {
@@ -71,6 +72,50 @@ namespace ProtoRTS
             }
         }
     }
+
+
+    public class CC_SaveFile : CC_Base
+    {
+        public override string CommandName { get { return "save"; } }
+        public override string Description { get { return "Save savefile [string name]."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+
+                RTS.instance.SaveGame(args[0]);
+
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage("save <string name> | Failed save!");
+            }
+        }
+    }
+
+    public class CC_LoadSaveFile : CC_Base
+    {
+        public override string CommandName { get { return "load"; } }
+        public override string Description { get { return "Load save file [string name]."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+
+                RTS.instance.LoadGame(args[0]);
+
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage("load <string name> | No save file loaded!");
+            }
+        }
+    }
+
 
     public class CC_LoadScene : CC_Base
     {
@@ -224,6 +269,29 @@ namespace ProtoRTS
 
             DevConsole.Instance.SendConsoleMessage($"{Selection.AllSelectedUnits.Count} units are killed.");
 
+        }
+    }
+
+
+    public class CC_Cheat_money : CC_Base
+    {
+        public override string CommandName { get { return "cc.money"; } }
+        public override string Description { get { return "Adds 5k minerals and energy."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+                var myFactionSheet = SyntiosEngine.MyFactionSheet;
+                myFactionSheet.Mineral += 5000;
+                myFactionSheet.Energy += 5000;
+
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage("loadlevel <int index> | Level index not valid!");
+            }
         }
     }
 

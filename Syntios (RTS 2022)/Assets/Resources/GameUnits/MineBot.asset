@@ -19,6 +19,7 @@ MonoBehaviour:
   LineOfSight: 6
   spriteWireframe: {fileID: 21300000, guid: 6bc12da6eda2a0c43b57f0ee5dbf161e, type: 3}
   MaxHP: 35
+  SupplyCount: 1
   HasEnergy: 0
   IsUntouchable: 0
   AllUnitTags: 02000000050000000a000000
@@ -29,3 +30,16 @@ MonoBehaviour:
   - {fileID: 8300000, guid: b3e4aec9fcf138348a74ea33f81da9a7, type: 3}
   voiceline_Move:
   - {fileID: 8300000, guid: 92e43032af4bb534fb31370f2264bcff, type: 3}
+  commandCards:
+  - cardName: default
+    commands:
+    - button: {fileID: 11400000, guid: c62efbfe0e21d34479760900f1102f55, type: 2}
+      position: 0
+    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      position: 1
+    - button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
+      position: 2
+    - button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
+      position: 3
+    - button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
+      position: 4

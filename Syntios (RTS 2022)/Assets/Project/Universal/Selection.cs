@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Sirenix.OdinInspector;
+using Pathfinding;
 
 namespace ProtoRTS
 {
@@ -25,10 +26,15 @@ namespace ProtoRTS
 	{
 
 		private List<GameUnit> allSelectedUnits = new List<GameUnit>();
+		public LayerMask layer_Terrain;
+		public GameObject circle_Green;
+        public GameObject circle_Yellow;
+        public GameObject circle_Red;
+		[FoldoutGroup("Building")] [SerializeField] private GameObject highlight_3dModel;
 
+		private bool isBuildPlacement = false;
 
-
-		private static Selection _instance;
+        private static Selection _instance;
 
         private void Awake()
         {
@@ -74,8 +80,23 @@ namespace ProtoRTS
 		{
 
 		}
+        internal static GameObject GetCircle(Unit.TypePlayer typePlayer)
+        {
+			if (typePlayer == Unit.TypePlayer.Player)
+			{
+				return _instance.circle_Green;
+			}
+			else if (typePlayer == Unit.TypePlayer.Neutral)
+            {
+                return _instance.circle_Yellow;
+            }
+			else
+            {
+                return _instance.circle_Red;
+            }
+        }
 
-		internal static void DeselectAllUnits()
+        internal static void DeselectAllUnits()
 		{
 			foreach (var unit in _instance.allSelectedUnits)
 			{
@@ -112,5 +133,94 @@ namespace ProtoRTS
             }
 		}
 
-	}
+		public Vector3 GetCursorPositionTerrain()
+		{
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, 512f, layer_Terrain))
+            {
+				return hit.point;
+            }
+
+            if (Physics.Raycast(ray, out hit, 512f))
+            {
+                return hit.point;
+            }
+
+            return Vector3.zero;
+        }
+
+
+		[FoldoutGroup("DEBUG")]
+		[SerializeField] private SO_GameUnit DEBUG_buildingPlacement1;
+
+        [FoldoutGroup("DEBUG")]
+        [Button("BuildPlacement")]
+		public void DEBUG_PlacementBuilding1()
+		{
+			BuildPlacement(DEBUG_buildingPlacement1);
+		}
+
+        [FoldoutGroup("DEBUG")]
+		public void BuildPlacement(SO_GameUnit buildingSO)
+		{
+			if (highlight_3dModel != null) { Destroy(highlight_3dModel.gameObject); }
+
+			GameObject go_New = new GameObject($"Highlight_{buildingSO.NameDisplay}");
+			
+			foreach(var model in buildingSO.basePrefab.modelView)
+			{
+				var new_model = Instantiate(model.gameObject);
+				var navmeshCut = new_model.GetComponent<NavmeshCut>();
+				if (navmeshCut != null) Destroy(navmeshCut);
+
+                new_model.transform.SetParent(go_New.transform);
+			}
+
+			Vector3 cursorPos = GetCursorPositionTerrain();
+			Vector3 placePos = Vector3.zero;
+			placePos.x = Mathf.RoundToInt(cursorPos.x);
+			placePos.y = Map.instance.GetPositionY_cliffLevel(cursorPos);
+            placePos.z = Mathf.RoundToInt(cursorPos.z);
+            go_New.transform.position = placePos;
+			highlight_3dModel = go_New;
+            isBuildPlacement = true;
+        }
+
+        [FoldoutGroup("DEBUG")]
+        [Button("CancelPlacement")]
+        public void CancelPlacement()
+        {
+            if (highlight_3dModel != null) { Destroy(highlight_3dModel.gameObject); }
+
+            isBuildPlacement = false;
+        }
+
+        [FoldoutGroup("DEBUG")]
+        [Button("Build here")]
+        public void BuildBuilding()
+		{
+			var newUnit = Instantiate(DEBUG_buildingPlacement1.basePrefab);
+			newUnit.transform.position = highlight_3dModel.transform.position;
+
+        }
+
+        private void Update()
+        {
+            if (isBuildPlacement)
+			{
+				if (highlight_3dModel != null)
+				{
+                    Vector3 cursorPos = GetCursorPositionTerrain();
+                    Vector3 placePos = Vector3.zero;
+                    placePos.x = Mathf.RoundToInt(cursorPos.x/2)*2;
+                    placePos.y = Map.instance.GetPositionY_cliffLevel(cursorPos);
+                    placePos.z = Mathf.RoundToInt(cursorPos.z/2)*2;
+                    highlight_3dModel.transform.position = placePos;
+
+                }
+            }
+        }
+    }
 }

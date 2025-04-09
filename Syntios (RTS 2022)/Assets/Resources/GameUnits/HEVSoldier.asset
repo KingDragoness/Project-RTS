@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd0dd0db53ec194cb76883cd4a64e47, type: 3}
+  m_Name: HEVSoldier
+  m_EditorClassIdentifier: 
+  ID: HEVSoldier
+  NameDisplay: HEV Soldier
+  basePrefab: {fileID: 6256584996307328785, guid: de6a17608ce737b4faaf7c28a104bfdd,
+    type: 3}
+  Rank: Elite
+  Radius: 0.61
+  LineOfSight: 10
+  spriteWireframe: {fileID: 21300000, guid: b8bd164065e5797479369a3e14047e35, type: 3}
+  MaxHP: 100
+  SupplyCount: 1
+  HasEnergy: 0
+  IsUntouchable: 0
+  AllUnitTags: 0100000005000000
+  port_Importance: -100
+  port_Idles:
+  - {fileID: 32900000, guid: 7273b758f334c274597a548359242545, type: 3}
+  port_Talkings: []
+  voiceline_Ready:
+  - {fileID: 8300000, guid: 638af488323a6444b9ab62951f54c306, type: 3}
+  voiceline_Move: []
+  commandCards:
+  - cardName: default
+    commands:
+    - commandType: 0
+      button: {fileID: 11400000, guid: c62efbfe0e21d34479760900f1102f55, type: 2}
+      abilityScriptName: default
+      position: 0
+      cardToOpen: 
+    - commandType: 0
+      button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      abilityScriptName: default
+      position: 1
+      cardToOpen: 
+    - commandType: 0
+      button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
+      abilityScriptName: default
+      position: 2
+      cardToOpen: 
+    - commandType: 0
+      button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
+      abilityScriptName: default
+      position: 3
+      cardToOpen: 
+    - commandType: 0
+      button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
+      abilityScriptName: default
+      position: 4
+      cardToOpen: 
+  unitAbility: []

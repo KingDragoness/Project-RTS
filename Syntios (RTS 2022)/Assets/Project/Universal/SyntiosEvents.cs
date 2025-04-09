@@ -13,6 +13,7 @@ namespace ProtoRTS
         public static System.Action<GameUnit> UI_OrderMove;
         public static System.Action UI_ReselectUpdate;
         public static System.Action Game_ReloadMap;
+        public static System.Action Game_LoadFile;
 
 
 
@@ -28,6 +29,7 @@ namespace ProtoRTS
             UI_OrderMove = null;
             UI_ReselectUpdate = null;
             Game_ReloadMap = null;
+            Game_LoadFile = null;
         }
 
         private void Awake()

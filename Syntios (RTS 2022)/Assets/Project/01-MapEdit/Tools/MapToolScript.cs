@@ -20,7 +20,7 @@ namespace ProtoRTS.MapEditor
 		}
 
 
-		public Vector2Int WorldPosToPixelPos(Vector3 worldPos)
+		public static Vector2Int WorldPosToPixelPos(Vector3 worldPos)
 		{
 			Vector2Int pos_1 = new Vector2Int();
 			pos_1.x = Mathf.RoundToInt(worldPos.x * 2);
@@ -38,13 +38,13 @@ namespace ProtoRTS.MapEditor
 			return pos_1;
 		}
 
-		public int HeightmapPosToIndex(Vector2Int pos)
+		public static int HeightmapPosToIndex(Vector2Int pos)
 		{
 			int index = (pos.y * Map.TerrainData.size_x) + (pos.x);
 			return index;
 		}
 
-		public int PixelPosToIndex(Vector2Int pos)
+        public static int PixelPosToIndex(Vector2Int pos)
 		{
 			int index = (pos.y * 1024) + (pos.x);
 			return index;

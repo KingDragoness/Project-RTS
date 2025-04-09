@@ -7,7 +7,7 @@ namespace ProtoRTS
 {
 	public class Tick : MonoBehaviour
 	{
-        public static System.Action OnTick;
+        public static System.Action<int> OnTick;
 
         private int _tick = 0;
 
@@ -40,7 +40,7 @@ namespace ProtoRTS
             if (_timer <= 0f)
             {
                 _timer = 1f / ticksPerSecond;
-                OnTick?.Invoke();
+                OnTick?.Invoke(_tick);
                 _tick++;
             }
         }

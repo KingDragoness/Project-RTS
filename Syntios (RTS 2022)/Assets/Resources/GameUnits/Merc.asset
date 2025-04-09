@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: Merc
   NameDisplay: Mobius Mercenary
+  basePrefab: {fileID: 7771179368390759321, guid: a24545c72417f1f47865b676b9966d3e,
+    type: 3}
   Rank: 
   Radius: 1
   LineOfSight: 8
@@ -38,3 +40,32 @@ MonoBehaviour:
   - {fileID: 8300000, guid: c1b09f283f6255544a55e8aa27b109dc, type: 3}
   - {fileID: 8300000, guid: e60e419746b2d634f8f0d1e5719b3a7a, type: 3}
   - {fileID: 8300000, guid: 05b436f01cb827d4c872f063a698c352, type: 3}
+  commandCards:
+  - cardName: default
+    commands:
+    - commandType: 0
+      button: {fileID: 11400000, guid: c62efbfe0e21d34479760900f1102f55, type: 2}
+      abilityScriptName: default
+      position: 0
+      cardToOpen: 
+    - commandType: 0
+      button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      abilityScriptName: default
+      position: 1
+      cardToOpen: 
+    - commandType: 0
+      button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
+      abilityScriptName: default
+      position: 2
+      cardToOpen: 
+    - commandType: 0
+      button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
+      abilityScriptName: default
+      position: 3
+      cardToOpen: 
+    - commandType: 0
+      button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
+      abilityScriptName: default
+      position: 4
+      cardToOpen: 
+  unitAbility: []

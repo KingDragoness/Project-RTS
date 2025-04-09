@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ProtoRTS.Game;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -448,6 +449,8 @@ namespace ProtoRTS
             }
         }
 
+
+
         [FoldoutGroup("FIXED Reference")] [SerializeField] public int[] x_table_indexes;
         [FoldoutGroup("FIXED Reference")] [SerializeField] public int[] y_table_indexes;
 
@@ -466,11 +469,6 @@ namespace ProtoRTS
             Instance = this;
             _timerUpdateTexture = 1f / UpdateTexturePerSecond;
             _timerUpdateFOW = 1f / UpdateFOWPerSecond;
-
-        }
-
-        private void Start()
-        {
             allFOWMaps.Add(new FOWMap(Unit.Player.Player1, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player2, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player3, new bool[256, 256], new bool[256, 256]));
@@ -480,11 +478,32 @@ namespace ProtoRTS
             allFOWMaps.Add(new FOWMap(Unit.Player.Player7, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player8, new bool[256, 256], new bool[256, 256]));
 
+
+        }
+
+        private void Start()
+        {
+
             foreach(var circle in FixedPatternCircles)
             {
                 circle._map = map;
             }
 
+        }
+
+        public void LaunchBlank()
+        {
+
+        }
+
+        public void LaunchLoadedGame()
+        {
+            foreach (var fowMap in allFOWMaps)
+            {
+                var faction = RTS.cachedLoadedSave.allFactions.Find(x => x.Faction == fowMap.faction);
+                fowMap.exploredPoints = faction.exploredPoints;
+                fowMap.activePoints = faction.activePoints; 
+            }
         }
 
         private void UpdateTexture()

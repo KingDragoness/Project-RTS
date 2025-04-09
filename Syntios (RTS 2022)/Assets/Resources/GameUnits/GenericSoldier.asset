@@ -13,12 +13,15 @@ MonoBehaviour:
   m_Name: GenericSoldier
   m_EditorClassIdentifier: 
   ID: GenSoldier
-  NameDisplay: 21st Century Soldier
+  NameDisplay: Soldier
+  basePrefab: {fileID: 6256584996307328785, guid: 0021233e3dd03d442bbb5188e36196e2,
+    type: 3}
   Rank: 
   Radius: 0.5
   LineOfSight: 10
   spriteWireframe: {fileID: 21300000, guid: 07cfa059d1e011d4e8a1d2b63943e584, type: 3}
-  MaxHP: 35
+  MaxHP: 40
+  SupplyCount: 1
   HasEnergy: 0
   IsUntouchable: 0
   AllUnitTags: 0100000005000000
@@ -31,3 +34,139 @@ MonoBehaviour:
   voiceline_Move:
   - {fileID: 8300000, guid: b947594b22bdb7943a170364e2dabdc1, type: 3}
   - {fileID: 8300000, guid: b741ebd998eeb2a48b6fbe8024905a3a, type: 3}
+  commandCards:
+  - cardName: default
+    commands:
+    - button: {fileID: 11400000, guid: c62efbfe0e21d34479760900f1102f55, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 0
+      abilityScriptName: Move
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 1
+      abilityScriptName: Stop
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 2
+      abilityScriptName: default
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 3
+      abilityScriptName: Attack
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 4
+      abilityScriptName: default
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: 003d80d474a462b4986fec07d73bc76e, type: 2}
+      commandType: 4
+      gameUnit: {fileID: 11400000}
+      position: 8
+      abilityScriptName: default
+      cardToOpen: build
+    - button: {fileID: 11400000, guid: 0a92df97b13ffd3448179b7aaa740d77, type: 2}
+      commandType: 4
+      gameUnit: {fileID: 11400000}
+      position: 9
+      abilityScriptName: default
+      cardToOpen: build_advanced
+  - cardName: build
+    commands:
+    - button: {fileID: 11400000, guid: 5aa06e1f77e0c8341a31eb253bf4510b, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 0
+      abilityScriptName: Place Building-test 1
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: 1ca4947bee3fae94483b537a28c5eeed, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 1
+      abilityScriptName: Place Building-test 2
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      commandType: 4
+      gameUnit: {fileID: 11400000}
+      position: 11
+      abilityScriptName: default
+      cardToOpen: default
+  - cardName: build_advanced
+    commands:
+    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      commandType: 4
+      gameUnit: {fileID: 11400000}
+      position: 11
+      abilityScriptName: default
+      cardToOpen: default
+  - cardName: construction
+    commands:
+    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 11
+      abilityScriptName: Cancel Building
+      cardToOpen: 
+  unitAbility:
+  - name: default
+    allActions: []
+    orderCategory: 1
+  - name: Move
+    allActions:
+    - type: 0
+      targetType: 0
+      buildingSO: {fileID: 0}
+    - type: 1
+      targetType: 0
+      buildingSO: {fileID: 0}
+    orderCategory: 5
+  - name: Stop
+    allActions:
+    - type: 1
+      targetType: 0
+      buildingSO: {fileID: 0}
+    orderCategory: 0
+  - name: Attack
+    allActions:
+    - type: 0
+      targetType: 0
+      buildingSO: {fileID: 0}
+    - type: 20
+      targetType: 0
+      buildingSO: {fileID: 0}
+    - type: 13
+      targetType: 0
+      buildingSO: {fileID: 0}
+    orderCategory: 6
+  - name: Cancel Building
+    allActions:
+    - type: 22
+      targetType: 0
+      buildingSO: {fileID: 0}
+    orderCategory: 0
+  - name: Building
+    allActions:
+    - type: 21
+      targetType: 0
+      buildingSO: {fileID: 0}
+    orderCategory: 0
+  - name: Place Building-test 1
+    allActions:
+    - type: 18
+      targetType: 0
+      buildingSO: {fileID: 11400000, guid: f532d0f78005bde49b6047787ffadd84, type: 2}
+    orderCategory: 0
+  - name: Place Building-test 2
+    allActions:
+    - type: 18
+      targetType: 0
+      buildingSO: {fileID: 0}
+    orderCategory: 0

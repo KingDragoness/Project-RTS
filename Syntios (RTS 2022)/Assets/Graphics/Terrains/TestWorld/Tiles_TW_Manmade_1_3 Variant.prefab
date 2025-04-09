@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &779563908281573131
+--- !u!1001 &5718388916220384182
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -16,22 +16,22 @@ PrefabInstance:
     - target: {fileID: 1093572927708617454, guid: eefe43f21785986459cc30a919f21100,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
+      value: -0.0000030025835
       objectReference: {fileID: 0}
     - target: {fileID: 1093572927708617454, guid: eefe43f21785986459cc30a919f21100,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.0000029653306
       objectReference: {fileID: 0}
     - target: {fileID: 1093572927708617454, guid: eefe43f21785986459cc30a919f21100,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.7071068
+      value: -0.70710665
       objectReference: {fileID: 0}
     - target: {fileID: 1093572927708617454, guid: eefe43f21785986459cc30a919f21100,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.7071068
+      value: -0.70710695
       objectReference: {fileID: 0}
     - target: {fileID: 1093572927708617454, guid: eefe43f21785986459cc30a919f21100,
         type: 3}
@@ -47,7 +47,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 1386559698921480891, guid: 35bc64922be5ea8498bae0c65d9bbd7b,
+      objectReference: {fileID: 826662694695768112, guid: 35bc64922be5ea8498bae0c65d9bbd7b,
         type: 3}
     - target: {fileID: 4819322382622862002, guid: eefe43f21785986459cc30a919f21100,
         type: 3}
@@ -55,10 +55,15 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1386559698921480891, guid: 35bc64922be5ea8498bae0c65d9bbd7b,
         type: 3}
+    - target: {fileID: 4851691437605346542, guid: eefe43f21785986459cc30a919f21100,
+        type: 3}
+      propertyPath: m_Name
+      value: cliff_x1_y3
+      objectReference: {fileID: 0}
     - target: {fileID: 5755407147452155190, guid: eefe43f21785986459cc30a919f21100,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 83
+      value: 85
       objectReference: {fileID: 0}
     - target: {fileID: 5755407147452155190, guid: eefe43f21785986459cc30a919f21100,
         type: 3}

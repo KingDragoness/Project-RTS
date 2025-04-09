@@ -8,6 +8,10 @@ using Sirenix.OdinInspector;
 using Pathfinding;
 using Newtonsoft.Json;
 using ReadOnlyAttribute = Sirenix.OdinInspector.ReadOnlyAttribute;
+using System.Drawing;
+using Color = UnityEngine.Color;
+using ProtoRTS.MapEditor;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 namespace ProtoRTS
 {
@@ -122,7 +126,7 @@ namespace ProtoRTS
         {
             get
             {
-                return allVanillaTerrainPresets.Find(x => x.PresetID == _terrainData.ID);
+                return allVanillaTerrainPresets.Find(x => x.PresetID == _terrainData.presetID);
             }
         }
 
@@ -154,6 +158,7 @@ namespace ProtoRTS
         }
 
         public static string lastLoadedValidmap = "";
+
 
         #region Map Loading
         public void LoadMapFromProtoDir(string mapName)
@@ -201,6 +206,11 @@ namespace ProtoRTS
             SyntiosEvents.Game_ReloadMap?.Invoke();
         }
 
+        public void LoadGame_LoadSyntiosTerrainDat(SyntiosTerrainData dat)
+        {
+            _terrainData = dat;
+        }
+
         IEnumerator RETARD_UpdateNavmesh()
         {
             yield return null;
@@ -241,29 +251,50 @@ namespace ProtoRTS
         public void UpdateNavMesh()
         {
 
-            var recastGraph = AstarPath.active.data.recastGraph;
-            int width = (_terrainData.size_x * 2) / 1;
-            int depth = (_terrainData.size_y * 2) / 1;
+           foreach(RecastGraph recastGraph in AstarPath.active.data.FindGraphsOfType(typeof(RecastGraph)))
+           {
+                int width = (_terrainData.size_x * 2) / 1;
+                int depth = (_terrainData.size_y * 2) / 1;
 
-            var center = WorldPosCenter;
-            center.x += 0;
-            center.z += 0;
+                var center = WorldPosCenter;
+                center.x += 0;
+                center.z += 0; 
 
-            recastGraph.cellSize = 1;
-            recastGraph.forcedBoundsSize = new Vector3(width, 100, depth);
-            recastGraph.forcedBoundsCenter = center;
-            //gridGraph.SetDimensions(width, depth, 1);
-            //gridGraph.center = center;
+                recastGraph.cellSize = 1;
+                recastGraph.forcedBoundsSize = new Vector3(width, 100, depth);
+                recastGraph.forcedBoundsCenter = center;
+                //gridGraph.SetDimensions(width, depth, 1);
+                //gridGraph.center = center;
 
-            AstarPath.active.Scan(recastGraph);
+                AstarPath.active.Scan(recastGraph);
+            }
+           
+            //var recastGraph = AstarPath.active.data.recastGraph;
+           
         }
 
-        public float GetPositionY(Vector3 realpos)
+        public float GetPositionY_navMesh(Vector3 realpos)
         {
             var recastGraph = AstarPath.active.data.recastGraph;
             var nn = recastGraph.GetNearest(realpos, constraint: NNConstraint.Walkable);
             return nn.position.y;
         }
+
+        public float GetPositionY_cliffLevel(Vector3 realpos)
+        {
+            Vector2Int pixelPosCenter = MapToolScript.WorldPosToCliffmapPos(realpos);
+           // Debug.Log(pixelPosCenter);
+            if (pixelPosCenter.x < 0) pixelPosCenter.x = 0;
+            if (pixelPosCenter.y < 0) pixelPosCenter.y = 0;
+            if (pixelPosCenter.x > TerrainData.size_x - 1) pixelPosCenter.x = TerrainData.size_x - 1;
+            if (pixelPosCenter.y > TerrainData.size_y - 1) pixelPosCenter.y = TerrainData.size_y - 1;
+
+
+            int index = MapToolScript.HeightmapPosToIndex(pixelPosCenter);
+
+            return Map.TerrainData.cliffLevel[index] * 4;
+        }
+
 
         private void BootMap_Start()
         {

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 730174786014184271}
   - component: {fileID: 4047799693007192736}
   m_Layer: 2
-  m_Name: Circle_Outline
+  m_Name: Circle_Outline(Red)
   m_TagString: Untagged
   m_Icon: {fileID: 2800000, guid: b13eaa936989fc0408167d66f635441a, type: 3}
   m_NavMeshLayer: 0
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0ce5c36b3ad149c40994fbeeb419af10, type: 2}
+  - {fileID: 2100000, guid: 105340b7228877d4092a9aea40104cee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

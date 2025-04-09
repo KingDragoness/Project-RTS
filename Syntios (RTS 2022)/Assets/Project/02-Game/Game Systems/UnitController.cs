@@ -30,7 +30,7 @@ namespace ProtoRTS.Game
 		/// <summary>
 		/// FOW
 		/// </summary>
-		private void RefreshUnitModel()
+		private void RefreshUnitModel(int tick)
         {
 			int index_0 = indexHeightClamping * limitUnitPerTick;
 			int index_length = (indexHeightClamping + 1) * limitUnitPerTick;

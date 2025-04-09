@@ -36,6 +36,7 @@ namespace ProtoRTS
         float scrollWheel_targetY = 0f;
         float terrain_targetY = 0f;
         float original_yPos = 0;
+        private float lastTerrainYPos = 0f;
 
         private static RTSCamera instance;
 
@@ -46,6 +47,8 @@ namespace ProtoRTS
                 return new Vector3(Map.MapSize.x / 2f, 0f, Map.MapSize.y / 2f);
             }
         }
+
+        public static RTSCamera Instance { get => instance;  }
 
         private void Awake()
         {
@@ -176,6 +179,11 @@ namespace ProtoRTS
                 if (Physics.Raycast(posOrigin, Vector3.down, out hit, 1000f, layer_Terrain))
                 {
                     y_position = hit.point.y;
+                    lastTerrainYPos = y_position;
+                }
+                else
+                {
+                    y_position = lastTerrainYPos;
                 }
 
                 Vector3 pos = transform.position;
@@ -183,8 +191,10 @@ namespace ProtoRTS
 
                 if (SyntiosEngine.CurrentMode == Gamemode.Game)
                 {
-                    if (pos.y >= 8) pos.y = 8f;
+                    //if (pos.y >= 8) pos.y = 8f;
                 }
+
+                pos.y = Map.instance.GetPositionY_cliffLevel(pos);
 
                 delta.y = gameObject.transform.position.y - pos.y;
                 delta.y = -delta.y * ySpeed * 0.0025f;

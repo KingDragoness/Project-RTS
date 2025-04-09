@@ -331,7 +331,7 @@ namespace ProtoRTS.Game
                 }
             }
 
-            if (voice != null)
+            if (voice != null && gameUnit.IsPlayerUnit())
             {
                 portraitAudioSource.clip = voice;
                 portraitAudioSource.Play();
