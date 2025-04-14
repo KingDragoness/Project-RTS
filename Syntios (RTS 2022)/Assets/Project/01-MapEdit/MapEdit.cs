@@ -4,6 +4,8 @@ using System.IO;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using Newtonsoft.Json;
+using System.IO.Compression;
+using System.Text;
 
 namespace ProtoRTS.MapEditor
 {
@@ -61,8 +63,44 @@ namespace ProtoRTS.MapEditor
 
             string jsonTypeNameAll = JsonConvert.SerializeObject(Map.TerrainData, Formatting.Indented, JsonSettings());
 
+            byte[] compressedJsonData = CompressJsonData(jsonTypeNameAll);
+            Debug.Log($"Original file: {jsonTypeNameAll.Length} Bytes");
+            Debug.Log($"Compressed (GZip): {compressedJsonData.Length} Bytes");
+            Debug.Log($"{name}.map | Map file saved: {pathSave}");
 
-            File.WriteAllText(pathSave, jsonTypeNameAll);
+            File.WriteAllBytes(pathSave, compressedJsonData);
+
+            //File.WriteAllText(pathSave, jsonTypeNameAll);
+        }
+
+        private static byte[] CompressJsonData(string jsonData)
+        {
+            byte[] byteArray = Encoding.UTF8.GetBytes(jsonData);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var gzipStream = new GZipStream(memoryStream, System.IO.Compression.CompressionLevel.Optimal))
+                {
+                    gzipStream.Write(byteArray, 0, byteArray.Length);
+                }
+                return memoryStream.ToArray();
+            }
+        }
+
+        private static byte[] DecompressJsonData(byte[] bytes)
+        {
+            using (var memoryStream = new MemoryStream(bytes))
+            {
+
+                using (var outputStream = new MemoryStream())
+                {
+                    using (var decompressStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+                    {
+                        decompressStream.CopyTo(outputStream);
+                    }
+                    return outputStream.ToArray();
+                }
+            }
         }
 
         public static JsonSerializerSettings JsonSettings()

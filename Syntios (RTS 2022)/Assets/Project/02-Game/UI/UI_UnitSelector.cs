@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Video;
 using Sirenix.OdinInspector;
 using ToolBox.Pools;
+using static UnityEngine.UI.CanvasScaler;
 
 namespace ProtoRTS.Game
 {
@@ -16,6 +17,7 @@ namespace ProtoRTS.Game
         public Button[] allGroupButtons;
         public Transform parentButton;
         public GridLayoutGroup gridLayoutGroup;
+        public Gradient gradientWireframeHP;
         [FoldoutGroup("Portrait")] public Image image_PortraitScreen;
         [FoldoutGroup("Portrait")] public Image image_NoiseTV;
         [FoldoutGroup("Portrait")] public VideoPlayer portraitVideoPlayer;
@@ -34,6 +36,7 @@ namespace ProtoRTS.Game
             SyntiosEvents.UI_DeselectAll += event_UI_DeselectAll;
             SyntiosEvents.UI_OrderMove += event_UI_OrderMove;
             SyntiosEvents.UI_ReselectUpdate += event_UI_ReselectUpdate;
+            Tick.OnTick += event_OnTick;
         }
 
         private void OnDestroy()
@@ -42,6 +45,7 @@ namespace ProtoRTS.Game
             SyntiosEvents.UI_DeselectAll -= event_UI_DeselectAll;
             SyntiosEvents.UI_OrderMove -= event_UI_OrderMove;
             SyntiosEvents.UI_ReselectUpdate -= event_UI_ReselectUpdate;
+            Tick.OnTick -= event_OnTick;
         }
 
         private void Start()
@@ -74,6 +78,24 @@ namespace ProtoRTS.Game
             UI.CommandPanel.RefreshUI();
             UI.UnitSelection.RefreshUI();
         }
+
+
+        private void event_OnTick(int tick)
+        {
+            if (tick % 2 == 0)
+            {
+                //only refresh wireframes
+                foreach (var button in pooledButtons)
+                {
+                    var unit = button.attachedGameUnit;
+
+                    float HP = (float)unit.stat_HP / (float)unit.Class.MaxHP;
+                    var colorHP = gradientWireframeHP.Evaluate(HP);
+                    button.icon_Unit.color = colorHP;
+                }
+            }
+        }
+
 
         private void event_UI_OrderMove(GameUnit gameunit)
         {
@@ -171,6 +193,10 @@ namespace ProtoRTS.Game
                 button.transform.localPosition = Vector3.zero;
                 button.transform.localScale = Vector3.one;
                 button.attachedGameUnit = unit;
+
+                float HP = (float)unit.stat_HP / (float)unit.Class.MaxHP;
+                var colorHP = gradientWireframeHP.Evaluate(HP);
+                button.icon_Unit.color = colorHP;
 
                 {
                     button.button.onClick.AddListener(Check);

@@ -22,6 +22,9 @@ MonoBehaviour:
   spriteWireframe: {fileID: 21300000, guid: 07cfa059d1e011d4e8a1d2b63943e584, type: 3}
   MaxHP: 40
   SupplyCount: 1
+  MineralCost: 50
+  EnergyCost: 25
+  BuildTime: 24
   HasEnergy: 0
   IsUntouchable: 0
   AllUnitTags: 0100000005000000
@@ -93,7 +96,7 @@ MonoBehaviour:
       position: 1
       abilityScriptName: Place Building-test 2
       cardToOpen: 
-    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+    - button: {fileID: 11400000, guid: 1e4b0d6fede76cf448ef65aaac1c2c2a, type: 2}
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 11
@@ -101,7 +104,7 @@ MonoBehaviour:
       cardToOpen: default
   - cardName: build_advanced
     commands:
-    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+    - button: {fileID: 11400000, guid: 1e4b0d6fede76cf448ef65aaac1c2c2a, type: 2}
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 11
@@ -109,7 +112,7 @@ MonoBehaviour:
       cardToOpen: default
   - cardName: construction
     commands:
-    - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+    - button: {fileID: 11400000, guid: 1e4b0d6fede76cf448ef65aaac1c2c2a, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 11
@@ -168,5 +171,5 @@ MonoBehaviour:
     allActions:
     - type: 18
       targetType: 0
-      buildingSO: {fileID: 0}
+      buildingSO: {fileID: 11400000, guid: 0c4ba2f3b2fcfae43a21a8bf34a2aa75, type: 2}
     orderCategory: 0

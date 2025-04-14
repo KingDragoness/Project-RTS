@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Pathfinding;
 using System.Text;
 using System;
+using System.Linq;
 
 namespace ProtoRTS.Game
 {
@@ -34,7 +35,25 @@ namespace ProtoRTS.Game
         private void Start()
         {
             if (IsLoadFromSaveFile)
+            {
                 fowScript.LaunchLoadedGame();
+
+
+                //create game units
+                {
+                    var allGameUnitSOs = Resources.LoadAll<SO_GameUnit>("GameUnits").ToList();
+
+                    foreach (var unitDat in cachedLoadedSave.allUnits)
+                    {
+                        var gameUnitSO = allGameUnitSOs.Find(x => x.ID == unitDat.unitID);
+                        if (gameUnitSO == null)
+                        {
+                            continue;
+                        }
+                        var newUnit = GameUnit.CreateUnit(unitDat, gameUnitSO);
+                    }
+                }
+            }
 
             IsLoadFromSaveFile = false;
         }
@@ -91,11 +110,40 @@ namespace ProtoRTS.Game
                 }
             }
 
+            //clear game unit (this is for editor; in final release, there is no unit left on 02-ProtoRTSsystem.scene)
+            {
+                var allGameUnits = FindObjectsByType<GameUnit>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+                foreach (var unit in allGameUnits)
+                {
+                    Destroy(unit.gameObject);
+                }
+            }
+
         }
+
+        [FoldoutGroup("DEBUG")]
+        [DisableInEditorMode]
+        [Button("DEBUG - Load developer save file")]
+        public void DEVELOPER_LoadDevSave()
+        {
+            var savefile1 = UnpackSaveFile_Uncompressed(SyntiosEngine.SavePath + $"/{DEBUG_SaveFilePathname}.TESTSAVE");
+            Debug.Log($"Attempt load developer's save file: " + SyntiosEngine.SavePath + $"/{DEBUG_SaveFilePathname}.TESTSAVE");
+            DevConsole.Instance.SendConsoleMessage($"Attempt load developer's save file: " + SyntiosEngine.SavePath + $"/{DEBUG_SaveFilePathname}.TESTSAVE");
+
+            if (savefile1 != null)
+            {
+                IsLoadFromSaveFile = true;
+                cachedLoadedSave = savefile1;
+                Application.LoadLevel(Application.loadedLevel);
+                Debug.Log("Loaded.");
+            }
+        }
+
 
         public void LoadGame(string savefilename)
         {
-            var savefile1 = UnpackSaveFile(SyntiosEngine.SavePath + $"/{savefilename}.save");
+            var savefile1 = UnpackSaveFile_Gz(SyntiosEngine.SavePath + $"/{savefilename}.save");
             Debug.Log($"Attempt load save file: " + SyntiosEngine.SavePath + $"/{savefilename}.save");
             DevConsole.Instance.SendConsoleMessage($"Attempt load save file: " + SyntiosEngine.SavePath + $"/{savefilename}.save");
 
@@ -108,7 +156,7 @@ namespace ProtoRTS.Game
             }
         }
 
-        public SaveData UnpackSaveFile(string path)
+        public SaveData UnpackSaveFile_Uncompressed(string path)
         {
             SaveData result = null;
             JsonSerializerSettings settings = JsonSettings();
@@ -125,6 +173,8 @@ namespace ProtoRTS.Game
 
             return result;
         }
+
+        
 
         [FoldoutGroup("DEBUG")]
         [Button("DEBUG_TestDecompressLoad")]
@@ -165,6 +215,7 @@ namespace ProtoRTS.Game
         public string DEBUG_SaveFilePathname = "D";
 
         [FoldoutGroup("DEBUG")]
+        [DisableInEditorMode]
         [Button("Save Game")]
         public void DEBUG_SaveGame()
         {
@@ -184,22 +235,32 @@ namespace ProtoRTS.Game
             string pathSave = SyntiosEngine.SavePath + $"/{saveName}.save";
             string jsonTypeNameAll = JsonConvert.SerializeObject(SyntiosEngine.SaveData, Formatting.Indented, JsonSettings());
 
+
+            // Compress JSON data using GZip
+            byte[] compressedJsonData = CompressJsonData(jsonTypeNameAll);
+            Debug.Log($"Original file: {jsonTypeNameAll.Length} Bytes");
+            Debug.Log($"Compressed (GZip): {compressedJsonData.Length} Bytes");
             Debug.Log($"{saveName}.save | Save game file saved: {pathSave}");
 
-            //test compressed
-            {
-                // Compress JSON data using GZip
-                byte[] compressedJsonData = CompressJsonData(jsonTypeNameAll);
-                string pathSave_compressed = SyntiosEngine.SavePath + $"/{saveName}_GZip.save";
-                Debug.Log($"Original file: {jsonTypeNameAll.Length} Bytes");
-                Debug.Log($"Compressed (GZip): {compressedJsonData.Length} Bytes");
+            File.WriteAllBytes(pathSave, compressedJsonData);
 
-                File.WriteAllBytes(pathSave_compressed, compressedJsonData);
+            //File.WriteAllText(pathSave, jsonTypeNameAll);
+        }
 
-            }
+        [FoldoutGroup("DEBUG")]
+        [DisableInEditorMode]
+        [Button("DEBUG - UncompressedSave")]
+        public void DEVELOPER_UncompressedSave()
+        {
+            string saveName = DEBUG_SaveFilePathname;
+
+            SyntiosEngine.SaveData = PackSaveData();
+
+            string pathSave = SyntiosEngine.SavePath + $"/{saveName}.TESTSAVE";
+            string jsonTypeNameAll = JsonConvert.SerializeObject(SyntiosEngine.SaveData, Formatting.Indented, JsonSettings());
+            Debug.Log($"{saveName}.TESTSAVE | DEVELOPER save game file saved: {pathSave}");
 
             File.WriteAllText(pathSave, jsonTypeNameAll);
-
         }
 
         public static JsonSerializerSettings JsonSettings()
@@ -209,7 +270,6 @@ namespace ProtoRTS.Game
                 TypeNameHandling = TypeNameHandling.All,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
                 MissingMemberHandling = MissingMemberHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore
             };
 
             return settings;

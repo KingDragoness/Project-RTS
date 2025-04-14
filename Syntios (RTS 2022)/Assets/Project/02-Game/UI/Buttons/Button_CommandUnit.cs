@@ -19,5 +19,17 @@ namespace ProtoRTS.Game
 		{
             UI_RTSCommands.ClickButton(this);
 		}
-	}
+
+		public void Highlight()
+		{
+            UI_RTSCommands.HighlightButton(this);
+
+        }
+
+        public void Dehighlight()
+        {
+            UI_RTSCommands.DehighlightButton(this);
+
+        }
+    }
 }

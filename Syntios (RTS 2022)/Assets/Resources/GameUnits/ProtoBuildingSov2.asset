@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd0dd0db53ec194cb76883cd4a64e47, type: 3}
+  m_Name: ProtoBuildingSov2
+  m_EditorClassIdentifier: 
+  ID: ProtoSov2
+  NameDisplay: Proto Building 2
+  basePrefab: {fileID: 5449250714936161718, guid: f45a037f5c501304ab3fed4d6099b4fb,
+    type: 3}
+  Rank: 
+  Radius: 4
+  LineOfSight: 8
+  spriteWireframe: {fileID: 21300000, guid: 63df497243b7cb64ab838d7633e2dd5f, type: 3}
+  MaxHP: 250
+  SupplyCount: 0
+  MineralCost: 150
+  EnergyCost: 150
+  BuildTime: 45
+  HasEnergy: 0
+  IsUntouchable: 0
+  AllUnitTags: 0b000000
+  port_Importance: -100
+  port_Idles: []
+  port_Talkings: []
+  voiceline_Ready: []
+  voiceline_Move: []
+  commandCards:
+  - cardName: default
+    commands: []
+  unitAbility: []

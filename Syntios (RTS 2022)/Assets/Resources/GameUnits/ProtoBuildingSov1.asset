@@ -22,6 +22,9 @@ MonoBehaviour:
   spriteWireframe: {fileID: 21300000, guid: 065d1bc8895249846954b18900526c4a, type: 3}
   MaxHP: 250
   SupplyCount: 0
+  MineralCost: 200
+  EnergyCost: 100
+  BuildTime: 35
   HasEnergy: 0
   IsUntouchable: 0
   AllUnitTags: 0b000000
@@ -32,5 +35,21 @@ MonoBehaviour:
   voiceline_Move: []
   commandCards:
   - cardName: default
-    commands: []
-  unitAbility: []
+    commands:
+    - button: {fileID: 11400000, guid: b28942760061d8a428758b039529e5bb, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 0
+      abilityScriptName: train-minebot
+      cardToOpen: 
+  unitAbility:
+  - name: default
+    allActions: []
+    orderCategory: 1
+  - name: train-minebot
+    allActions:
+    - type: 19
+      targetType: 0
+      buildingSO: {fileID: 0}
+      gameunitSO: {fileID: 11400000, guid: b89dd84ec59800f4684ff3534fc42f91, type: 2}
+    orderCategory: 8

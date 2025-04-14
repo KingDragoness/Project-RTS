@@ -65,14 +65,28 @@ namespace ProtoRTS
 		public float Radius = 2;
 		[Range(2,16)] public int LineOfSight = 7;
 		public Sprite spriteWireframe;
-		public int MaxHP = 40;
-		[Range(0, 10)] public int SupplyCount = 1;
-		public bool HasEnergy = false;
-		public bool IsUntouchable = false; //for scarab or missiles
 
-		public List<Unit.Tag> AllUnitTags = new List<Unit.Tag>();
 
-		[FoldoutGroup("Portraits")]
+        [FoldoutGroup("Resources")] public int MineralCost = 50;
+        [FoldoutGroup("Resources")] public int EnergyCost = 25;
+        [FoldoutGroup("Resources")][Range(0, 10)] public int SupplyCount = 1;
+        [FoldoutGroup("Resources")] [Range(0, 500)] public int BuildTime = 24;
+
+        #region Unit Properties
+        [FoldoutGroup("Unit Properties")] public int MaxHP = 40;
+        [FoldoutGroup("Unit Properties")] public bool HasEnergy = false;
+        [FoldoutGroup("Unit Properties")] public bool IsUntouchable = false; //for scarab or missiles
+        [FoldoutGroup("Unit Properties")] public List<Unit.Tag> AllUnitTags = new List<Unit.Tag>();
+		#endregion
+
+		#region AI behaviours
+		[FoldoutGroup("AI Properties")] public bool AI_b_AttackOnSight = false;
+        [FoldoutGroup("AI Properties")] public bool AI_b_AttackOnProvoked = false;
+        [FoldoutGroup("AI Properties")] public bool AI_b_FleeOnProvoked = false;
+        #endregion
+
+        #region Portraits
+        [FoldoutGroup("Portraits")]
 		[SerializeField]
 		[Tooltip("<= 0 for non-hero units. > 0 for hero units.")]
 		internal int port_Importance = -9000;
@@ -81,7 +95,10 @@ namespace ProtoRTS
 		[FoldoutGroup("Portraits")] [SerializeField] internal VideoClip[] port_Talkings;
 		[FoldoutGroup("Portraits")] [SerializeField] internal AudioClip[] voiceline_Ready;
 		[FoldoutGroup("Portraits")] [SerializeField] internal AudioClip[] voiceline_Move;
-		public List<CommandCard> commandCards = new List<CommandCard>();
+
+        #endregion
+
+        public List<CommandCard> commandCards = new List<CommandCard>();
         public List<UnitAbility> unitAbility = new List<UnitAbility>();
 
         private void OnValidate()

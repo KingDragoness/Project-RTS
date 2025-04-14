@@ -289,6 +289,11 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Unit
       objectReference: {fileID: 0}
+    - target: {fileID: 3590507451872051179, guid: 89a5185dfdb75e8499caa8470874a6d1,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 27e0d2402cef22e4994ac2b83226a645, type: 2}
     - target: {fileID: 4695866650081152068, guid: 89a5185dfdb75e8499caa8470874a6d1,
         type: 3}
       propertyPath: m_LODs.Array.data[1].screenRelativeHeight

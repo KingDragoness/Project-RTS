@@ -12,6 +12,8 @@ using System.Drawing;
 using Color = UnityEngine.Color;
 using ProtoRTS.MapEditor;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.IO.Compression;
+using System.Text;
 
 namespace ProtoRTS
 {
@@ -224,7 +226,12 @@ namespace ProtoRTS
 
             try
             {
-                result = JsonConvert.DeserializeObject<SyntiosTerrainData>(File.ReadAllText(path), settings);
+                var compressedDat = File.ReadAllBytes(path);
+                var decompressedData = DecompressJsonData(compressedDat);
+                string deCompressedString = Encoding.UTF8.GetString(decompressedData);
+
+                result = JsonConvert.DeserializeObject<SyntiosTerrainData>(deCompressedString, settings);
+                //result = JsonConvert.DeserializeObject<SyntiosTerrainData>(File.ReadAllText(path), settings);
             }
             catch
             {
@@ -234,6 +241,37 @@ namespace ProtoRTS
 
             return result;
         }
+
+        private static byte[] CompressJsonData(string jsonData)
+        {
+            byte[] byteArray = Encoding.UTF8.GetBytes(jsonData);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var gzipStream = new GZipStream(memoryStream, System.IO.Compression.CompressionLevel.Optimal))
+                {
+                    gzipStream.Write(byteArray, 0, byteArray.Length);
+                }
+                return memoryStream.ToArray();
+            }
+        }
+
+        private static byte[] DecompressJsonData(byte[] bytes)
+        {
+            using (var memoryStream = new MemoryStream(bytes))
+            {
+
+                using (var outputStream = new MemoryStream())
+                {
+                    using (var decompressStream = new GZipStream(memoryStream, CompressionMode.Decompress))
+                    {
+                        decompressStream.CopyTo(outputStream);
+                    }
+                    return outputStream.ToArray();
+                }
+            }
+        }
+
 
         public static JsonSerializerSettings JsonSettings()
         {

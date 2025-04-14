@@ -12,7 +12,7 @@ namespace ProtoRTS
     {
         public string displayName = "Move";
         public Sprite sprite;
-        public string tooltip = "Orders selected units to move to the target area or follow the target unit. Moving units will not engage enemies.";
+        [TextArea(2,4)] public string tooltip = "Orders selected units to move to the target area or follow the target unit. Moving units will not engage enemies.";
         public bool allowTint = false;
     }
 }

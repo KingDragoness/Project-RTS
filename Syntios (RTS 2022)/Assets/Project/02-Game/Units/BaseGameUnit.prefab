@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4473763869584416521}
   - component: {fileID: 8127373176595696534}
+  - component: {fileID: 372263825532545944}
   - component: {fileID: 7068976686415573386}
   - component: {fileID: 9109924655286209173}
   - component: {fileID: 1343909883869624340}
@@ -59,6 +60,19 @@ MonoBehaviour:
   followerEntity: {fileID: 0}
   rvoController: {fileID: 1343909883869624340}
   ai: {fileID: 9109924655286209173}
+--- !u!114 &372263825532545944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3009204139791718263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 856903df09c65ee42b036a8e42c3974e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 8127373176595696534}
 --- !u!114 &7068976686415573386
 MonoBehaviour:
   m_ObjectHideFlags: 0

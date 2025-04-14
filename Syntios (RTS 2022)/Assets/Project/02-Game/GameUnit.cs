@@ -5,6 +5,7 @@ using Pathfinding;
 using Pathfinding.RVO;
 using Sirenix.OdinInspector;
 using System;
+using ProtoRTS.Game;
 
 namespace ProtoRTS
 {
@@ -35,7 +36,13 @@ namespace ProtoRTS
 
         private void Start()
 		{
-			SyntiosEngine.Instance.AddNewUnit(this);
+            if (isLoadedSaveFile == false)
+            {
+                target = transform.position;
+				target.y = Map.instance.GetPositionY_cliffLevel(target);
+            }
+
+            SyntiosEngine.Instance.AddNewUnit(this);
 			SetUnitStat();
             DynamicAssetStorage.Instance.RegisterCustomMaterial_GameUnit(this);
 			DynamicAssetStorage.Instance.OverrideCustomMaterial_GameUnit(this);
@@ -87,7 +94,6 @@ namespace ProtoRTS
 
         void OnEnable()
 		{
-			target = transform.position;
 
 			if (followerEntity != null)
 			{
@@ -106,9 +112,35 @@ namespace ProtoRTS
 
 		}
 
+		private bool isLoadedSaveFile = false;
+
+		private void Awake()
+		{
+			
+        }
+
+
+
+		
+
         private void OnDestroy()
         {
 			SyntiosEngine.Instance.RemoveUnit(this);
+        }
+
+
+        public static GameUnit CreateUnit(SaveData.UnitData unitData, SO_GameUnit gameunitSO)
+        {
+            var unit = Instantiate(gameunitSO.basePrefab);
+			if (unit == null) return null;
+
+            unit.transform.position = unitData.unitPosition;
+			unit.target = unitData.move_TargetPos;
+			unit.stat_faction = unitData.stat_Faction;
+			unit.stat_HP = (int)unitData.stat_HP;
+			unit.isLoadedSaveFile = true;
+
+            return unit;
         }
 
         void Update()

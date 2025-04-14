@@ -143,7 +143,7 @@ namespace ProtoRTS
                         {
                             SelectUnits();
                         }
-                        if (singleSelectUnit != null)
+                        if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                         {
                             //Selection.DeselectAllUnits();
                             SelectOneUnit(singleSelectUnit);
@@ -151,7 +151,7 @@ namespace ProtoRTS
                     }
                     else if (doubleClickDetected == true)
                     {
-                        if (singleSelectUnit != null)
+                        if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                         {
                             SelectAllUnitInScreenSpace(singleSelectUnit);
                         }

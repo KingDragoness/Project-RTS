@@ -37,15 +37,15 @@ namespace ProtoRTS
             }
             else if (index == 2)
             {
-                DevConsole.Instance.SendConsoleMessage($"Test!");
+                DevConsole.Instance.SendConsoleMessage($"Test");
             }
             else if (index == 3)
             {
-                DevConsole.Instance.SendConsoleMessage($"Inspired by C&C and SC2!");
+                DevConsole.Instance.SendConsoleMessage($"Inspired by C&C and SC2");
             }
             else if (index == 4)
             {
-                DevConsole.Instance.SendConsoleMessage($"This is index 4 of cc.hellow!");
+                DevConsole.Instance.SendConsoleMessage($"This is index 4 of cc.hellow");
             }
             else
             {
@@ -73,50 +73,6 @@ namespace ProtoRTS
         }
     }
 
-
-    public class CC_SaveFile : CC_Base
-    {
-        public override string CommandName { get { return "save"; } }
-        public override string Description { get { return "Save savefile [string name]."; } }
-
-
-        public override void ExecuteCommand(string[] args)
-        {
-            try
-            {
-
-                RTS.instance.SaveGame(args[0]);
-
-            }
-            catch
-            {
-                DevConsole.Instance.SendConsoleMessage("save <string name> | Failed save!");
-            }
-        }
-    }
-
-    public class CC_LoadSaveFile : CC_Base
-    {
-        public override string CommandName { get { return "load"; } }
-        public override string Description { get { return "Load save file [string name]."; } }
-
-
-        public override void ExecuteCommand(string[] args)
-        {
-            try
-            {
-
-                RTS.instance.LoadGame(args[0]);
-
-            }
-            catch
-            {
-                DevConsole.Instance.SendConsoleMessage("load <string name> | No save file loaded!");
-            }
-        }
-    }
-
-
     public class CC_LoadScene : CC_Base
     {
         public override string CommandName { get { return "loadlevel"; } }
@@ -141,24 +97,6 @@ namespace ProtoRTS
     }
 
 
-    public class CC_LoadMap : CC_Base
-    {
-        public override string CommandName { get { return "lm"; } }
-        public override string Description { get { return "Load map from directory folder."; } }
-
-
-        public override void ExecuteCommand(string[] args)
-        {
-            if (args.Length >= 1)
-            {
-                Map.instance.LoadMapFromProtoDir(args[0]);
-            }
-            else
-            {
-                DevConsole.Instance.SendConsoleMessage("lm <string mapName> | Name map not valid!");
-            }
-        }
-    }
 
     public class CC_SummonAllToHere : CC_Base
     {
@@ -272,6 +210,39 @@ namespace ProtoRTS
         }
     }
 
+    public class CC_SetHPPercentage : CC_Base
+    {
+        public override string CommandName { get { return "sethp"; } }
+        public override string Description { get { return "Set all selected units' HP to <int percentageHP %>."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+                if (float.TryParse(args[0], out float hp))
+                {
+
+                    foreach (var unit in Selection.AllSelectedUnits)
+                    {
+                        var hp_target = hp / 100f;
+
+                        //Debug.Log($"{unit.ID} : {hp_target}     [{hp_target * (float)unit.Class.MaxHP}]");
+                        unit.stat_HP = Mathf.RoundToInt(hp_target * (float)unit.Class.MaxHP);
+                    }
+                }
+
+            
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage($"sethp <int percentageHP %> | HP value not valid!");
+            }
+
+
+        }
+    }
+
 
     public class CC_Cheat_money : CC_Base
     {
@@ -296,6 +267,20 @@ namespace ProtoRTS
     }
 
 
+    public class CC_Clear : CC_Base
+    {
+        public override string CommandName { get { return "clear"; } }
+        public override string Description { get { return "Clear console command."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            DevConsole.Instance.consoleText.text = ">\n";
+        }
+    }
+
+
+    #region Save & Load map/game
     public class CC_Reloadmap : CC_Base
     {
         public override string CommandName { get { return "rm"; } }
@@ -315,17 +300,114 @@ namespace ProtoRTS
         }
     }
 
-    public class CC_Clear : CC_Base
+    public class CC_LoadMap : CC_Base
     {
-        public override string CommandName { get { return "clear"; } }
-        public override string Description { get { return "Clear console command."; } }
+        public override string CommandName { get { return "lm"; } }
+        public override string Description { get { return "Load map from directory folder."; } }
 
 
         public override void ExecuteCommand(string[] args)
         {
-            DevConsole.Instance.consoleText.text = ">\n";
+            if (args.Length >= 1)
+            {
+                Map.instance.LoadMapFromProtoDir(args[0]);
+            }
+            else
+            {
+                DevConsole.Instance.SendConsoleMessage("lm <string mapName> | Name map not valid!");
+            }
         }
     }
+
+
+
+    public class CC_SaveFile : CC_Base
+    {
+        public override string CommandName { get { return "save"; } }
+        public override string Description { get { return "Save savefile [string name]."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+
+                RTS.instance.SaveGame(args[0]);
+
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage("save <string name> | Failed save!");
+            }
+        }
+    }
+
+    public class CC_DEV_UncompressedSaveFile : CC_Base
+    {
+        public override string CommandName { get { return "devsave"; } }
+        public override string Description { get { return "Save uncompressed savefile."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+
+                RTS.instance.DEVELOPER_UncompressedSave();
+
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage("devsave failed");
+            }
+        }
+    }
+
+    public class CC_DEV_LoadUncompressedSaveFile : CC_Base
+    {
+        public override string CommandName { get { return "devload"; } }
+        public override string Description { get { return "Load uncompressed savefile."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+
+                RTS.instance.DEVELOPER_LoadDevSave();
+
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage("devload failed");
+            }
+        }
+    }
+
+    public class CC_LoadSaveFile : CC_Base
+    {
+        public override string CommandName { get { return "load"; } }
+        public override string Description { get { return "Load save file [string name]."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+
+                RTS.instance.LoadGame(args[0]);
+
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage("load <string name> | No save file loaded!");
+            }
+        }
+    }
+
+
+
+    #endregion
 
 
 }

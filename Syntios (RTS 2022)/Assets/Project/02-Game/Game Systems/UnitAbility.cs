@@ -92,6 +92,7 @@ namespace ProtoRTS.Game
             public ActionType type;
 			[ShowIf(nameof(TargetablePosition))] public TargetType targetType;
 			[ShowIf("type", ActionType.PlaceBuilding)] public SO_GameUnit buildingSO;
+            [ShowIf("type", ActionType.QueueUnit)] public SO_GameUnit gameunitSO;
 
         }
 

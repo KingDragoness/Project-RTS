@@ -26,6 +26,13 @@ namespace ProtoRTS.Game
             Tick.OnTick -= UpdateUI;
         }
 
+        private void Start()
+        {
+            var myFactionSheet = SyntiosEngine.MyFactionSheet;
+            last_mineralValue = (int)myFactionSheet.Mineral;
+            last_energyValue = (int)myFactionSheet.Energy;
+        }
+
         private void UpdateUI(int tick)
         {
             if (tick % 2 == 0) return;

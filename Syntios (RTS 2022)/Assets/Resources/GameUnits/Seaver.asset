@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: Seaver
   NameDisplay: Mobius Seaver
+  basePrefab: {fileID: 6615940647404512330, guid: e43e4fa417391894ea9e4de9ab64c1de,
+    type: 3}
   Rank: 
   Radius: 2
   LineOfSight: 9
@@ -37,12 +39,33 @@ MonoBehaviour:
   - cardName: default
     commands:
     - button: {fileID: 11400000, guid: c62efbfe0e21d34479760900f1102f55, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
       position: 0
+      abilityScriptName: default
+      cardToOpen: 
     - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
       position: 1
+      abilityScriptName: default
+      cardToOpen: 
     - button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
       position: 2
+      abilityScriptName: default
+      cardToOpen: 
     - button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
       position: 3
+      abilityScriptName: default
+      cardToOpen: 
     - button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
       position: 4
+      abilityScriptName: default
+      cardToOpen: 
+  unitAbility: []

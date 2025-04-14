@@ -20,15 +20,19 @@ namespace ProtoRTS.Game
         private void Awake()
         {
 			SyntiosEvents.UI_NewSelection += event_UI_NewSelection;
+            SyntiosEvents.UI_ReselectUpdate += event_UI_ReselectUpdate;
             SyntiosEvents.UI_DeselectAll += event_UI_DeselectAll;
+            Tick.OnTick += event_OnTick;
 
         }
-
 
         private void OnDestroy()
         {
             SyntiosEvents.UI_NewSelection -= event_UI_NewSelection;
+            SyntiosEvents.UI_ReselectUpdate -= event_UI_ReselectUpdate;
             SyntiosEvents.UI_DeselectAll -= event_UI_DeselectAll;
+            Tick.OnTick -= event_OnTick;
+
         }
 
         private void event_UI_DeselectAll()
@@ -36,10 +40,30 @@ namespace ProtoRTS.Game
             foreach (var button in buttons) { button.gameObject.SetActive(false); }
         }
 
+
+        private void event_UI_ReselectUpdate()
+        {
+            if (Selection.AllSelectedUnits.Find(x => x == currentGameUnit) == null) 
+            {
+                foreach (var button in buttons) { button.gameObject.SetActive(false); }
+            }
+            else
+            {
+
+            }
+        }
+
+        private void event_OnTick(int tick)
+        {
+
+        }
+
+
         private void event_UI_NewSelection(GameUnit unit)
         {
 			foreach (var button in buttons) { button.gameObject.SetActive(false); }
             if (unit.stat_faction != SyntiosEngine.CurrentFaction) return;
+            if (unit == null) { return; }
             var commandCard = unit.Class.commandCards[0];
 
             currentCommandCard = commandCard.cardName;
@@ -130,6 +154,53 @@ namespace ProtoRTS.Game
             }
         }
 
+        public void HighlightButton(Button_CommandUnit button)
+        {
+            var commandCard = currentGameUnit.Class.commandCards.Find(x => x.cardName == currentCommandCard);
+            if (commandCard == null) return;
+
+            var command = commandCard.commands.Find(x => x.position == button.index);
+            var abilityScript = currentGameUnit.Class.unitAbility.Find(x => x.name == command.abilityScriptName);
+
+            GameUI_Tooltip_CommandCard.Instance.OpenTooltip(button.gameObject);
+            GameUI_Tooltip_CommandCard.Instance.Tooltip_Text($"{command.button.displayName} (<color=white>{Key(command.position)}</color>)", $"{command.button.tooltip}");
+
+            if (abilityScript != null) 
+            {
+                var action_placeBuilding = abilityScript.allActions.Find(x => x.type == UnitAbility.ActionType.PlaceBuilding);
+                var action_queueUnit = abilityScript.allActions.Find(x => x.type == UnitAbility.ActionType.QueueUnit);
+
+                if (action_placeBuilding != null)
+                {
+                    var buildingSO = action_placeBuilding.buildingSO;
+                    if (buildingSO != null) 
+                    {
+                        if (buildingSO.MineralCost != 0) GameUI_Tooltip_CommandCard.Instance.Show_Minerals(buildingSO.MineralCost);
+                        if (buildingSO.EnergyCost != 0) GameUI_Tooltip_CommandCard.Instance.Show_Gas(buildingSO.EnergyCost);
+                        if (buildingSO.BuildTime != 0) GameUI_Tooltip_CommandCard.Instance.Show_Time(buildingSO.BuildTime);
+
+                    }
+                }
+
+                if (action_queueUnit != null)
+                {
+                    var unitSO = action_queueUnit.gameunitSO;
+                    if (unitSO != null)
+                    {
+                        if (unitSO.MineralCost != 0) GameUI_Tooltip_CommandCard.Instance.Show_Minerals(unitSO.MineralCost);
+                        if (unitSO.EnergyCost != 0) GameUI_Tooltip_CommandCard.Instance.Show_Gas(unitSO.EnergyCost);
+                        if (unitSO.SupplyCount != 0) GameUI_Tooltip_CommandCard.Instance.Show_Supply(unitSO.SupplyCount);
+                        if (unitSO.BuildTime != 0) GameUI_Tooltip_CommandCard.Instance.Show_Time(unitSO.BuildTime);
+
+                    }
+                }
+            }
+        }
+
+        public void DehighlightButton(Button_CommandUnit button)
+        {
+            GameUI_Tooltip_CommandCard.Instance.CloseTooltip();
+        }
 
         private void Update()
 		{
