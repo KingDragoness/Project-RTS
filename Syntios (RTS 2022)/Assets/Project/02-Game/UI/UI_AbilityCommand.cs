@@ -6,7 +6,7 @@ using System;
 
 namespace ProtoRTS.Game
 {
-	public class UI_RTSCommands : MonoBehaviour
+	public class UI_AbilityCommand : MonoBehaviour
 	{
 
 		public List<Button_CommandUnit> buttons;
@@ -14,7 +14,7 @@ namespace ProtoRTS.Game
         public RuntimeAnimatorController anim_Blue;
 
         private GameUnit currentGameUnit;
-        private string currentCommandCard;
+        private CommandCard currentCommandCard;
 
 
         private void Awake()
@@ -37,7 +37,28 @@ namespace ProtoRTS.Game
 
         private void event_UI_DeselectAll()
         {
-            foreach (var button in buttons) { button.gameObject.SetActive(false); }
+            if (Selection.AllSelectedUnits.Find(x => x == currentGameUnit) == null)
+            {
+                if (Selection.AllSelectedUnits.Count == 0)
+                {
+                    //really no unit left
+                    foreach (var button in buttons) { button.gameObject.SetActive(false); }
+                    currentGameUnit = null;
+                    currentCommandCard = null;
+                    return;
+                }
+
+                while (currentGameUnit == null)
+                {
+                    currentGameUnit = Selection.GetPortraitedUnit;
+                    currentCommandCard = currentGameUnit.Class.DefaultCard;
+                }
+                //foreach (var button in buttons) { button.gameObject.SetActive(false); }
+            }
+            else
+            {
+
+            }
         }
 
 
@@ -45,7 +66,21 @@ namespace ProtoRTS.Game
         {
             if (Selection.AllSelectedUnits.Find(x => x == currentGameUnit) == null) 
             {
-                foreach (var button in buttons) { button.gameObject.SetActive(false); }
+                if (Selection.AllSelectedUnits.Count == 0)
+                {
+                    //really no unit left
+                    foreach (var button in buttons) { button.gameObject.SetActive(false); }
+                    currentGameUnit = null;
+                    currentCommandCard = null;
+                    return;
+                }
+
+                while (currentGameUnit == null)
+                {
+                    currentGameUnit = Selection.GetPortraitedUnit;
+                    currentCommandCard = currentGameUnit.Class.DefaultCard;
+                }
+                //foreach (var button in buttons) { button.gameObject.SetActive(false); }
             }
             else
             {
@@ -66,7 +101,7 @@ namespace ProtoRTS.Game
             if (unit == null) { return; }
             var commandCard = unit.Class.commandCards[0];
 
-            currentCommandCard = commandCard.cardName;
+            currentCommandCard = commandCard;
             currentGameUnit = unit;
 
 
@@ -75,6 +110,9 @@ namespace ProtoRTS.Game
 				buttons[command.position].gameObject.SetActive(true);
 				buttons[command.position].buttonIcon.sprite = command.button.sprite;
                 buttons[command.position].label_Hotkey.text = Key(command.position);
+                buttons[command.position].type = command.commandType;
+                buttons[command.position].CommandButtonSO = command.button;
+
                 if (command.button.allowTint)
                 {
                     buttons[command.position].buttonAnim.runtimeAnimatorController = anim_Blue;
@@ -95,6 +133,9 @@ namespace ProtoRTS.Game
                 buttons[command.position].gameObject.SetActive(true);
                 buttons[command.position].buttonIcon.sprite = command.button.sprite;
                 buttons[command.position].label_Hotkey.text = Key(command.position);
+                buttons[command.position].type = command.commandType;
+                buttons[command.position].CommandButtonSO = command.button;
+
                 if (command.button.allowTint)
                 {
                     buttons[command.position].buttonAnim.runtimeAnimatorController = anim_Blue;
@@ -105,6 +146,11 @@ namespace ProtoRTS.Game
                 }
 
             }
+        }
+
+        public void ReloadCommandCard()
+        {
+            RefreshCommandCard(currentCommandCard);
         }
 
 		public string Key(int keyCode)
@@ -139,40 +185,58 @@ namespace ProtoRTS.Game
 
         public void ClickButton(Button_CommandUnit button)
         {
-            var commandCard = currentGameUnit.Class.commandCards.Find(x => x.cardName == currentCommandCard);
+            if (button.type == UnitButtonCommand.Type.CancelTarget) 
+            {
+                RTS.instance.commandUnit.CloseTargetSelector();
+                RefreshCommandCard(currentCommandCard);
+                return;
+            }
+
+            var commandCard = currentGameUnit.Class.commandCards.Find(x => x.cardName == currentCommandCard.cardName);
 
             if (commandCard == null) return;
 
             var command = commandCard.commands.Find(x => x.position == button.index);
 
-            if (command.commandType == UnitOrder.Type.Submenu)
+            if (command.commandType == UnitButtonCommand.Type.Submenu)
             {
-                currentCommandCard = command.cardToOpen;
-                var targetedCC = currentGameUnit.Class.commandCards.Find(x => x.cardName == currentCommandCard);
-
-                RefreshCommandCard(targetedCC);
+                var nextCC = command.cardToOpen;
+                currentCommandCard = currentGameUnit.Class.commandCards.Find(x => x.cardName == nextCC);
+                RefreshCommandCard(currentCommandCard);
             }
+
+            if (command.commandType == UnitButtonCommand.Type.AbilityCommand)
+            {
+                CommandUnit.Instance.CommandUI_ExecuteCommand(currentGameUnit, command);
+            }
+
         }
 
         public void HighlightButton(Button_CommandUnit button)
         {
-            var commandCard = currentGameUnit.Class.commandCards.Find(x => x.cardName == currentCommandCard);
+            if (button.type == UnitButtonCommand.Type.CancelTarget)
+            {
+                GameUI_Tooltip_CommandCard.Instance.OpenTooltip(button.gameObject);
+
+                //HARD-CODED
+                GameUI_Tooltip_CommandCard.Instance.Tooltip_Text($"{button.CommandButtonSO.displayName} (<color=white>{Key(11)}</color>)", $"{button.CommandButtonSO.tooltip}");
+                return;
+            }
+
+            var commandCard = currentGameUnit.Class.commandCards.Find(x => x.cardName == currentCommandCard.cardName);
             if (commandCard == null) return;
 
             var command = commandCard.commands.Find(x => x.position == button.index);
-            var abilityScript = currentGameUnit.Class.unitAbility.Find(x => x.name == command.abilityScriptName);
 
             GameUI_Tooltip_CommandCard.Instance.OpenTooltip(button.gameObject);
             GameUI_Tooltip_CommandCard.Instance.Tooltip_Text($"{command.button.displayName} (<color=white>{Key(command.position)}</color>)", $"{command.button.tooltip}");
 
-            if (abilityScript != null) 
-            {
-                var action_placeBuilding = abilityScript.allActions.Find(x => x.type == UnitAbility.ActionType.PlaceBuilding);
-                var action_queueUnit = abilityScript.allActions.Find(x => x.type == UnitAbility.ActionType.QueueUnit);
+            if (command != null) 
+            {               
 
-                if (action_placeBuilding != null)
+                if (command.abilityType == UnitButtonCommand.AbilityOrder.BuildBuilding)
                 {
-                    var buildingSO = action_placeBuilding.buildingSO;
+                    var buildingSO = command.buildingSO;
                     if (buildingSO != null) 
                     {
                         if (buildingSO.MineralCost != 0) GameUI_Tooltip_CommandCard.Instance.Show_Minerals(buildingSO.MineralCost);
@@ -182,9 +246,9 @@ namespace ProtoRTS.Game
                     }
                 }
 
-                if (action_queueUnit != null)
+                if (command.abilityType == UnitButtonCommand.AbilityOrder.TrainUnit)
                 {
-                    var unitSO = action_queueUnit.gameunitSO;
+                    var unitSO = command.unitSO;
                     if (unitSO != null)
                     {
                         if (unitSO.MineralCost != 0) GameUI_Tooltip_CommandCard.Instance.Show_Minerals(unitSO.MineralCost);
@@ -202,10 +266,47 @@ namespace ProtoRTS.Game
             GameUI_Tooltip_CommandCard.Instance.CloseTooltip();
         }
 
+
+
         private void Update()
 		{
-			
-		}
+            if (currentCommandCard == null) return;
+            if (currentGameUnit == null) return;
+
+            if (Input.GetKeyUp(KeyCode.Q))
+            {
+                if (currentCommandCard.CheckHasCommandAtIndex(0) == true) { ClickButton(buttons[0]); }
+            }
+            if (Input.GetKeyUp(KeyCode.W))
+            {
+                if (currentCommandCard.CheckHasCommandAtIndex(1) == true) { ClickButton(buttons[1]); }
+            }
+            if (Input.GetKeyUp(KeyCode.E))
+            {
+                if (currentCommandCard.CheckHasCommandAtIndex(2) == true) { ClickButton(buttons[2]); }
+            }
+            if (Input.GetKeyUp(KeyCode.R))
+            {
+                if (currentCommandCard.CheckHasCommandAtIndex(3) == true) { ClickButton(buttons[3]); }
+            }
+
+            if (Input.GetKeyUp(KeyCode.A))
+            {
+                if (currentCommandCard.CheckHasCommandAtIndex(4) == true) { ClickButton(buttons[4]); }
+            }
+            if (Input.GetKeyUp(KeyCode.S))
+            {
+                if (currentCommandCard.CheckHasCommandAtIndex(5) == true) { ClickButton(buttons[5]); }
+            }
+            if (Input.GetKeyUp(KeyCode.D))
+            {
+                if (currentCommandCard.CheckHasCommandAtIndex(6) == true) { ClickButton(buttons[6]); }
+            }
+            if (Input.GetKeyUp(KeyCode.F))
+            {
+                if (currentCommandCard.CheckHasCommandAtIndex(7) == true) { ClickButton(buttons[7]); }
+            }
+        }
 		
 		private void OnEnable()
 		{

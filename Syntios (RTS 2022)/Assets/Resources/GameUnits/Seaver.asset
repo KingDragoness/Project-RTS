@@ -20,11 +20,17 @@ MonoBehaviour:
   Radius: 2
   LineOfSight: 9
   spriteWireframe: {fileID: 21300000, guid: 9afd1ebddef63fc47a3a8d4e90e5bbeb, type: 3}
-  MaxHP: 150
+  MineralCost: 50
+  EnergyCost: 25
   SupplyCount: 4
+  BuildTime: 24
+  MaxHP: 150
   HasEnergy: 0
   IsUntouchable: 0
   AllUnitTags: 00000000020000000a000000
+  AI_b_AttackOnSight: 1
+  AI_b_AttackOnProvoked: 1
+  AI_b_FleeOnProvoked: 0
   port_Importance: -100
   port_Idles:
   - {fileID: 32900000, guid: 8bcc81e1bcb3f0548abf638369154358, type: 3}
@@ -42,30 +48,39 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 0
-      abilityScriptName: default
+      abilityType: 0
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 1
-      abilityScriptName: default
+      abilityType: 0
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 2
-      abilityScriptName: default
+      abilityType: 0
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 3
-      abilityScriptName: default
+      abilityType: 0
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 4
-      abilityScriptName: default
+      abilityType: 0
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
-  unitAbility: []

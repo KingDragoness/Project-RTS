@@ -20,8 +20,14 @@ namespace ProtoRTS
 		public SO_GameUnit Class { get => _class; }
 
 		private Transform circleOutline;
+		private bool isSelected = false;
 
-		public void SelectedUnit()
+        public virtual void Awake()
+		{
+
+		}
+		
+        public void SelectedUnit()
 		{
 			if (circleOutline != null) Destroy(circleOutline.gameObject);
 
@@ -36,9 +42,39 @@ namespace ProtoRTS
 			t1.transform.localScale = Vector3.one * _class.Radius * 2.1f;
 			t1.gameObject.SetActive(true);
 			circleOutline = t1;
-		}
 
-		public bool IsPlayerUnit()
+			isSelected = true;
+
+        }
+
+		public void HighlightUnit()
+		{
+            if (circleOutline != null) Destroy(circleOutline.gameObject);
+
+            //consult "Force"
+            var factionStatus = FactionAlliance.Instance.GetFactionStatus(SyntiosEngine.CurrentFaction, stat_faction);
+
+            Transform prefab = null;
+            prefab = Selection.GetCircle(factionStatus).transform;
+
+            Transform t1 = Instantiate(prefab, transform, false);
+            t1.transform.localPosition = Vector3.zero + new Vector3(0f, 0.2f, 0f);
+            t1.transform.localScale = Vector3.one * _class.Radius * 2.1f;
+            t1.gameObject.SetActive(true);
+            circleOutline = t1;
+        }
+
+		public void DehighlightUnit()
+		{
+            if (circleOutline != null) Destroy(circleOutline.gameObject);
+
+			if (isSelected)
+			{
+				SelectedUnit();
+            }
+        }
+
+        public bool IsPlayerUnit()
 		{
             var factionStatus = FactionAlliance.Instance.GetFactionStatus(SyntiosEngine.CurrentFaction, stat_faction);
 			
@@ -50,8 +86,9 @@ namespace ProtoRTS
         public void DeselectUnit()
 		{
 			if (circleOutline != null) Destroy(circleOutline.gameObject);
+            isSelected = false;
 
-		}
+        }
 
-	}
+    }
 }

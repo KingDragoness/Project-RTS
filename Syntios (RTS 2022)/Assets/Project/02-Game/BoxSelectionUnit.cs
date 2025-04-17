@@ -13,6 +13,7 @@ namespace ProtoRTS
         [FoldoutGroup("Selection")] public GameObject go_EndDragBox;
         [FoldoutGroup("Selection")] public int minBoxSizeDrag = 12;
         [FoldoutGroup("Selection")] public float DoubleClickTime = 0.3f;
+        public bool disableBoxSelect = false;
 
 
         //public GameObject circleOutline_Green;
@@ -80,6 +81,7 @@ namespace ProtoRTS
             bool doubleClickDetected = false;
 
             _timeSinceMouse0 += Time.deltaTime;
+            if (disableBoxSelect == false)
             {
                 singleSelectUnit = GetSingleGameUnit();
 
@@ -93,13 +95,22 @@ namespace ProtoRTS
                     }
                     else
                     {
-                        Selection.DeselectAllUnits();
+                        //Selection.DeselectAllUnits();
                         startPosition = GetRaycastWorldClick();
 
                         // For selection the Units
                         selectionBounds = new Bounds();
                         _invalidDrag = false;
                     }
+                }
+
+                if (Input.GetKeyUp(KeyCode.Escape))
+                {
+                    Selection.DeselectAllUnits();
+                    startPosition = GetRaycastWorldClick();
+
+                    selectionBounds = new Bounds();
+                    _invalidDrag = false;
                 }
 
 
@@ -141,11 +152,12 @@ namespace ProtoRTS
                     {
                         if (_invalidDrag == false)
                         {
+                            Selection.DeselectAllUnits();
                             SelectUnits();
                         }
-                        if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
+                        else if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                         {
-                            //Selection.DeselectAllUnits();
+                            Selection.DeselectAllUnits();
                             SelectOneUnit(singleSelectUnit);
                         }
                     }
@@ -153,6 +165,7 @@ namespace ProtoRTS
                     {
                         if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                         {
+                            Selection.DeselectAllUnits();
                             SelectAllUnitInScreenSpace(singleSelectUnit);
                         }
                     }

@@ -32,6 +32,16 @@ namespace ProtoRTS
             Game_LoadFile = null;
         }
 
+        private void OnDestroy()
+        {
+            UI_NewSelection = null;
+            UI_DeselectAll = null;
+            UI_OrderMove = null;
+            UI_ReselectUpdate = null;
+            Game_ReloadMap = null;
+            Game_LoadFile = null;
+        }
+
         private void Awake()
         {
            

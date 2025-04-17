@@ -20,14 +20,18 @@ MonoBehaviour:
   Radius: 0.5
   LineOfSight: 10
   spriteWireframe: {fileID: 21300000, guid: 07cfa059d1e011d4e8a1d2b63943e584, type: 3}
-  MaxHP: 40
-  SupplyCount: 1
   MineralCost: 50
   EnergyCost: 25
+  SupplyCount: 1
   BuildTime: 24
+  MaxHP: 40
+  IsFlyUnit: 0
   HasEnergy: 0
   IsUntouchable: 0
   AllUnitTags: 0100000005000000
+  AI_b_AttackOnSight: 1
+  AI_b_AttackOnProvoked: 1
+  AI_b_FleeOnProvoked: 0
   port_Importance: -150
   port_Idles: []
   port_Talkings: []
@@ -44,43 +48,81 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 0
-      abilityScriptName: Move
+      abilityType: 1
+      unitOrder:
+        rid: 1618176901921636352
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 1
-      abilityScriptName: Stop
+      abilityType: 2
+      unitOrder:
+        rid: 1618176901921636353
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 2
-      abilityScriptName: default
+      abilityType: 4
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 3
-      abilityScriptName: Attack
+      abilityType: 3
+      unitOrder:
+        rid: 1618176901921636354
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 4
-      abilityScriptName: default
+      abilityType: 5
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: 949957a4f8eba134a8b1accc7fe5e8c7, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 5
+      abilityType: 10
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: 003d80d474a462b4986fec07d73bc76e, type: 2}
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 8
-      abilityScriptName: default
+      abilityType: 0
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: build
     - button: {fileID: 11400000, guid: 0a92df97b13ffd3448179b7aaa740d77, type: 2}
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 9
-      abilityScriptName: default
+      abilityType: 0
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: build_advanced
   - cardName: build
     commands:
@@ -88,19 +130,31 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 0
-      abilityScriptName: Place Building-test 1
+      abilityType: 7
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 11400000, guid: f532d0f78005bde49b6047787ffadd84, type: 2}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: 1ca4947bee3fae94483b537a28c5eeed, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 1
-      abilityScriptName: Place Building-test 2
+      abilityType: 7
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 11400000, guid: 0c4ba2f3b2fcfae43a21a8bf34a2aa75, type: 2}
+      unitSO: {fileID: 0}
       cardToOpen: 
     - button: {fileID: 11400000, guid: 1e4b0d6fede76cf448ef65aaac1c2c2a, type: 2}
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 11
-      abilityScriptName: default
+      abilityType: 0
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: default
   - cardName: build_advanced
     commands:
@@ -108,7 +162,11 @@ MonoBehaviour:
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 11
-      abilityScriptName: default
+      abilityType: 0
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: default
   - cardName: construction
     commands:
@@ -116,60 +174,26 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 11
-      abilityScriptName: Cancel Building
+      abilityType: 0
+      unitOrder:
+        rid: -2
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 
-  unitAbility:
-  - name: default
-    allActions: []
-    orderCategory: 1
-  - name: Move
-    allActions:
-    - type: 0
-      targetType: 0
-      buildingSO: {fileID: 0}
-    - type: 1
-      targetType: 0
-      buildingSO: {fileID: 0}
-    orderCategory: 5
-  - name: Stop
-    allActions:
-    - type: 1
-      targetType: 0
-      buildingSO: {fileID: 0}
-    orderCategory: 0
-  - name: Attack
-    allActions:
-    - type: 0
-      targetType: 0
-      buildingSO: {fileID: 0}
-    - type: 20
-      targetType: 0
-      buildingSO: {fileID: 0}
-    - type: 13
-      targetType: 0
-      buildingSO: {fileID: 0}
-    orderCategory: 6
-  - name: Cancel Building
-    allActions:
-    - type: 22
-      targetType: 0
-      buildingSO: {fileID: 0}
-    orderCategory: 0
-  - name: Building
-    allActions:
-    - type: 21
-      targetType: 0
-      buildingSO: {fileID: 0}
-    orderCategory: 0
-  - name: Place Building-test 1
-    allActions:
-    - type: 18
-      targetType: 0
-      buildingSO: {fileID: 11400000, guid: f532d0f78005bde49b6047787ffadd84, type: 2}
-    orderCategory: 0
-  - name: Place Building-test 2
-    allActions:
-    - type: 18
-      targetType: 0
-      buildingSO: {fileID: 11400000, guid: 0c4ba2f3b2fcfae43a21a8bf34a2aa75, type: 2}
-    orderCategory: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 1618176901921636352
+      type: {class: Order_Move, ns: ProtoRTS.Game, asm: Assembly-CSharp}
+      data:
+        target: {fileID: 0}
+        positionTarget: {x: 0, y: 0, z: 0}
+    - rid: 1618176901921636353
+      type: {class: Order_Stop, ns: ProtoRTS.Game, asm: Assembly-CSharp}
+      data: 
+    - rid: 1618176901921636354
+      type: {class: Order_Attack, ns: ProtoRTS.Game, asm: Assembly-CSharp}
+      data:
+        enemyUnit: {fileID: 0}

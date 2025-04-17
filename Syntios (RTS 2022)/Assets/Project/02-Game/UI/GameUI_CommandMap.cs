@@ -19,7 +19,7 @@ namespace ProtoRTS.Game
             {
                 var minimapPos = minimap.GetMousePosInMinimap();
                 var worldPos = minimap.ConvertMinimapPosToWorldPos(minimapPos);
-                commandUnit.MoveUnitsHere(worldPos);
+                //commandUnit.Old_MoveUnitsHere(worldPos);
 
                 if (Selection.GetPortraitedUnit != null)
                 {

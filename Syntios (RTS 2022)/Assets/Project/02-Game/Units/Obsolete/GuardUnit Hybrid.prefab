@@ -156,6 +156,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3986827402992411512}
   - component: {fileID: 3986827402992411515}
+  - component: {fileID: 6062536442700213397}
   - component: {fileID: 3986827402992411513}
   - component: {fileID: 5615413358465768408}
   - component: {fileID: 3986827402992411511}
@@ -201,7 +202,8 @@ MonoBehaviour:
   stat_HP: 25
   stat_Energy: 0
   stat_faction: 1
-  target: {x: 0, y: 0, z: 0}
+  move_Target: {x: 0, y: 0, z: 0}
+  move_TargetUnit: {fileID: 0}
   targetY: 0
   modelView:
   - {fileID: 1585967104541339347}
@@ -217,7 +219,24 @@ MonoBehaviour:
   - {fileID: 6428701856319805148}
   followerEntity: {fileID: 0}
   rvoController: {fileID: 6528910487834864001}
-  ai: {fileID: 5615413358465768408}
+  groundAIPath: {fileID: 5615413358465768408}
+--- !u!114 &6062536442700213397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3986827402992411507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 856903df09c65ee42b036a8e42c3974e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unit: {fileID: 3986827402992411515}
+  orders: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!114 &3986827402992411513
 MonoBehaviour:
   m_ObjectHideFlags: 0

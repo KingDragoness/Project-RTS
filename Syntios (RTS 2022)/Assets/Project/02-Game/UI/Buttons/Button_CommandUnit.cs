@@ -9,11 +9,13 @@ namespace ProtoRTS.Game
 	public class Button_CommandUnit : MonoBehaviour
 	{
 
-		public UI_RTSCommands UI_RTSCommands;
+		public UI_AbilityCommand UI_RTSCommands;
 		public Animator buttonAnim;
 		public Image buttonIcon;
 		public Text label_Hotkey;
-		public int index = 0;
+		public UnitButtonCommand.Type type;
+		public CommandButtonSO CommandButtonSO;
+        public int index = 0;
 
 		public void OnClick()
 		{

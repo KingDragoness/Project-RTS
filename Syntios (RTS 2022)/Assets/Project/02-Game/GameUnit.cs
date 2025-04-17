@@ -12,34 +12,45 @@ namespace ProtoRTS
 
 	public class GameUnit : AbstractUnit
 	{
-		public Vector3 target;
-		public float targetY = 0;
+		public Vector3 move_Target;
+        public GameUnit move_TargetUnit;
+        public float targetY = 0;
 		[FoldoutGroup("References")] public Renderer[] modelView;
 		[FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
 		[FoldoutGroup("References")] public RVOController rvoController; //change to modular
-		[FoldoutGroup("References")] public AIPath ai; //change to modular
+		[FoldoutGroup("References")] public AIPath groundAIPath; //change to modular
 
+		private GameUnit_OrderController _orderHandler;
 		private bool _isVisibleFromFOW = false;
+        private bool _isLoadedSaveFile = false;
 
 
 
-		public float Radius
+        public float Radius
         {
             get
             {
 				if (followerEntity != null) return followerEntity.radius;
-				return ai.radius;
+				return groundAIPath.radius;
             }
         }
 
         public bool IsVisibleFromFOW { get => _isVisibleFromFOW;  }
+        public GameUnit_OrderController OrderHandler { get => _orderHandler;  }
+
+
+        public override void Awake()
+        {
+			base.Awake();
+            _orderHandler = GetComponentInChildren<GameUnit_OrderController>();
+        }
 
         private void Start()
 		{
-            if (isLoadedSaveFile == false)
+            if (_isLoadedSaveFile == false)
             {
-                target = transform.position;
-				target.y = Map.instance.GetPositionY_cliffLevel(target);
+                move_Target = transform.position;
+				move_Target.y = Map.instance.GetPositionY_cliffLevel(move_Target);
             }
 
             SyntiosEngine.Instance.AddNewUnit(this);
@@ -92,13 +103,14 @@ namespace ProtoRTS
 			}
 		}
 
+
         void OnEnable()
 		{
 
 			if (followerEntity != null)
 			{
 			}
-            if (ai) ai.onSearchPath += Update;
+            if (groundAIPath) groundAIPath.onSearchPath += Update;
 			Tick.OnTick += OnTickUnit;
 
 		}
@@ -108,20 +120,9 @@ namespace ProtoRTS
 			if (followerEntity != null)
 			{
 			}
-            if (ai) ai.onSearchPath -= Update;
+            if (groundAIPath) groundAIPath.onSearchPath -= Update;
 
 		}
-
-		private bool isLoadedSaveFile = false;
-
-		private void Awake()
-		{
-			
-        }
-
-
-
-		
 
         private void OnDestroy()
         {
@@ -135,13 +136,18 @@ namespace ProtoRTS
 			if (unit == null) return null;
 
             unit.transform.position = unitData.unitPosition;
-			unit.target = unitData.move_TargetPos;
+			unit.move_Target = unitData.move_TargetPos;
 			unit.stat_faction = unitData.stat_Faction;
 			unit.stat_HP = (int)unitData.stat_HP;
-			unit.isLoadedSaveFile = true;
+			unit._isLoadedSaveFile = true;
 
             return unit;
         }
+
+		public bool CheckFlag(Unit.Tag tag)
+		{
+			return Class.AllUnitTags.Contains(tag);
+		}
 
         void Update()
 		{
@@ -155,8 +161,18 @@ namespace ProtoRTS
 
 		private void OnTickUnit(int tick)
 		{
-			if (ai) ai.destination = target;
-		}
+			if (groundAIPath != null)
+			{
+				if (move_TargetUnit != null)
+				{
+                    groundAIPath.destination = move_TargetUnit.transform.position;
+                }
+                else
+				{
+                    groundAIPath.destination = move_Target;
+                }
+            }
+        }
 
 
 		public void SetUnitStat()
@@ -164,7 +180,9 @@ namespace ProtoRTS
 			stat_HP = _class.MaxHP;
         }
 
-		public void KillUnit()
+        [FoldoutGroup("DEBUG")]
+		[Button("Kill Unit")]
+        public void KillUnit()
         {
 			stat_HP = 0;
 			Destroy(gameObject);
@@ -193,5 +211,10 @@ namespace ProtoRTS
 			modelView = meshRenderers;
 
 		}
-	}
+
+        #region Functions
+
+
+        #endregion
+    }
 }

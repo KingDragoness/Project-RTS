@@ -8,7 +8,7 @@ namespace ProtoRTS
 
     [CreateAssetMenu(fileName = "Move", menuName = "Syntios/Button", order = 1)]
 
-    public class CommandButton : ScriptableObject
+    public class CommandButtonSO : ScriptableObject
     {
         public string displayName = "Move";
         public Sprite sprite;

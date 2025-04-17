@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using UnityEngine.Video;
 using ProtoRTS.Game;
 using System.Linq;
+using UnityEngine.UIElements;
 
 namespace ProtoRTS
 {
@@ -14,13 +15,48 @@ namespace ProtoRTS
 	public class CommandCard
 	{
 		public string cardName = "default";
-		public List<UnitOrder> commands = new List<UnitOrder>();
-	}
+		public List<UnitButtonCommand> commands = new List<UnitButtonCommand>();
+
+
+        public bool CheckHasCommandAtIndex(int index)
+        {
+            foreach(var comm in commands) if (comm.position == index) return true;
+
+            return false;
+        }
+
+        public UnitButtonCommand CommandButton(int index)
+        {
+            var button = commands.Find(x => x.position == index);
+
+            return button;
+        }
+
+    }
 
 	[System.Serializable]
-	public class UnitOrder
+	public class UnitButtonCommand
 	{
-		public enum Type
+
+        public enum AbilityOrder
+        {
+            None,
+            Move,
+            Stop,
+            Attack,
+            HoldPosition,
+            Patrol,
+            EnterExitUnit,
+            BuildBuilding,
+            TrainUnit,
+            GatherResources,
+            HealRepair,
+            ExecuteAbility
+
+        }
+
+
+        public enum Type
 		{
 			AbilityCommand,
 			CancelPlacement,
@@ -29,23 +65,43 @@ namespace ProtoRTS
 			Submenu
 		}
 
-        public CommandButton button;
-        [FoldoutGroup("")] public Type commandType;
-        [FoldoutGroup("")][ReadOnly] public SO_GameUnit gameUnit;
-        [FoldoutGroup("")][Range(0, 11)] public int position;
-        [FoldoutGroup("")][ShowIf("commandType", Type.AbilityCommand)] [ValueDropdown("AllAbilities")] public string abilityScriptName = "default";
-        [FoldoutGroup("")][ShowIf("commandType", Type.Submenu)][ValueDropdown("AllCommandCard")] public string cardToOpen = "";
+        public CommandButtonSO button;
+        [FoldoutGroup("$Combined_1")] public Type commandType;
+        [FoldoutGroup("$Combined_1")][ReadOnly] public SO_GameUnit gameUnit;
+        [FoldoutGroup("$Combined_1")][Range(0, 11)] public int position;
+        [FoldoutGroup("$Combined_1")][ShowIf("commandType", Type.AbilityCommand)] public AbilityOrder abilityType;
+        [FoldoutGroup("$Combined_1")][ShowIf("abilityType", AbilityOrder.BuildBuilding)] public SO_GameUnit buildingSO;
+        [FoldoutGroup("$Combined_1")][ShowIf("abilityType", AbilityOrder.TrainUnit)] public SO_GameUnit unitSO;
+        [FoldoutGroup("$Combined_1")][ShowIf("commandType", Type.Submenu)][ValueDropdown("AllCommandCard")] public string cardToOpen = "";
         //public Requirement
 
-        private IEnumerable AllAbilities()
-        {
-			return gameUnit.unitAbility.Select(x => new ValueDropdownItem(x.name, x.name));
+        public string Combined_1 
+        { 
+            get 
+            {
+                if (commandType == Type.Submenu)
+                {
+                    return this.commandType + $" {cardToOpen}";
+                }    
+                if (commandType == Type.AbilityCommand)
+                {
+                    if (abilityType == AbilityOrder.BuildBuilding) return $"Build {buildingSO}";
+                    if (abilityType == AbilityOrder.TrainUnit) return $"Train {unitSO}";
+                    return this.abilityType.ToString();
+                }
+
+                return this.commandType + ""; 
+            } 
         }
+
 
         private IEnumerable AllCommandCard()
         {
+            if (gameUnit == null) return null;
             return gameUnit.commandCards.Select(x => new ValueDropdownItem(x.cardName, x.cardName));
         }
+
+       
     }
 
 
@@ -67,6 +123,7 @@ namespace ProtoRTS
 		public Sprite spriteWireframe;
 
 
+
         [FoldoutGroup("Resources")] public int MineralCost = 50;
         [FoldoutGroup("Resources")] public int EnergyCost = 25;
         [FoldoutGroup("Resources")][Range(0, 10)] public int SupplyCount = 1;
@@ -74,6 +131,7 @@ namespace ProtoRTS
 
         #region Unit Properties
         [FoldoutGroup("Unit Properties")] public int MaxHP = 40;
+        [FoldoutGroup("Unit Properties")] public bool IsFlyUnit = false;
         [FoldoutGroup("Unit Properties")] public bool HasEnergy = false;
         [FoldoutGroup("Unit Properties")] public bool IsUntouchable = false; //for scarab or missiles
         [FoldoutGroup("Unit Properties")] public List<Unit.Tag> AllUnitTags = new List<Unit.Tag>();
@@ -97,9 +155,20 @@ namespace ProtoRTS
 		[FoldoutGroup("Portraits")] [SerializeField] internal AudioClip[] voiceline_Move;
 
         #endregion
+        //[ValueDropdown("DefaultCardCommands")] public string defaultRightClickAbility = "";
+        [InfoBox("Command card at [0] index is always default")] public List<CommandCard> commandCards = new List<CommandCard>();
 
-        public List<CommandCard> commandCards = new List<CommandCard>();
-        public List<UnitAbility> unitAbility = new List<UnitAbility>();
+
+        private IEnumerable DefaultCardCommands()
+        {
+            if (commandCards.Count == 0) return null;
+            return commandCards[0].commands.Select(x => new ValueDropdownItem(x.abilityType.ToString(), x.abilityType.ToString()));
+        }
+
+        public CommandCard DefaultCard
+        {
+            get { return commandCards[0]; }
+        }
 
         private void OnValidate()
         {

@@ -19,6 +19,7 @@ namespace ProtoRTS.Game
         public RTSCamera rtsCamera;
         public Map map;
         public FOWScript fowScript;
+        public CommandUnit commandUnit;
 
         public static RTS instance;
 
@@ -342,7 +343,7 @@ namespace ProtoRTS.Game
             unitData.stat_Faction = unit.stat_faction;
             unitData.stat_Energy = (System.UInt32)unit.stat_Energy;
             unitData.stat_KillCount = (System.UInt16)unit.stat_KillCount;
-            unitData.move_TargetPos = unit.target;
+            unitData.move_TargetPos = unit.move_Target;
 
             return unitData;
         }

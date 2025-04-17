@@ -11,7 +11,10 @@ namespace ProtoRTS.Game
 
 		[SerializeField] private UI_UnitSelector _unitSelection;
         [SerializeField] private UI_RTSCommandPanel _commandPanel;
+        [SerializeField] private UI_AbilityCommand _abilityCommandPanel;
         [SerializeField] private UI_UnitStats _unitStat;
+        [SerializeField] private UI_PromptMiddle _promptHelp;
+        [SerializeField] private BoxSelectionUnit _boxSelector;
         [SerializeField] private Canvas _canvas_MainUI;
 
         public static UI instance;
@@ -24,7 +27,11 @@ namespace ProtoRTS.Game
         public static UI_UnitSelector UnitSelection { get { return instance._unitSelection; } }
 
         public static UI_RTSCommandPanel CommandPanel { get { return instance._commandPanel; } }
+        public static UI_AbilityCommand AbilityUI { get { return instance._abilityCommandPanel; } }
         public static UI_UnitStats UnitStats { get { return instance._unitStat; } }
+        public static UI_PromptMiddle PromptHelp { get { return instance._promptHelp; } }
+        public static BoxSelectionUnit BoxSelect { get { return instance._boxSelector; } }
+
 
         public static Canvas CanvasMainUI { get { return instance._canvas_MainUI; } }
 

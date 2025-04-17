@@ -57,18 +57,7 @@ namespace ProtoRTS.Game
 			public Type type;
 
         }
-		
-		public enum OrderCategory
-		{
-			None,
-			DEFAULT,
-			MOVE = 5,
-			ATTACK,
-			PATROL,
-			ABILITY,
-			CARGO,
 
-		}
 
 		public enum TargetType
 		{
@@ -100,7 +89,6 @@ namespace ProtoRTS.Game
         //[Title("$name")]
         [FoldoutGroup("$name")] public string name = "default";
         [FoldoutGroup("$name")] public List<Action> allActions = new List<Action>();
-        [FoldoutGroup("$name")] public OrderCategory orderCategory;
 
 	}
 

@@ -21,7 +21,10 @@ namespace ProtoRTS
 			Massive,
 			Spellcaster,
 			Robotic,
-			Structure
+			Structure,
+			Factory,
+			Enterable,
+			Healer //if unit has repair or heal ability
         }
 
 		public enum Race
