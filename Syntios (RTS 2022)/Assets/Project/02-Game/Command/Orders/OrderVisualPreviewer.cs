@@ -4,6 +4,7 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using System;
 using System.Drawing;
+using static UnityEngine.UI.CanvasScaler;
 
 namespace ProtoRTS.Game
 {
@@ -26,6 +27,11 @@ namespace ProtoRTS.Game
             SyntiosEvents.UI_NewSelection += event_newSelection;
             SyntiosEvents.UI_DeselectAll += event_deselectAll;
             Tick.OnTick += event_onTick;
+        }
+
+        private void Start()
+        {
+            prefab_point.gameObject.SetActive(false);
         }
 
         private void OnDestroy()
@@ -117,6 +123,7 @@ namespace ProtoRTS.Game
                 point.wire.InstantUpdate();
                 point.attachedUnit = unit;
                 point.attachedUnitOrder = order_;
+                point.bigWire = false;
 
                 int i = 0;
                 Orders.UnitOrder prevOrder = order_;
@@ -198,6 +205,23 @@ namespace ProtoRTS.Game
                     if (point.attachedUnitOrder.isCompleted == true)
                     {
                         point.gameObject.SetActive(false);
+                        var order_ = point.attachedUnit.OrderHandler.GetCurrentOrder();
+
+                        if (order_ != null && Selection.AllSelectedUnits.Contains(point.attachedUnit))
+                        {
+                            //get new one
+                            var newPoint = GetVisualPoint();
+
+                            newPoint.wire.linerenderer.widthMultiplier = .1f;
+                            newPoint.wire.origin = point.attachedUnit.transform;
+                            newPoint.wire.posTarget = order_.TargetPosition();
+                            newPoint.wire.InstantUpdate();
+                            newPoint.attachedUnit = point.attachedUnit;
+                            newPoint.attachedUnitOrder = order_;
+                            newPoint.bigWire = false;
+
+                        }
+
                         continue;
                     }
 

@@ -117,6 +117,7 @@ namespace ProtoRTS
         }
 
 
+
         private void Update()
         {
             Update_Viewport();
@@ -126,7 +127,7 @@ namespace ProtoRTS
                 allowDrag = false;
             }
 
-            if (allowDrag) Update_MoveCam();
+            if (allowDrag && DisableInput == false) Update_MoveCam();
 
             if (cooldown_MinimapRefresh > 0f)
             {
@@ -333,8 +334,11 @@ namespace ProtoRTS
         }
 
 
+        public bool DisableInput = false;
+
         public void InitiateDrag()
         {
+            if (DisableInput) return;
             allowDrag = true;
         }
 
@@ -383,8 +387,8 @@ namespace ProtoRTS
 
             Vector3 result = new Vector3();
             result.x = Mathf.Lerp(0, Map.MapSize.x, lerp_x) * 2f;
-            result.y = 0f;
             result.z = Mathf.Lerp(0, Map.MapSize.y, lerp_y) * 2f;
+            result.y = Map.instance.GetPositionY_cliffLevel(result);
 
 
             return result;

@@ -15,19 +15,20 @@ namespace ProtoRTS.Game
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Right)
+            //if (eventData.button == PointerEventData.InputButton.Right)
             {
                 var minimapPos = minimap.GetMousePosInMinimap();
                 var worldPos = minimap.ConvertMinimapPosToWorldPos(minimapPos);
+                RTS.instance.commandUnit.MinimapClickDrop(eventData, worldPos);
                 //commandUnit.Old_MoveUnitsHere(worldPos);
 
-                if (Selection.GetPortraitedUnit != null)
-                {
-                    var unit = Selection.GetPortraitedUnit;
+                //if (Selection.GetPortraitedUnit != null)
+                //{
+                //    var unit = Selection.GetPortraitedUnit;
 
-                    SyntiosEvents.UI_OrderMove?.Invoke(unit);
+                //    SyntiosEvents.UI_OrderMove?.Invoke(unit);
 
-                }
+                //}
             }
         }
     }

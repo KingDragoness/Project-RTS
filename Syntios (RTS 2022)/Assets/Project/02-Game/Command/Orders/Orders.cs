@@ -82,7 +82,7 @@ namespace ProtoRTS.Game
 
             public override Vector3 TargetPosition()
             {
-                return positionTarget;
+                return positionTarget + new Vector3(0,0.07f,0);
             }
         }
 

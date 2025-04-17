@@ -6,6 +6,7 @@ using Sirenix.OdinInspector;
 using static UnityEngine.UI.CanvasScaler;
 using static UnityEngine.UI.Image;
 using UnityEngine.UIElements;
+using UnityEngine.EventSystems;
 
 namespace ProtoRTS.Game
 {
@@ -85,7 +86,8 @@ namespace ProtoRTS.Game
 			//block if there is UI
 			if (Input.GetMouseButtonDown(1))
 			{
-				if (MainUI.GetEventSystemRaycastResults().Count > 0)
+
+                if (MainUI.GetEventSystemRaycastResults().Count > 0)
 				{
 				}
                 else
@@ -114,6 +116,19 @@ namespace ProtoRTS.Game
 
 		}
 
+        public void MinimapClickDrop(PointerEventData eventData, Vector3 worldPos)
+        {
+            if (targetSelector_Opened && eventData.button == PointerEventData.InputButton.Left)
+            {
+                ExecuteOrder(worldPos, null);
+                CloseTargetSelector();
+            }
+            if (!targetSelector_Opened && eventData.button == PointerEventData.InputButton.Right)
+            {
+                QuickOrder(worldPos, null);
+            }
+        }
+
         #region Target Selector
 
         private GameUnit _previewedGameUnit;
@@ -138,6 +153,9 @@ namespace ProtoRTS.Game
                     }
                 }
             }
+
+            UI.BoxSelect.disableBoxSelectTime = 1f;
+
 
             if (hittedUnit != null)
             {
@@ -202,15 +220,17 @@ namespace ProtoRTS.Game
 
             UI.PromptHelp.OpenPrompt("Left click to select target.");       
             UI.AbilityUI.RefreshCommandCard(commandCard);
-            UI.BoxSelect.disableBoxSelect = true;
+            UI.BoxSelect.disableBoxSelectTime = 1f;
+            UI.CommandMap.minimap.DisableInput = true;
             targetSelector_Opened = true;
         }
 
         public void CloseTargetSelector()
         {
             UI.PromptHelp.ClosePrompt();
-            UI.BoxSelect.disableBoxSelect = false;
+            UI.BoxSelect.disableBoxSelectTime = 0.2f;
             UI.AbilityUI.ReloadCommandCard();
+            UI.CommandMap.minimap.DisableInput = false;
             targetSelector_currentGameUnit = null;
             targetSelector_Opened = false;
             Cursor.Change(Cursor.Type.Normal);
@@ -256,12 +276,6 @@ namespace ProtoRTS.Game
         private void Handle_RightClick()
         {
 			GameUnit hittedUnit = null;
-            bool queueOrder = false;
-
-            if (Input.GetKeyUp(KeyCode.LeftShift))
-            {
-                queueOrder = true;
-            }
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -292,30 +306,39 @@ namespace ProtoRTS.Game
             var mainSelectedUnit = Selection.GetPortraitedUnit;
             allFormations = new Formation[count];
 
+
+            QuickOrder(hit.point, hittedUnit);
+            CreateCursor(hit2.point);
+
+
+        }
+
+        public void QuickOrder(Vector3 pos, GameUnit hittedUnit)
+        {
             int index = 0;
-			foreach(var unit in Selection.AllSelectedUnits)
-			{
+            foreach (var unit in Selection.AllSelectedUnits)
+            {
                 if (unit.stat_faction != SyntiosEngine.CurrentFaction) continue;
-				//set rally point
-				if (unit.CheckFlag(Unit.Tag.Factory) && unit.CheckFlag(Unit.Tag.Structure) && hittedUnit == null)
-				{
-                    PrepareOrder_SetRallyPoint(unit, hit.point);
-                }
-				//move order
-				else if (hittedUnit == null)
+                //set rally point
+                if (unit.CheckFlag(Unit.Tag.Factory) && unit.CheckFlag(Unit.Tag.Structure) && hittedUnit == null)
                 {
-                    PrepareOrder_Move(unit, null, hit.point, index);
+                    PrepareOrder_SetRallyPoint(unit, pos);
+                }
+                //move order
+                else if (hittedUnit == null)
+                {
+                    PrepareOrder_Move(unit, null, pos, index);
                 }
                 //check whether to follow, attack, heal or enter unit
                 else if (hittedUnit != null)
                 {
-					//friendly
+                    //friendly
                     if (hittedUnit.stat_faction == unit.stat_faction)
-					{
-						PrepareOrder_Move(unit, hittedUnit);
+                    {
+                        PrepareOrder_Move(unit, hittedUnit);
                     }
-					//heal
-					else if (hittedUnit.stat_faction == unit.stat_faction && unit.CheckFlag(Unit.Tag.Healer))
+                    //heal
+                    else if (hittedUnit.stat_faction == unit.stat_faction && unit.CheckFlag(Unit.Tag.Healer))
                     {
                         PrepareOrder_Heal(unit, hittedUnit);
                     }
@@ -327,17 +350,12 @@ namespace ProtoRTS.Game
                     //enemy
                     else if (hittedUnit.stat_faction != unit.stat_faction)
                     {
-                        PrepareOrder_Attack(unit, hittedUnit, hit.point);
+                        PrepareOrder_Attack(unit, hittedUnit, pos);
                     }
                 }
 
-                index++;
+                //index++;
             }
-
-
-            CreateCursor(hit2.point);
-
-            //MoveUnitsHere(hit.point);
 
             if (Selection.GetPortraitedUnit != null)
             {
@@ -346,6 +364,9 @@ namespace ProtoRTS.Game
                 SyntiosEvents.UI_OrderMove?.Invoke(unit1);
 
             }
+
+            CreateCursor(pos);
+
         }
 
         public void CreateCursor(Vector3 position)
@@ -384,8 +405,8 @@ namespace ProtoRTS.Game
             //positionTarget.z += curr_column * origin.Class.Radius * 2f;
 
 
-            Formation f = new Formation(origin.Class.Radius, positionTarget);
-            allFormations[index] = f;
+            //Formation f = new Formation(origin.Class.Radius, positionTarget);
+            //allFormations[index] = f;
 
             //prepare formation
             Orders.Order_Move order_unit = new Orders.Order_Move(gameUnit, positionTarget);

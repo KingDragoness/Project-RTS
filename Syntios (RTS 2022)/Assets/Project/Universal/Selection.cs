@@ -98,7 +98,9 @@ namespace ProtoRTS
 
         internal static void DeselectAllUnits()
 		{
-			foreach (var unit in _instance.allSelectedUnits)
+            Debug.Log("test");
+
+            foreach (var unit in _instance.allSelectedUnits)
 			{
 				if (unit == null) continue;
 				unit.DeselectUnit();

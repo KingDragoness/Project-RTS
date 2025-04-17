@@ -13,7 +13,7 @@ namespace ProtoRTS
         [FoldoutGroup("Selection")] public GameObject go_EndDragBox;
         [FoldoutGroup("Selection")] public int minBoxSizeDrag = 12;
         [FoldoutGroup("Selection")] public float DoubleClickTime = 0.3f;
-        public bool disableBoxSelect = false;
+        public float disableBoxSelectTime = 0f;
 
 
         //public GameObject circleOutline_Green;
@@ -81,7 +81,9 @@ namespace ProtoRTS
             bool doubleClickDetected = false;
 
             _timeSinceMouse0 += Time.deltaTime;
-            if (disableBoxSelect == false)
+            if (disableBoxSelectTime > 0) disableBoxSelectTime -= Time.deltaTime;
+
+            if (disableBoxSelectTime <= 0f)
             {
                 singleSelectUnit = GetSingleGameUnit();
 
@@ -144,7 +146,7 @@ namespace ProtoRTS
                 if (_timeSinceMouse0 <= DoubleClickTime) doubleClickDetected = true;
 
                 // When Releasing
-                if (Input.GetMouseButtonUp(0))
+                if (Input.GetMouseButtonUp(0) && disableBoxSelectTime <= 0f)
                 {
                     _timeSinceMouse0 = 0f;
 
@@ -155,7 +157,7 @@ namespace ProtoRTS
                             Selection.DeselectAllUnits();
                             SelectUnits();
                         }
-                        else if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
+                        if (Selection.AllSelectedUnits.Count <= 0 && singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                         {
                             Selection.DeselectAllUnits();
                             SelectOneUnit(singleSelectUnit);
