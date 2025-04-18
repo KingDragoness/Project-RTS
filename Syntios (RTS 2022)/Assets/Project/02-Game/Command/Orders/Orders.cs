@@ -211,6 +211,7 @@ namespace ProtoRTS.Game
                     targetPoint = endPoint;
                 }
 
+                targetPoint += new Vector3(0, 0.07f, 0);
 
                 return targetPoint;
             }

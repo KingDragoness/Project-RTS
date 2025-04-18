@@ -85,6 +85,7 @@ namespace ProtoRTS.Game
             }
 
             var newPoint = Instantiate(prefab_point, Vector3.zero, Quaternion.identity, transform);
+            newPoint.gameObject.name += $"-{orderVisualPoints.Count}";
             newPoint.gameObject.EnableGameobject(true);
             orderVisualPoints.Add(newPoint);
 
@@ -106,9 +107,8 @@ namespace ProtoRTS.Game
                 visualPoint.gameObject.SetActive(false);
             }
 
-            List<Vector3> listedPositions_above0 = new List<Vector3>();
+            Dictionary<int, OrderVisualPoint> similarPoints = new Dictionary<int, OrderVisualPoint>();
             //assign every wire to one unit
-
 
             foreach (var unit in Selection.AllSelectedUnits)
             {
@@ -138,14 +138,15 @@ namespace ProtoRTS.Game
                         continue;
                     }
 
-                    if (listedPositions_above0.Contains(additionalOrder.TargetPosition()))
                     {
-                        var dji = orderVisualPoints.Find(x => x.bigWire_MultipleUnitPos == additionalOrder.TargetPosition());
+
+                        var dji = FindSimilarPoint( additionalOrder.TargetPosition());
                         if (dji != null)
                         {
+                            Debug.Log(additionalOrder.TargetPosition().ToString());
                             dji.bigWireOrders.Add(additionalOrder);
+                            continue;
                         }
-                        continue;
                     }
 
                     var point2 = GetVisualPoint();
@@ -159,12 +160,27 @@ namespace ProtoRTS.Game
                     point2.wire.posTarget = additionalOrder.TargetPosition();
                     point2.wire.InstantUpdate();
                     point2.bigWire_MultipleUnitPos = additionalOrder.TargetPosition();
+
+
+                    similarPoints.TryAdd(prevOrder.TargetPosition().magnitude.ToInt(), point2);
+                    Debug.Log($"key: {prevOrder.TargetPosition().magnitude.ToInt()} | {point2.bigWire_MultipleUnitPos}");
                     prevOrder = additionalOrder;
-                    listedPositions_above0.Add(additionalOrder.TargetPosition());
                     i++;
 
                 }
             }
+        }
+
+        public OrderVisualPoint FindSimilarPoint(Vector3 targetPosition)
+        {
+            foreach (var orderPoint in orderVisualPoints)
+            {
+                float dist = Vector3.Distance(orderPoint.bigWire_MultipleUnitPos, targetPosition);
+
+                if (dist < 0.1f) return orderPoint;
+            }
+
+            return null;
         }
 
         private void Update()
@@ -175,6 +191,7 @@ namespace ProtoRTS.Game
             foreach (var point in orderVisualPoints)
             {
                 if (point == null) continue;
+                if (!point.gameObject.activeSelf) continue;
 
                 if (point.bigWire)
                 {
@@ -191,6 +208,7 @@ namespace ProtoRTS.Game
 
                     if (allowDeletion)
                     {
+                        //Debug.Log($"123_{point.attachedUnit}");
                         point.gameObject.SetActive(false);
                         continue;
                     }
@@ -229,6 +247,7 @@ namespace ProtoRTS.Game
 
                     if (point.currentOrder)
                     {
+                        //point.wire.posTarget = point.attachedUnitOrder.TargetPosition();
                         point.wire.origin = point.attachedUnit.transform;
                     }
                 }

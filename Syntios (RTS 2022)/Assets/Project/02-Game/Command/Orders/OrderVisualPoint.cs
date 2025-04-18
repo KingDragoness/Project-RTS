@@ -17,5 +17,10 @@ namespace ProtoRTS.Game
         public bool currentOrder = false;
 		public bool bigWire = false;
 
+		[Button("Count big wire order")]
+		public void BigWireCount()
+		{
+			Debug.Log(bigWireOrders.Count);
+		}
 	}
 }
