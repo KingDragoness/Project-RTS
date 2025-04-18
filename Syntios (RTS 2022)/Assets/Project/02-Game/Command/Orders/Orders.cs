@@ -26,6 +26,7 @@ namespace ProtoRTS.Game
             public abstract bool IsObjectiveAchieved(GameUnit myUnit);
             public abstract void Run(GameUnit myUnit);
             public abstract Vector3 TargetPosition();
+            public virtual bool IsOrderExistsInUnit(GameUnit myUnit) { return myUnit.OrderHandler.orders.Contains(this); }
         }
 
         [System.Serializable]
