@@ -71,13 +71,13 @@ namespace ProtoRTS.Game
 		/// 
 		/// </summary>
 		/// <param name="unitOrder">Insert the implemented class order</param>
-		public void AddCommandOrder(UnitOrder unitOrder)
+		private void AddCommandOrder(UnitOrder unitOrder)
 		{
             orders.Add(unitOrder);
 
         }
 
-        public void OverrideCommandOrder(UnitOrder unitOrder)
+        private void OverrideCommandOrder(UnitOrder unitOrder)
         {
 			orders.Clear();
             orders.Add(unitOrder);
@@ -95,93 +95,35 @@ namespace ProtoRTS.Game
 			return orders.Contains(unitOrder);
 		}
 
-        //SCRAP EVERYTHING BELOW
+        public virtual void AddOrder_Move(Vector3 targetPos, GameUnit targetUnit, bool overrideOrder = true)
+        {
+            bool valid = false;
+            foreach (var cc in unit.Class.commandCards)
+            {
+                foreach (var button in cc.commands)
+                {
+                    if (button.abilityType == UnitButtonCommand.AbilityOrder.Move && button.commandType == UnitButtonCommand.Type.AbilityCommand)
+                    {
+                        valid = true;
+                        break;
+                    }
 
-        private void Order_MOVE_Ground(GameUnit target, Vector3 positionTarget) 
-		{
+                }
+            }
+            if (!valid) return;
+            
+            var order_unit = new Orders.Order_Move(targetUnit, targetPos);
 
-            if (target != null)
-			{
-				unit.move_TargetUnit = target;
-            }
-			else
-			{
-				unit.move_Target = positionTarget;
-                unit.move_TargetUnit = null;
-            }
+            if (overrideOrder) OverrideCommandOrder(order_unit);
+            else AddCommandOrder(order_unit);
         }
 
-		private void Order_MOVE_Air(GameUnit target, Vector3 positionTarget)
-		{
-
-		}
-
-		public void Order_MOVE(GameUnit target, Vector3 positionTarget)
-		{
-			if (unit.Class.IsFlyUnit)
-			{
-                Order_MOVE_Air(target, positionTarget);
-            }
-			else
-			{
-                Order_MOVE_Ground(target, positionTarget);
-            }
+        public virtual void GiveOrder(Orders.UnitOrder unitOrder, bool overrideOrder = true)
+        {
+            if (overrideOrder) OverrideCommandOrder(unitOrder);
+            else AddCommandOrder(unitOrder);
         }
 
-		public void Order_ATTACK()
-		{
-
-		}
-
-		public void Order_STOP()
-		{
-
-		}
-
-		public void Order_PATROL()
-		{ 
-			
-		}
-
-		public void Order_HOLDPOS()
-		{
-
-		}
-
-		public void Order_ExecuteAbility()
-		{
-
-		}
-
-		public void Order_EnterExitUnit()
-		{
-
-		}
-
-		public void Order_GatherResources()
-		{
-
-		}
-
-		public void Order_Repair()
-		{
-
-		}
-
-		public void Order_Constructing()
-		{
-
-		}
-
-		public void Order_PlaceBuilding()
-		{
-
-		}
-
-		public void Order_SetRallyPoint()
-		{
-
-		}
 
         #endregion
 

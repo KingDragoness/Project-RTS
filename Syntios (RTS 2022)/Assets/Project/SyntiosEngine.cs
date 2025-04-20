@@ -71,6 +71,7 @@ namespace ProtoRTS
 	{
 
 		public List<GameUnit> ListedGameUnits = new List<GameUnit>();
+        public int UnitIncrementGUID = 0;
         public Gamemode CurrentGamemode;
         [SerializeField] private SaveData _saveDat;
         private List<FactionSheet> allFactions = new List<FactionSheet>();
@@ -82,7 +83,7 @@ namespace ProtoRTS
         public static FactionSheet MyFactionSheet { get => Instance.GetFactionSheet(CurrentFaction); }
 
 
-        public static Unit.Player CurrentFaction { get => Instance.currentFaction; }
+        public static Unit.Player CurrentFaction { get => Instance.currentFaction; set => Instance.currentFaction = value; }
         public static Gamemode CurrentMode { get => Instance.CurrentGamemode; }
         public static SaveData SaveData { get => Instance._saveDat; set => Instance._saveDat = value; }
         public static readonly string SavePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "/My Games/Syntios/Saves";
@@ -105,7 +106,8 @@ namespace ProtoRTS
             var faction = GetFactionSheet(unit.stat_faction);
             faction.ListedGameUnits.Add(unit);
             SyntiosEvents.UI_ReselectUpdate?.Invoke();
-
+            unit.guid = UnitIncrementGUID.ToString();
+            UnitIncrementGUID++;
         }
 
         public void RemoveUnit(GameUnit unit)
@@ -116,6 +118,12 @@ namespace ProtoRTS
             Selection.AllSelectedUnits.Remove(unit);
             SyntiosEvents.UI_ReselectUpdate?.Invoke();
 
+
+        }
+
+        public static GameUnit GetUnit (string guid)
+        {
+            return Instance.ListedGameUnits.Find(x => x.guid == guid);
         }
 
         public FactionSheet GetFactionSheet(Unit.Player factionId)

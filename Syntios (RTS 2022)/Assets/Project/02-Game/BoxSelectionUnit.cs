@@ -79,6 +79,7 @@ namespace ProtoRTS
         {
 
             bool doubleClickDetected = false;
+            bool addUnit = false;
 
             _timeSinceMouse0 += Time.deltaTime;
             if (disableBoxSelectTime > 0) disableBoxSelectTime -= Time.deltaTime;
@@ -104,6 +105,11 @@ namespace ProtoRTS
                         selectionBounds = new Bounds();
                         _invalidDrag = false;
                     }
+                }
+
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    addUnit = true;
                 }
 
                 if (Input.GetKeyUp(KeyCode.Escape))
@@ -154,7 +160,7 @@ namespace ProtoRTS
                     {
                         if (_invalidDrag == false)
                         {
-                            Selection.DeselectAllUnits();
+                            if (addUnit == false) Selection.DeselectAllUnits();
                             SelectUnits();
                         }
                         if (Selection.AllSelectedUnits.Count <= 0 && singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)

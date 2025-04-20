@@ -15,7 +15,7 @@ namespace ProtoRTS
 		[FoldoutGroup("Game Stats")] [SerializeField] internal int stat_KillCount;
 		[FoldoutGroup("Game Stats")] [SerializeField] internal int stat_HP = 25;
 		[FoldoutGroup("Game Stats")] [SerializeField] internal int stat_Energy = 0;
-		[FoldoutGroup("Game Stats")] [SerializeField] internal Unit.Player stat_faction;
+        [FoldoutGroup("Game Stats")] [SerializeField] internal Unit.Player stat_faction;
 
 		public SO_GameUnit Class { get => _class; }
 

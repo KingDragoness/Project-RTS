@@ -24,6 +24,7 @@ namespace ProtoRTS.Game
         private void Awake()
         {
             _instance = this;	
+			Change(Type.Normal);
         }
 
         public static void Change(Type _type)

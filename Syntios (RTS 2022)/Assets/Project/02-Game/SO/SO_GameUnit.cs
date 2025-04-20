@@ -119,7 +119,6 @@ namespace ProtoRTS
 		public GameUnit basePrefab;
 		public string Rank = "";
 		public float Radius = 2;
-		[Range(2,16)] public int LineOfSight = 7;
 		public Sprite spriteWireframe;
 
 
@@ -133,6 +132,7 @@ namespace ProtoRTS
         [FoldoutGroup("Unit Properties")] public int MaxHP = 40;
         [FoldoutGroup("Unit Properties")] public bool IsFlyUnit = false;
         [FoldoutGroup("Unit Properties")] public bool HasEnergy = false;
+        [FoldoutGroup("Unit Properties")][Range(2, 16)] public int LineOfSight = 7;
         [FoldoutGroup("Unit Properties")] public bool IsUntouchable = false; //for scarab or missiles
         [FoldoutGroup("Unit Properties")] public List<Unit.Tag> AllUnitTags = new List<Unit.Tag>();
 		#endregion

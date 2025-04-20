@@ -320,7 +320,8 @@ namespace ProtoRTS
 
         public float GetPositionY_cliffLevel(Vector3 realpos)
         {
-            Vector2Int pixelPosCenter = MapToolScript.WorldPosToCliffmapPos(realpos);
+            Vector3 centeredRealPos = realpos - new Vector3(2, 0, 2);
+            Vector2Int pixelPosCenter = MapToolScript.WorldPosToCliffmapPos(centeredRealPos);
            // Debug.Log(pixelPosCenter);
             if (pixelPosCenter.x < 0) pixelPosCenter.x = 0;
             if (pixelPosCenter.y < 0) pixelPosCenter.y = 0;

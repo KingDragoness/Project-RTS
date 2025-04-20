@@ -25,6 +25,7 @@ MonoBehaviour:
   SupplyCount: 4
   BuildTime: 24
   MaxHP: 150
+  IsFlyUnit: 0
   HasEnergy: 0
   IsUntouchable: 0
   AllUnitTags: 00000000020000000a000000
@@ -48,7 +49,7 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 0
-      abilityType: 0
+      abilityType: 1
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -56,7 +57,7 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 1
-      abilityType: 0
+      abilityType: 2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -64,7 +65,7 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 2
-      abilityType: 0
+      abilityType: 4
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -72,7 +73,7 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 3
-      abilityType: 0
+      abilityType: 3
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -80,7 +81,7 @@ MonoBehaviour:
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 4
-      abilityType: 0
+      abilityType: 5
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 

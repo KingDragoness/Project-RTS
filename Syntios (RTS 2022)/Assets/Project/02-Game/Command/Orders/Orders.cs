@@ -2,12 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Newtonsoft.Json;
+using UnityEditor;
 
 namespace ProtoRTS.Game
 {
 
     public class Orders
     {
+
+        [System.Serializable]
+        public abstract class UnitOrder_SaveDat
+        {
+
+        }
 
         //queueable orders:
         //Move
@@ -23,23 +31,46 @@ namespace ProtoRTS.Game
         {
             public bool isCompleted = false;
 
+            public abstract bool AllowAttack();
+
+            /// <summary>
+            /// Allows units to attack any enemy in range/sight until
+            /// it move maybe 10 units from its original position
+            /// </summary>
+            /// <returns></returns>
+            /// 
+            public abstract bool AllowBeDistracted_and_AttackNearby();
             public abstract bool IsObjectiveAchieved(GameUnit myUnit);
             public abstract void Run(GameUnit myUnit);
             public abstract Vector3 TargetPosition();
             public virtual bool IsOrderExistsInUnit(GameUnit myUnit) { return myUnit.OrderHandler.orders.Contains(this); }
+            public abstract void Save();
+
         }
 
         [System.Serializable]
         public class Order_Move : UnitOrder
         {
 
-            public GameUnit target;
+
+            [JsonIgnore] public GameUnit target;
+            public string guidTarget;
             public Vector3 positionTarget;
 
             public Order_Move(GameUnit target, Vector3 positionTarget)
             {
                 this.target = target;
                 this.positionTarget = positionTarget;
+            }
+
+            public override bool AllowAttack()
+            {
+                return false;
+            }
+
+            public override bool AllowBeDistracted_and_AttackNearby()
+            {
+                return false;
             }
 
             public override bool IsObjectiveAchieved(GameUnit myUnit)
@@ -59,7 +90,7 @@ namespace ProtoRTS.Game
 
                 float distance = Vector3.Distance(myUnit.transform.position, target.transform.position);
 
-                if (distance < myUnit.Class.Radius + 0.5f)
+                if (distance < myUnit.Class.Radius + 0.5f + target.Class.Radius)
                 {
                     isCompleted = true;
                     return true;
@@ -70,6 +101,8 @@ namespace ProtoRTS.Game
 
             public override void Run(GameUnit myUnit)
             {
+                myUnit.RVO_LockWhenNotMoving(false);
+
                 if (target != null)
                 {
                     myUnit.move_TargetUnit = target;
@@ -81,6 +114,11 @@ namespace ProtoRTS.Game
                 }
             }
 
+            public override void Save()
+            {
+                if (target != null) guidTarget = target.guid;
+            }
+
             public override Vector3 TargetPosition()
             {
                 return positionTarget + new Vector3(0,0.07f,0);
@@ -90,6 +128,15 @@ namespace ProtoRTS.Game
         [System.Serializable]
         public class Order_Stop : UnitOrder
         {
+            public override bool AllowAttack()
+            {
+                return false;
+            }
+            public override bool AllowBeDistracted_and_AttackNearby()
+            {
+                return true;
+            }
+
             public override bool IsObjectiveAchieved(GameUnit myUnit)
             {
                 isCompleted = true;
@@ -100,6 +147,13 @@ namespace ProtoRTS.Game
             {
                 myUnit.move_Target = myUnit.transform.position;
                 myUnit.move_TargetUnit = null;
+                myUnit.RVO_LockWhenNotMoving(false);
+
+            }
+
+            public override void Save()
+            {
+
             }
 
             public override Vector3 TargetPosition()
@@ -109,12 +163,29 @@ namespace ProtoRTS.Game
         }
 
 
+        //In some units (Seaver, Carrier-interceptor units), it needs to have special scripts
+        //Order_Attack_Seaver
+
+        /// <summary>
+        /// In some units, need to pass through the GUOC first
+        /// Order_Attack_Seaver!
+        /// </summary>
         [System.Serializable]
         public class Order_Attack : UnitOrder
         {
 
-            public GameUnit enemyUnit;
+            [JsonIgnore] public GameUnit enemyUnit;
+            public string guidTarget;
+            public Vector3 attackPosition;
 
+            public override bool AllowAttack()
+            {
+                return true;
+            }
+            public override bool AllowBeDistracted_and_AttackNearby()
+            {
+                return true;
+            }
 
             public override bool IsObjectiveAchieved(GameUnit myUnit)
             {
@@ -144,7 +215,13 @@ namespace ProtoRTS.Game
                 }
 
                 myUnit.move_TargetUnit = enemyUnit;
+                myUnit.RVO_LockWhenNotMoving(false);
 
+            }
+
+            public override void Save()
+            {
+                if (enemyUnit != null) guidTarget = enemyUnit.guid;
             }
 
             public override Vector3 TargetPosition()
@@ -159,6 +236,15 @@ namespace ProtoRTS.Game
             public Vector3 startPoint;
             public Vector3 endPoint;
             bool b = false;
+
+            public override bool AllowAttack()
+            {
+                return true;
+            }
+            public override bool AllowBeDistracted_and_AttackNearby()
+            {
+                return true;
+            }
 
             public Order_Patrol(Vector3 _start, Vector3 _end)
             {
@@ -196,6 +282,7 @@ namespace ProtoRTS.Game
 
 
                 myUnit.move_Target = targetPoint;
+                myUnit.RVO_LockWhenNotMoving(false);
 
             }
 
@@ -215,6 +302,49 @@ namespace ProtoRTS.Game
                 targetPoint += new Vector3(0, 0.07f, 0);
 
                 return targetPoint;
+            }
+
+            public override void Save()
+            {
+
+            }
+        }
+
+        [System.Serializable]
+        public class Order_HoldPosition : UnitOrder
+        {
+            public Order_HoldPosition()
+            {
+            }
+
+            public override bool AllowAttack()
+            {
+                return true;
+            }
+            public override bool AllowBeDistracted_and_AttackNearby()
+            {
+                return false;
+            }
+            public override bool IsObjectiveAchieved(GameUnit myUnit)
+            {
+                return false;
+            }
+
+            public override void Run(GameUnit myUnit)
+            {
+                myUnit.move_Target = myUnit.transform.position;
+                myUnit.move_TargetUnit = null;
+                myUnit.RVO_LockWhenNotMoving(true);
+            }
+
+            public override void Save()
+            {
+
+            }
+
+            public override Vector3 TargetPosition()
+            {
+                return Vector3.zero;
             }
         }
     }

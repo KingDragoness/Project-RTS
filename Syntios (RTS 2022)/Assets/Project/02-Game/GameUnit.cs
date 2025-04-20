@@ -12,6 +12,7 @@ namespace ProtoRTS
 
 	public class GameUnit : AbstractUnit
 	{
+		[ReadOnly] public string guid = "";
 		public Vector3 move_Target;
         public GameUnit move_TargetUnit;
         public float targetY = 0;
@@ -60,7 +61,7 @@ namespace ProtoRTS
 
 			if (rvoController != null)
 			{
-				//if (false) 
+				if (false) 
 				{
 					int layerNeutralPlayer = 1 << 10;
                     int layerPlayer1 = 1 << 11;
@@ -90,6 +91,12 @@ namespace ProtoRTS
                     rvoController.collidesWith = (RVOLayer)finalMask;
                 }
 				
+				if (Class.IsFlyUnit)
+				{
+                    rvoController.layer = RVOLayer.Layer9;
+                    rvoController.collidesWith = RVOLayer.Layer9;
+
+                }
 
             }
         }
@@ -139,7 +146,13 @@ namespace ProtoRTS
 			unit.move_Target = unitData.move_TargetPos;
 			unit.stat_faction = unitData.stat_Faction;
 			unit.stat_HP = (int)unitData.stat_HP;
+			unit.stat_Energy = (int)unitData.stat_Energy;
+			unit.guid = unitData.guid;
 			unit._isLoadedSaveFile = true;
+
+			{
+				unit.OrderHandler.orders.AddRange(unitData.allOrders);
+			}
 
             return unit;
         }
@@ -157,20 +170,43 @@ namespace ProtoRTS
 				//followerEntity.SetDestination(target);
 			}
 
-		}
+            if (groundAIPath && Class.IsFlyUnit)
+            {
+                Vector3 targetPos_fly = transform.position;
+                Vector3 targetPos_fly_forward = transform.position + transform.forward * 4f;
+                Vector3 targetPos_fly_backward = transform.position + transform.forward * -4f;
+
+                targetPos_fly.y = Map.instance.GetPositionY_cliffLevel(targetPos_fly);
+                targetPos_fly_forward.y = Map.instance.GetPositionY_cliffLevel(targetPos_fly_forward);
+                targetPos_fly_backward.y = Map.instance.GetPositionY_cliffLevel(targetPos_fly_backward);
+
+                //pick highest point
+                if (targetPos_fly_forward.y > targetPos_fly.y) targetPos_fly.y = targetPos_fly_forward.y;
+                if (targetPos_fly_backward.y > targetPos_fly.y) targetPos_fly.y = targetPos_fly_backward.y;
+
+                float delta = Mathf.Abs(targetPos_fly.y - transform.position.y);
+				delta = Mathf.Clamp(delta, 0.25f, 2.0f);
+
+                transform.position = Vector3.MoveTowards(transform.position, targetPos_fly, 10f * delta * Time.deltaTime);
+            }
+        }
 
 		private void OnTickUnit(int tick)
 		{
 			if (groundAIPath != null)
 			{
-				if (move_TargetUnit != null)
+               
+                if (move_TargetUnit != null)
 				{
-                    groundAIPath.destination = move_TargetUnit.transform.position;
+					Vector3 pos_targetUnit = move_TargetUnit.transform.position;
+                    groundAIPath.destination = pos_targetUnit;
                 }
                 else
 				{
                     groundAIPath.destination = move_Target;
                 }
+
+				
             }
         }
 
@@ -214,6 +250,17 @@ namespace ProtoRTS
 
         #region Functions
 
+		public void RVO_LockWhenNotMoving(bool lockNotMoving)
+		{
+			if (rvoController == null) return;
+			rvoController.lockWhenNotMoving = lockNotMoving;
+			if (lockNotMoving == false) rvoController.locked = false;
+		}
+
+		//public bool IsUnitHasAbility(UnitButtonCommand.AbilityOrder abilityType)
+		//{
+		//	if ()
+		//}
 
         #endregion
     }

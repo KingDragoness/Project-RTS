@@ -138,6 +138,7 @@ MonoBehaviour:
   stat_HP: 25
   stat_Energy: 0
   stat_faction: 1
+  guid: 
   move_Target: {x: 0, y: 0, z: 0}
   move_TargetUnit: {fileID: 0}
   targetY: 0

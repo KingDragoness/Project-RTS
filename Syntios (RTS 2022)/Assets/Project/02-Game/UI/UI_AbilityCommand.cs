@@ -35,6 +35,15 @@ namespace ProtoRTS.Game
 
         }
 
+        public bool IsGameUnitMatched(GameUnit unit)
+        {
+            return currentGameUnit == unit;
+        }
+        public bool IsCommandCardMatched(CommandCard cc)
+        {
+            return currentCommandCard == cc;
+        }
+
         private void event_UI_DeselectAll()
         {
             if (Selection.AllSelectedUnits.Find(x => x == currentGameUnit) == null)
@@ -42,7 +51,7 @@ namespace ProtoRTS.Game
                 if (Selection.AllSelectedUnits.Count == 0)
                 {
                     //really no unit left
-                    foreach (var button in buttons) { button.gameObject.SetActive(false); }
+                    foreach (var button in buttons) { button.gameObject.SetActive(false); button.emptyButton = true; }
                     currentGameUnit = null;
                     currentCommandCard = null;
                     return;
@@ -69,7 +78,7 @@ namespace ProtoRTS.Game
                 if (Selection.AllSelectedUnits.Count == 0)
                 {
                     //really no unit left
-                    foreach (var button in buttons) { button.gameObject.SetActive(false); }
+                    foreach (var button in buttons) { button.gameObject.SetActive(false); button.emptyButton = true; }
                     currentGameUnit = null;
                     currentCommandCard = null;
                     return;
@@ -96,7 +105,7 @@ namespace ProtoRTS.Game
 
         private void event_UI_NewSelection(GameUnit unit)
         {
-			foreach (var button in buttons) { button.gameObject.SetActive(false); }
+			foreach (var button in buttons) { button.gameObject.SetActive(false); button.emptyButton = true; }
             if (unit.stat_faction != SyntiosEngine.CurrentFaction) return;
             if (unit == null) { return; }
             var commandCard = unit.Class.commandCards[0];
@@ -107,42 +116,44 @@ namespace ProtoRTS.Game
 
             foreach (var command in commandCard.commands)
 			{
-				buttons[command.position].gameObject.SetActive(true);
-				buttons[command.position].buttonIcon.sprite = command.button.sprite;
-                buttons[command.position].label_Hotkey.text = Key(command.position);
-                buttons[command.position].type = command.commandType;
-                buttons[command.position].CommandButtonSO = command.button;
+                var button = buttons[command.position];
+                button.gameObject.SetActive(true);
+				button.buttonIcon.sprite = command.button.sprite;
+                button.label_Hotkey.text = Key(command.position);
+                button.type = command.commandType;
+                button.CommandButtonSO = command.button;
 
                 if (command.button.allowTint)
                 {
-                    buttons[command.position].buttonAnim.runtimeAnimatorController = anim_Blue;
+                    button.buttonAnim.runtimeAnimatorController = anim_Blue;
                 }
                 else
                 {
-                    buttons[command.position].buttonAnim.runtimeAnimatorController = anim_White;
+                    button.buttonAnim.runtimeAnimatorController = anim_White;
                 }
             }
         }
 
         public void RefreshCommandCard(CommandCard commandCard)
         {
-            foreach (var button in buttons) { button.gameObject.SetActive(false); }
+            foreach (var button in buttons) { button.gameObject.SetActive(false); button.emptyButton = true; }
 
             foreach (var command in commandCard.commands)
             {
-                buttons[command.position].gameObject.SetActive(true);
-                buttons[command.position].buttonIcon.sprite = command.button.sprite;
-                buttons[command.position].label_Hotkey.text = Key(command.position);
-                buttons[command.position].type = command.commandType;
-                buttons[command.position].CommandButtonSO = command.button;
+                var button = buttons[command.position];
+                button.gameObject.SetActive(true);
+                button.buttonIcon.sprite = command.button.sprite;
+                button.label_Hotkey.text = Key(command.position);
+                button.type = command.commandType;
+                button.CommandButtonSO = command.button;
 
                 if (command.button.allowTint)
                 {
-                    buttons[command.position].buttonAnim.runtimeAnimatorController = anim_Blue;
+                    button.buttonAnim.runtimeAnimatorController = anim_Blue;
                 }
                 else
                 {
-                    buttons[command.position].buttonAnim.runtimeAnimatorController = anim_White;
+                    button.buttonAnim.runtimeAnimatorController = anim_White;
                 }
 
             }
@@ -176,7 +187,8 @@ namespace ProtoRTS.Game
             int _i = 0;
             foreach (var button in buttons) 
             { 
-                button.gameObject.SetActive(false); 
+                button.gameObject.SetActive(false);
+                button.emptyButton = true;
                 button.index = _i;
                 _i++;
             }
@@ -270,6 +282,7 @@ namespace ProtoRTS.Game
 
         private void Update()
 		{
+            if (DevConsole.Instance.consoleInputObject.activeSelf) return;
             if (currentCommandCard == null) return;
             if (currentGameUnit == null) return;
 

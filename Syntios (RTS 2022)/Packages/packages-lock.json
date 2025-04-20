@@ -23,6 +23,13 @@
         "com.unity.ugui": "1.0.0"
       }
     },
+    "com.bedtime.editor-history": {
+      "version": "https://github.com/BedtimeDigitalGames/Unity-Editor-History.git#1.4.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "d160f357f3bd5ca121d4e02438e3ccfe1dc5347f"
+    },
     "com.needle.compilation-visualizer": {
       "version": "1.8.3",
       "depth": 0,

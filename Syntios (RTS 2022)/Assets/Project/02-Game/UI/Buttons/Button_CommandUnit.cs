@@ -13,6 +13,7 @@ namespace ProtoRTS.Game
 		public Animator buttonAnim;
 		public Image buttonIcon;
 		public Text label_Hotkey;
+		public bool emptyButton = false;
 		public UnitButtonCommand.Type type;
 		public CommandButtonSO CommandButtonSO;
         public int index = 0;

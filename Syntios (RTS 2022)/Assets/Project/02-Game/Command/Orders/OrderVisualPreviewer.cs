@@ -88,14 +88,24 @@ namespace ProtoRTS.Game
                 Orders.UnitOrder order = unit.OrderHandler.GetCurrentOrder();
                 if (order == null) continue;
 
-                OrderVisualPoint visualPoint = GetVisualPoint();
-
-                visualPoint.wire.origin = unit.transform;
-                visualPoint.wire.posTarget = order.TargetPosition();
-                visualPoint.attachedOrder = order;
-                visualPoint.attachedUnit = unit;
-                visualPoint.orderPosTarget = visualPoint.wire.posTarget.ToInt();
+                SpawnOrderVisual(unit);
             }
+        }
+
+        public void SpawnOrderVisual(GameUnit unit)
+        {
+            Orders.UnitOrder order = unit.OrderHandler.GetCurrentOrder();
+            if (order == null) return;
+
+            OrderVisualPoint visualPoint = GetVisualPoint();
+
+            visualPoint.wire.origin = unit.transform;
+            visualPoint.wire.posTarget = order.TargetPosition();
+            visualPoint.attachedOrder = order;
+            visualPoint.attachedUnit = unit;
+            visualPoint.orderPosTarget = visualPoint.wire.posTarget.ToInt();
+            visualPoint.wire.InstantUpdate();
+            visualPoint.circle.transform.position = visualPoint.wire.posTarget;
         }
 
         public bool AlreadyExistPoint(Vector3Int v3)
@@ -114,13 +124,8 @@ namespace ProtoRTS.Game
                 if (order == null) continue;
                 if (AlreadyExistPoint(order.TargetPosition().ToInt())) continue;
 
-                OrderVisualPoint visualPoint = GetVisualPoint();
+                SpawnOrderVisual(unit);
 
-                visualPoint.wire.origin = unit.transform;
-                visualPoint.wire.posTarget = order.TargetPosition();
-                visualPoint.attachedOrder = order;
-                visualPoint.attachedUnit = unit;
-                visualPoint.orderPosTarget = visualPoint.wire.posTarget.ToInt();
                 count_unit++;
             }
 
@@ -142,6 +147,13 @@ namespace ProtoRTS.Game
                 if (!item.attachedOrder.IsOrderExistsInUnit(item.attachedUnit))
                 {
                     item.gameObject.SetActive(false); continue;
+                }
+
+                //update target
+                {
+                    item.wire.posTarget = item.attachedOrder.TargetPosition();
+                    item.circle.transform.position = item.wire.posTarget;
+
                 }
                 count_vp++;
             }

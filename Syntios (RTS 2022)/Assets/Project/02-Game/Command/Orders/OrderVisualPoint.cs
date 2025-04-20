@@ -9,6 +9,8 @@ namespace ProtoRTS.Game
 	{
 
 		public Wire wire;
+		public Transform circle;
+		[Space]
         public GameUnit attachedUnit;
         public Orders.UnitOrder attachedOrder;
 		public Vector3Int orderPosTarget;

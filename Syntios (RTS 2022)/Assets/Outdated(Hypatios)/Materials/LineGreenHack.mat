@@ -14,7 +14,6 @@ Material:
   m_ValidKeywords:
   - _ALPHABLEND_ON
   - _EMISSION
-  - _FADING_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
@@ -72,7 +71,7 @@ Material:
     - _CameraFarFadeDistance: 2
     - _CameraNearFadeDistance: 1
     - _Cull: 0
-    - _Cutoff: 0.5
+    - _Cutoff: 0.14
     - _DetailNormalMapScale: 1
     - _DistortionBlend: 0.5
     - _DistortionEnabled: 0
@@ -90,7 +89,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
-    - _SoftParticlesEnabled: 1
+    - _SoftParticlesEnabled: 0
     - _SoftParticlesFarFadeDistance: 1
     - _SoftParticlesNearFadeDistance: 0
     - _SpecularHighlights: 1
@@ -99,7 +98,7 @@ Material:
     - _ZWrite: 0
     m_Colors:
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
-    - _Color: {r: 0.28773576, g: 1, b: 0.5120497, a: 0.5882353}
-    - _EmissionColor: {r: 0.8627451, g: 2.9960785, b: 1.427451, a: 1}
-    - _SoftParticleFadeParams: {r: 0, g: 1, b: 0, a: 0}
+    - _Color: {r: 0.13034001, g: 0.9528302, b: 0.390353, a: 1}
+    - _EmissionColor: {r: 0.37553152, g: 1.3041189, b: 0.621334, a: 1}
+    - _SoftParticleFadeParams: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

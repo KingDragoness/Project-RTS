@@ -102,6 +102,8 @@ namespace ProtoRTS.Game
             Map.instance.DEBUG_dontInitializeData = true;
             Map.instance.LoadGame_LoadSyntiosTerrainDat(cachedLoadedSave.terrain);
             rtsCamera.transform.position = cachedLoadedSave.cameraPosition;
+            SyntiosEngine.CurrentFaction = cachedLoadedSave.playerFaction;
+            SyntiosEngine.Instance.UnitIncrementGUID = cachedLoadedSave.IncrementUnitGUID;
 
             //faction sheet
             {
@@ -315,6 +317,7 @@ namespace ProtoRTS.Game
             saveDat.terrain = Map.TerrainData;
             saveDat.terrain_PresetID = Map.TerrainData.presetID;
             saveDat.playerFaction = SyntiosEngine.CurrentFaction;
+            saveDat.IncrementUnitGUID = SyntiosEngine.Instance.UnitIncrementGUID;
             saveDat.allUnits.Clear();
             saveDat.cameraPosition = RTSCamera.Instance.transform.position;
 
@@ -344,6 +347,13 @@ namespace ProtoRTS.Game
             unitData.stat_Energy = (System.UInt32)unit.stat_Energy;
             unitData.stat_KillCount = (System.UInt16)unit.stat_KillCount;
             unitData.move_TargetPos = unit.move_Target;
+            unitData.guid = unit.guid;
+
+            //orders
+            {
+                foreach (var e in unit.OrderHandler.orders) e.Save();
+                unitData.allOrders = unit.OrderHandler.orders;
+            }
 
             return unitData;
         }

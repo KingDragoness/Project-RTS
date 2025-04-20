@@ -189,16 +189,17 @@ namespace ProtoRTS.Game
 
             if (targetSelector_commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Move)
             {
-                order_unit = new Orders.Order_Move(targetUnit, targetPos);
+                //order_unit = new Orders.Order_Move(targetUnit, targetPos);
             }
 
 
             foreach (var gameUnit in Selection.AllSelectedUnits)
             {
-                if (targetSelector_commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Patrol) order_unit = new Orders.Order_Patrol(gameUnit.transform.position, targetPos);
+                if (targetSelector_commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Move) gameUnit.OrderHandler.AddOrder_Move(targetPos, targetUnit, true);
+                if (targetSelector_commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Patrol) gameUnit.OrderHandler.GiveOrder(new Orders.Order_Patrol(gameUnit.transform.position, targetPos), true);
+                if (targetSelector_commandOrder.abilityType == UnitButtonCommand.AbilityOrder.HoldPosition) gameUnit.OrderHandler.GiveOrder(new Orders.Order_HoldPosition(), true);
 
 
-                gameUnit.OrderHandler.OverrideCommandOrder(order_unit);
             }
 
             if (Selection.GetPortraitedUnit != null)
@@ -218,7 +219,9 @@ namespace ProtoRTS.Game
             targetSelector_targetType = _targetType;
             targetSelector_commandOrder = commandOrder;
 
-            UI.PromptHelp.OpenPrompt("Left click to select target.");       
+            if (commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Move) UI.PromptHelp.OpenPrompt("Left click to where move/follow unit.");
+            if (commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Patrol) UI.PromptHelp.OpenPrompt("Left click to where patrol.");
+
             UI.AbilityUI.RefreshCommandCard(commandCard);
             UI.BoxSelect.disableBoxSelectTime = 1f;
             UI.CommandMap.minimap.DisableInput = true;
@@ -231,6 +234,12 @@ namespace ProtoRTS.Game
             UI.BoxSelect.disableBoxSelectTime = 0.2f;
             UI.AbilityUI.ReloadCommandCard();
             UI.CommandMap.minimap.DisableInput = false;
+
+            if (_previewedGameUnit != null)
+            {
+                _previewedGameUnit.DehighlightUnit();
+            }
+
             targetSelector_currentGameUnit = null;
             targetSelector_Opened = false;
             Cursor.Change(Cursor.Type.Normal);
@@ -252,11 +261,15 @@ namespace ProtoRTS.Game
             }
             if (commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Stop)
             {
-                foreach (var gunit in Selection.AllSelectedUnits) gunit.OrderHandler.OverrideCommandOrder(new Orders.Order_Stop());
+                foreach (var gunit in Selection.AllSelectedUnits) gunit.OrderHandler.GiveOrder(new Orders.Order_Stop());
             }
             if (commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Patrol)
             {
                 OpenTargetSelector(unit, new UnitAbility.TargetType[2] { UnitAbility.TargetType.Position, UnitAbility.TargetType.SingleUnit }, commandOrder);
+            }
+            if (commandOrder.abilityType == UnitButtonCommand.AbilityOrder.HoldPosition)
+            {
+                foreach (var gunit in Selection.AllSelectedUnits) gunit.OrderHandler.GiveOrder(new Orders.Order_HoldPosition());
             }
         }
 
@@ -335,7 +348,7 @@ namespace ProtoRTS.Game
                     //friendly
                     if (hittedUnit.stat_faction == unit.stat_faction)
                     {
-                        PrepareOrder_Move(unit, hittedUnit);
+                        PrepareOrder_Move(unit, hittedUnit, pos);
                     }
                     //heal
                     else if (hittedUnit.stat_faction == unit.stat_faction && unit.CheckFlag(Unit.Tag.Healer))
@@ -409,10 +422,10 @@ namespace ProtoRTS.Game
             //allFormations[index] = f;
 
             //prepare formation
-            Orders.Order_Move order_unit = new Orders.Order_Move(gameUnit, positionTarget);
 
-            if (!isQueueingOrder) origin.OrderHandler.OverrideCommandOrder(order_unit);
-            else origin.OrderHandler.AddCommandOrder(order_unit);
+
+            if (!isQueueingOrder) origin.OrderHandler.AddOrder_Move(positionTarget, gameUnit, true);
+            else origin.OrderHandler.AddOrder_Move(positionTarget, gameUnit, false);
             //origin.OrderHandler.Order_MOVE(gameUnit, positionTarget);
 
 		}
