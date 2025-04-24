@@ -86,7 +86,9 @@ namespace ProtoRTS
 
             if (disableBoxSelectTime <= 0f)
             {
-                singleSelectUnit = GetSingleGameUnit();
+                var tempHoveredUnit = GetSingleGameUnit();
+                if (singleSelectUnit != null && singleSelectUnit != tempHoveredUnit) { singleSelectUnit.DehighlightUnit(); }
+                singleSelectUnit = tempHoveredUnit;
 
                 // When Clicked
                 if (Input.GetMouseButtonDown(0))
@@ -165,7 +167,6 @@ namespace ProtoRTS
                         }
                         if (Selection.AllSelectedUnits.Count <= 0 && singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                         {
-                            Selection.DeselectAllUnits();
                             SelectOneUnit(singleSelectUnit);
                         }
                     }
@@ -183,6 +184,11 @@ namespace ProtoRTS
                     startPosition = Vector2.zero;
                     endPosition = Vector2.zero;
                     DrawVisual();
+                }
+
+                if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
+                {
+                    singleSelectUnit.HighlightUnit();
                 }
             }
 
@@ -237,6 +243,7 @@ namespace ProtoRTS
             if (Selection.AllSelectedUnits.Count > 0 && unit.IsPlayerUnit() == false) return;
             if (!FOWScript.IsCoordRevealed(unit.transform.position) && unit.IsPlayerUnit() == false) return;
 
+            Selection.DeselectAllUnits();
 
             Selection.SelectUnit(unit);
             unit.SelectedUnit();
@@ -473,13 +480,11 @@ namespace ProtoRTS
 
                 }
             }
-           
 
 
             if (Selection.GetPortraitedUnit != null)
             {
                 var unit1 = Selection.GetPortraitedUnit;
-
                 SyntiosEvents.UI_NewSelection?.Invoke(unit1);
 
             }

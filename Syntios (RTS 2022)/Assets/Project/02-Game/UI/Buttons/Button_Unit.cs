@@ -9,6 +9,7 @@ namespace ProtoRTS.Game
 	public class Button_Unit : MonoBehaviour
 	{
 
+		public UI_UnitSelector unitSelector;
 		public Image icon_Unit;
 		public Button button;
 		public GameUnit attachedGameUnit;
@@ -16,16 +17,19 @@ namespace ProtoRTS.Game
 		/// <summary>
 		/// Disables button to retain structure
 		/// </summary>
-		public void DeselectUnit()
+		public void ClickButton()
         {
-			Selection.RemoveUnit(attachedGameUnit);
-			gameObject.SetActive(false);
-
-			if (Selection.GetPortraitedUnit != null)
+			//remove all non-similar units
+			if (Input.GetKey(KeyCode.LeftControl))
 			{
-				var unit1 = Selection.GetPortraitedUnit;
-				SyntiosEvents.UI_NewSelection?.Invoke(unit1);
-			}
+				unitSelector.DeselectNonSimilarUnits(this);
+
+            }
+			else
+			{
+                unitSelector.DeselectOneUnit(this);
+
+            }
 		}
 	}
 }

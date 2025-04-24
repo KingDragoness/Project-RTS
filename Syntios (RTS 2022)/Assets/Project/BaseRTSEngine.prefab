@@ -7090,13 +7090,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layer_Terrain:
     serializedVersion: 2
-    m_Bits: 0
-  circle_Green: {fileID: 8906759568970107544, guid: 649ff9c0101ea7847896705a8cf7be00,
+    m_Bits: 64
+  _selectedCirclePrefab: {fileID: 8906759568970107544, guid: 6c630f3b693fb7049a71403e2a18032e,
     type: 3}
-  circle_Yellow: {fileID: 8906759568970107544, guid: 3a7b9f9483027a0418a9b449ca231486,
-    type: 3}
-  circle_Red: {fileID: 8906759568970107544, guid: babac034bdaa70240a93c4c11ece811b,
-    type: 3}
+  mat_selectedCircle_green: {fileID: 2100000, guid: 0ce5c36b3ad149c40994fbeeb419af10,
+    type: 2}
+  mat_selectedCircle_yellow: {fileID: 2100000, guid: d587c7341a29af040a3d8b3c8e121803,
+    type: 2}
+  mat_selectedCircle_red: {fileID: 2100000, guid: 105340b7228877d4092a9aea40104cee,
+    type: 2}
+  mat_highlightCircle_green_tier1: {fileID: 2100000, guid: 5509ee6e0e70fac47af4be67a340c84d,
+    type: 2}
+  mat_highlightCircle_yellow_tier1: {fileID: 2100000, guid: e21cbf357be3f37409e0040575cb1260,
+    type: 2}
+  mat_highlightCircle_red_tier1: {fileID: 2100000, guid: 6d69db5efa4a997469cd9ea06765f639,
+    type: 2}
+  mat_highlightCircle_green_tier2: {fileID: 2100000, guid: 556c31d3e5b24734191be26479f72312,
+    type: 2}
+  mat_highlightCircle_yellow_tier2: {fileID: 2100000, guid: 4dbdc1f80dc58f548aeaa4918c42a787,
+    type: 2}
+  mat_highlightCircle_red_tier2: {fileID: 2100000, guid: 573240f4365347c4f94e3d1928166da2,
+    type: 2}
+  mat_highlightCircle_green_tier3: {fileID: 2100000, guid: d07c49d4f44169b42b2a38c0387bbc45,
+    type: 2}
+  mat_highlightCircle_yellow_tier3: {fileID: 2100000, guid: e21cbf357be3f37409e0040575cb1260,
+    type: 2}
+  mat_highlightCircle_red_tier3: {fileID: 2100000, guid: 7a44697ec04e45b4ebe3eada0968e394,
+    type: 2}
   highlight_3dModel: {fileID: 0}
   DEBUG_buildingPlacement1: {fileID: 0}
 --- !u!1 &7931366479952202441

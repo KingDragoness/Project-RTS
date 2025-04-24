@@ -27,18 +27,35 @@ namespace ProtoRTS
 
 		private List<GameUnit> allSelectedUnits = new List<GameUnit>();
 		public LayerMask layer_Terrain;
-		public GameObject circle_Green;
-        public GameObject circle_Yellow;
-        public GameObject circle_Red;
-		[FoldoutGroup("Building")] [SerializeField] private GameObject highlight_3dModel;
+        [FoldoutGroup("Circle")] [SerializeField] private GameObject _selectedCirclePrefab;
+        [FoldoutGroup("Circle")] public Material mat_selectedCircle_green;
+        [FoldoutGroup("Circle")] public Material mat_selectedCircle_yellow;
+        [FoldoutGroup("Circle")] public Material mat_selectedCircle_red;
+        //tier 1 = smallest, tier 3 = largest
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_green_tier1;
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_yellow_tier1;
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_red_tier1;
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_green_tier2;
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_yellow_tier2;
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_red_tier2;
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_green_tier3;
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_yellow_tier3;
+        [FoldoutGroup("Circle")] public Material mat_highlightCircle_red_tier3;
+
+        [FoldoutGroup("Building")] [SerializeField] private GameObject highlight_3dModel;
 
 		private bool isBuildPlacement = false;
 
         private static Selection _instance;
+        public static GameObject SelectedCirclePrefab 
+        {
+            get { return _instance._selectedCirclePrefab; }
+        }
 
         private void Awake()
         {
 			_instance = this;
+            
         }
 
 		private GameUnit _portraitedUnit
@@ -80,19 +97,72 @@ namespace ProtoRTS
 		{
 
 		}
-        internal static GameObject GetCircle(Unit.TypePlayer typePlayer)
+
+        internal static Material GetCircleMaterial(Unit.TypePlayer typePlayer, float radius, bool isSelect)
         {
-			if (typePlayer == Unit.TypePlayer.Player)
+			if (isSelect)
 			{
-				return _instance.circle_Green;
+                if (typePlayer == Unit.TypePlayer.Player)
+				{
+                    return _instance.mat_selectedCircle_green;
+                }
+				else if (typePlayer == Unit.TypePlayer.Neutral)
+				{
+					return _instance.mat_selectedCircle_yellow;
+				}
+				else
+				{
+					return _instance.mat_selectedCircle_red;
+				}
+
 			}
-			else if (typePlayer == Unit.TypePlayer.Neutral)
-            {
-                return _instance.circle_Yellow;
-            }
 			else
-            {
-                return _instance.circle_Red;
+			{
+                if (typePlayer == Unit.TypePlayer.Player)
+                {
+                    if (radius < 1.6f)
+                    {
+                        return _instance.mat_highlightCircle_green_tier1;
+                    }
+                    else if (radius < 3.5f)
+                    {
+                        return _instance.mat_highlightCircle_green_tier2;
+                    }
+                    else
+                    {
+                        return _instance.mat_highlightCircle_green_tier3;
+                    }
+                }
+                else if (typePlayer == Unit.TypePlayer.Neutral)
+                {
+                    if (radius < 1.6f)
+                    {
+                        return _instance.mat_highlightCircle_yellow_tier1;
+                    }
+                    else if (radius < 3.5f)
+                    {
+                        return _instance.mat_highlightCircle_yellow_tier2;
+                    }
+                    else
+                    {
+                        return _instance.mat_highlightCircle_yellow_tier3;
+                    }
+                }
+                else
+                {
+                    if (radius < 1.6f)
+                    {
+                        return _instance.mat_highlightCircle_red_tier1;
+                    }
+                    else if (radius < 3.5f)
+                    {
+                        return _instance.mat_highlightCircle_red_tier2;
+                    }
+                    else
+                    {
+                        return _instance.mat_highlightCircle_red_tier3;
+                    }
+                }
             }
         }
 
@@ -102,6 +172,7 @@ namespace ProtoRTS
 			{
 				if (unit == null) continue;
 				unit.DeselectUnit();
+				unit.DehighlightUnit();
 			}
 
 			_instance.allSelectedUnits.Clear();
@@ -133,7 +204,20 @@ namespace ProtoRTS
             }
 		}
 
-		public Vector3 GetCursorPositionTerrain()
+        //only for selection
+        internal static void RemoveAllExceptUnit(GameUnit unit)
+        {
+            var allUnsimilarUnits = Selection.AllSelectedUnits.FindAll(x => x._class.ID != unit.ID);
+
+			foreach(var unsimilarUnit in allUnsimilarUnits)
+			{
+                RemoveUnit(unsimilarUnit);
+
+            }
+
+        }
+
+        public Vector3 GetCursorPositionTerrain()
 		{
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;

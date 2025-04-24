@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using SuperSystems.UnityTools;
 
 namespace ProtoRTS
 {
@@ -19,59 +20,82 @@ namespace ProtoRTS
 
 		public SO_GameUnit Class { get => _class; }
 
-		private Transform circleOutline;
-		private bool isSelected = false;
+		private MeshRenderer circleOutline_Selected;
+        private MeshRenderer circleOutline_Highlight;
+		private Unit.TypePlayer tp_select;
+		private Unit.TypePlayer tp_highlight;
+
+        private bool isSelected = false;
+        private bool isHighlight = false;
 
         public virtual void Awake()
 		{
+            //initialize circle outline
+            {
+                var selectedCircle = Instantiate(Selection.SelectedCirclePrefab, transform, false);
+                selectedCircle.transform.localPosition = Vector3.zero + new Vector3(0f, 0.2f, 0f);
+                selectedCircle.transform.localScale = Vector3.one * _class.Radius * 2.1f;
+                selectedCircle.gameObject.SetActive(false);
 
-		}
+                var autorotateScript = selectedCircle.GetComponent<AutoRotate>();
+                circleOutline_Selected = selectedCircle.GetComponent<MeshRenderer>();
+                autorotateScript.speed.y = 30f / Class.Radius;
+            }
+
+            {
+                var highlightedCircle = Instantiate(Selection.SelectedCirclePrefab, transform, false);
+                highlightedCircle.transform.localPosition = Vector3.zero + new Vector3(0f, 0.2f, 0f);
+                highlightedCircle.transform.localScale = (Vector3.one * _class.Radius * 2f) + (Vector3.one * 0.5f) + (Vector3.one * _class.Radius * 0.25f);
+                highlightedCircle.gameObject.SetActive(false);
+
+                var autorotateScript = highlightedCircle.GetComponent<AutoRotate>();
+                circleOutline_Highlight = highlightedCircle.GetComponent<MeshRenderer>();
+                autorotateScript.speed.y = 30f / Class.Radius;
+            }
+        }
+
+
 		
         public void SelectedUnit()
 		{
-			if (circleOutline != null) Destroy(circleOutline.gameObject);
-
-			//consult "Force"
 			var factionStatus = FactionAlliance.Instance.GetFactionStatus(SyntiosEngine.CurrentFaction, stat_faction);
+            if (factionStatus == tp_select && isSelected) return;
 
-            Transform prefab = null;
-            prefab = Selection.GetCircle(factionStatus).transform;
 
-            Transform t1 = Instantiate(prefab, transform, false);
-			t1.transform.localPosition = Vector3.zero + new Vector3(0f, 0.2f, 0f);
-			t1.transform.localScale = Vector3.one * _class.Radius * 2.1f;
-			t1.gameObject.SetActive(true);
-			circleOutline = t1;
+            if (!circleOutline_Selected.gameObject.activeSelf) circleOutline_Selected.gameObject.SetActive(true);
+
+            var matCircle = Selection.GetCircleMaterial(factionStatus, _class.Radius, true);
+            circleOutline_Selected.material = matCircle;
 
 			isSelected = true;
-
+			tp_select = factionStatus;
         }
 
 		public void HighlightUnit()
 		{
-            if (circleOutline != null) Destroy(circleOutline.gameObject);
-
-            //consult "Force"
             var factionStatus = FactionAlliance.Instance.GetFactionStatus(SyntiosEngine.CurrentFaction, stat_faction);
+            if (factionStatus == tp_highlight && isHighlight) return;
 
-            Transform prefab = null;
-            prefab = Selection.GetCircle(factionStatus).transform;
 
-            Transform t1 = Instantiate(prefab, transform, false);
-            t1.transform.localPosition = Vector3.zero + new Vector3(0f, 0.2f, 0f);
-            t1.transform.localScale = Vector3.one * _class.Radius * 2.1f;
-            t1.gameObject.SetActive(true);
-            circleOutline = t1;
+            if (!circleOutline_Highlight.gameObject.activeSelf) circleOutline_Highlight.gameObject.SetActive(true);
+
+            var matCircle = Selection.GetCircleMaterial(factionStatus, _class.Radius, false);
+            circleOutline_Highlight.material = matCircle;
+
+            isHighlight = true;
+            tp_highlight = factionStatus;
         }
 
-		public void DehighlightUnit()
+        public void DehighlightUnit()
 		{
-            if (circleOutline != null) Destroy(circleOutline.gameObject);
+            if (circleOutline_Highlight.gameObject.activeSelf) circleOutline_Highlight.gameObject.SetActive(false);
 
 			if (isSelected)
 			{
 				SelectedUnit();
             }
+
+            isHighlight = false;
         }
 
         public bool IsPlayerUnit()
@@ -85,7 +109,7 @@ namespace ProtoRTS
 
         public void DeselectUnit()
 		{
-			if (circleOutline != null) Destroy(circleOutline.gameObject);
+            if (circleOutline_Selected.gameObject.activeSelf) circleOutline_Selected.gameObject.SetActive(false);
             isSelected = false;
 
         }

@@ -125,8 +125,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6648332431749651493}
-        m_TargetAssemblyTypeName: ProtoRTS.Button_Unit, Assembly-CSharp
-        m_MethodName: DeselectUnit
+        m_TargetAssemblyTypeName: ProtoRTS.Game.Button_Unit, Assembly-CSharp
+        m_MethodName: ClickButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -161,8 +161,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e766326d8b1afb344807823f3190fd81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  unitSelector: {fileID: 0}
   icon_Unit: {fileID: 1251272665373568552}
   button: {fileID: 3453669413460179090}
+  attachedGameUnit: {fileID: 0}
 --- !u!1 &1171753009765266901
 GameObject:
   m_ObjectHideFlags: 0

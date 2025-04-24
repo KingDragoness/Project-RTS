@@ -137,23 +137,12 @@ namespace ProtoRTS.Game
 
         public void RefreshUI()
         {
-            //if (_disallowTotalRefresh)
-            //{
-            //    return;
-            //}
-            //else
-            //{
-
-            //}
-
             gridLayoutGroup.enabled = true;
 
             foreach (var button in pooledButtons)
             {
 
-
             }
-
 
             int index = 0;
             int totalUnitCount = Selection.AllSelectedUnits.Count;
@@ -244,7 +233,55 @@ namespace ProtoRTS.Game
 
         }
 
+        #region Selection Handler
 
+        public void DeselectNonSimilarUnits(Button_Unit button)
+        {
+            Selection.RemoveAllExceptUnit(button.attachedGameUnit);
+            RefreshUI();
+
+            if (Selection.GetPortraitedUnit != null)
+            {
+                var unit1 = Selection.GetPortraitedUnit;
+                SyntiosEvents.UI_NewSelection?.Invoke(unit1);
+            }
+
+        }
+
+        public void DeselectOneUnit(Button_Unit button)
+        {
+            Selection.RemoveUnit(button.attachedGameUnit);
+            button.gameObject.SetActive(false);
+
+            if (Selection.GetPortraitedUnit != null)
+            {
+                var unit1 = Selection.GetPortraitedUnit;
+                SyntiosEvents.UI_NewSelection?.Invoke(unit1);
+            }
+
+
+            //check current group button
+            {
+                bool anyEnabled = false;
+                foreach (var unitButton in pooledButtons)
+                {
+                    if (unitButton.gameObject.activeSelf)
+                    {
+                        anyEnabled = true;
+                        break;
+                    }
+                }
+
+                if (!anyEnabled)
+                {
+                    ChangeGroup(0);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Portrait Player
         public void PlayPortrait(VideoClip clip)
         {
             portraitVideoPlayer.clip = clip;
@@ -363,5 +400,7 @@ namespace ProtoRTS.Game
                 portraitAudioSource.Play();
             }
         }
+
+        #endregion
     }
 }
