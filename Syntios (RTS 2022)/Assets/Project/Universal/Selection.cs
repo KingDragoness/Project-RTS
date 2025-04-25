@@ -180,7 +180,25 @@ namespace ProtoRTS
 
 		}
 
-		internal static void SelectUnit(GameUnit unit)
+
+        internal static void DeselectAllExcept(GameUnit gameunit)
+        {
+            List<GameUnit> allExcept = new List<GameUnit>();
+
+            foreach (var unit in _instance.allSelectedUnits)
+            {
+                if (unit == null) continue;
+                if (unit == gameunit) continue;
+                unit.DeselectUnit();
+                unit.DehighlightUnit();
+                allExcept.Add(unit);
+            }
+
+            foreach (var unitToDel in allExcept) _instance.allSelectedUnits.Remove(unitToDel);
+
+        }
+
+        internal static void SelectUnit(GameUnit unit)
 		{
 			if (_instance.allSelectedUnits.Contains(unit) == false)
 			{

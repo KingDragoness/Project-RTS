@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 45335
+  controlID: 713
   draggingID: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -149,7 +149,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 45336
+  controlID: 714
   draggingID: 0
 --- !u!114 &4
 MonoBehaviour:
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 50}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 45337
+  controlID: 715
   draggingID: 0
 --- !u!114 &5
 MonoBehaviour:
@@ -242,10 +242,10 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 815}
-      m_SelectedIDs: c8380000
-      m_LastClickedID: 0
-      m_ExpandedIDs: f281feffaebcffffbebcffffd6faffffa4950000a096000036a3000096a300009aa3000026aa00000cac0000f8ad000086ae00009ab20000
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 8e6fffff
+      m_LastClickedID: -36978
+      m_ExpandedIDs: c26fffffcefaffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -332,7 +332,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 367}
     m_SelectedIDs: 54b40000
     m_LastClickedID: 46164
-    m_ExpandedIDs: 0000000072c1000074c1000076c1000078c100007ac100007cc100007ec1000080c1000082c1000084c1000088c100008ac100008cc100000ec300001ec3000000ca9a3b
+    m_ExpandedIDs: 00000000a4c10000a6c10000a8c10000aac10000acc10000aec10000b0c10000b2c10000b4c10000b6c10000b8c10000bac10000bcc10000bec10000c0c1000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -360,7 +360,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000072c1000074c1000076c1000078c100007ac100007cc100007ec1000080c1000082c1000084c1000088c100008ac100008cc100000ec300001ec3000000ca9a3b
+    m_ExpandedIDs: 00000000a4c10000a6c10000a8c10000aac10000acc10000aec10000b0c10000b2c10000b4c10000b6c10000b8c10000bac10000bcc10000bec10000c0c1000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -959,7 +959,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ProjectBrowser
+  m_Name: ConsoleWindow
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -968,9 +968,9 @@ MonoBehaviour:
     y: 571
     width: 1276
     height: 368
-  m_MinSize: {x: 231, y: 271}
-  m_MaxSize: {x: 10001, y: 10021}
-  m_ActualView: {fileID: 13}
+  m_MinSize: {x: 101, y: 121}
+  m_MaxSize: {x: 4001, y: 4021}
+  m_ActualView: {fileID: 18}
   m_Panes:
   - {fileID: 13}
   - {fileID: 14}
@@ -979,8 +979,8 @@ MonoBehaviour:
   - {fileID: 17}
   - {fileID: 18}
   - {fileID: 19}
-  m_Selected: 0
-  m_LastSelected: 5
+  m_Selected: 5
+  m_LastSelected: 0
 --- !u!114 &13
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -1027,7 +1027,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources/GameUnits
+    - Assets/Project/Universal
     m_Globs: []
     m_OriginalText: 
     m_ImportLogFlags: 0
@@ -1035,16 +1035,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/Resources/GameUnits
+  - Assets/Project/Universal
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\UnityProjects\Project;RTS\Syntios (RTS 2022)
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 677}
-    m_SelectedIDs: 78c10000
-    m_LastClickedID: 49528
-    m_ExpandedIDs: 0000000072c1000074c1000076c1000078c100007ac100007cc100007ec1000080c1000082c1000084c1000088c100008ac100008cc100000ec300001ec3000000ca9a3b
+    m_SelectedIDs: a0c30000
+    m_LastClickedID: 50080
+    m_ExpandedIDs: 00000000a4c10000a6c10000a8c10000aac10000acc10000aec10000b0c10000b2c10000b4c10000b6c10000b8c10000bac10000bcc10000bec10000c0c1000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1072,7 +1072,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 0000000072c1000074c1000076c1000078c100007ac100007cc100007ec1000080c1000082c1000084c1000088c100008ac100008cc100000ec300001ec3000000ca9a3b
+    m_ExpandedIDs: 00000000a4c10000a6c10000a8c10000aac10000acc10000aec10000b0c10000b2c10000b4c10000b6c10000b8c10000bac10000bcc10000bec10000c0c1000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1097,8 +1097,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: c8380000
-    m_LastClickedInstanceID: 14536
+    m_SelectedInstanceIDs: 8e6fffff
+    m_LastClickedInstanceID: -36978
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000c23d8d0016a4000000000000daf300008c9800008e8c0000308b0000108c000080ad00008a8d0d00763a00006a39000054537d009cee8100723a000020ba0000464508009e45280098452800b2311200bc31120066be00005a030000b6ad0000b29cb6008ead00004e2fb800
     m_RenameOverlay:
@@ -1372,7 +1372,7 @@ MonoBehaviour:
     m_LastAppliedPresetName: Default
     m_SaveData: []
     m_OverlaysVisible: 1
-  m_Recording: 0
+  m_Recording: 1
   m_ActiveNativePlatformSupportModuleName: 
   m_AllModules:
   - rid: 7451645946156023808
@@ -2398,7 +2398,7 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 42736
+  m_LastSelectedObjectID: -36978
 --- !u!114 &18
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -2487,8 +2487,8 @@ MonoBehaviour:
     y: 0
     width: 644
     height: 939
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 276, y: 71}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 21}
   m_Panes:
   - {fileID: 21}
@@ -2523,9 +2523,9 @@ MonoBehaviour:
     width: 643
     height: 918
   m_SerializedDataModeController:
-    m_DataMode: 0
-    m_PreferredDataMode: 0
-    m_SupportedDataModes: 
+    m_DataMode: 3
+    m_PreferredDataMode: 3
+    m_SupportedDataModes: 010000000200000003000000
     isAutomatic: 1
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:

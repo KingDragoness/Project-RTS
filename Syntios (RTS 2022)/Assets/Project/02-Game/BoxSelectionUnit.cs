@@ -73,6 +73,7 @@ namespace ProtoRTS
         private bool _invalidDrag = false;
         private GameUnit singleSelectUnit;
         [ShowInInspector] [DisableInEditorMode] [SerializeField] private float _timeSinceMouse0 = 0.2f;
+        private GameUnit gameunitCached_singleUnit;
 
 
         private void Update()
@@ -140,6 +141,7 @@ namespace ProtoRTS
                     }
                     else
                     {
+                        _invalidDrag = true;
 
                     }
 
@@ -160,12 +162,16 @@ namespace ProtoRTS
 
                     if (doubleClickDetected == false)
                     {
-                        if (_invalidDrag == false)
+                        bool isSelectAnyUnit = CheckAnyUnitInBox();
+
+                        //start box selection if box select
+                        if (isSelectAnyUnit == true)
                         {
                             if (addUnit == false) Selection.DeselectAllUnits();
                             SelectUnits();
                         }
-                        if (Selection.AllSelectedUnits.Count <= 0 && singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
+                        //
+                        else if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                         {
                             SelectOneUnit(singleSelectUnit);
                         }
@@ -179,8 +185,6 @@ namespace ProtoRTS
                         }
                     }
                     
-                    _invalidDrag = false;
-
                     startPosition = Vector2.zero;
                     endPosition = Vector2.zero;
                     DrawVisual();
@@ -238,21 +242,24 @@ namespace ProtoRTS
 
         }
 
+
         void SelectOneUnit(GameUnit unit)
         {
-            if (Selection.AllSelectedUnits.Count > 0 && unit.IsPlayerUnit() == false) return;
+            //if (Selection.AllSelectedUnits.Count > 0 && unit.IsPlayerUnit() == false) return;
             if (!FOWScript.IsCoordRevealed(unit.transform.position) && unit.IsPlayerUnit() == false) return;
 
-            Selection.DeselectAllUnits();
-
+            Selection.DeselectAllExcept(unit);
             Selection.SelectUnit(unit);
             unit.SelectedUnit();
+
 
             if (Selection.GetPortraitedUnit != null)
             {
                 var unit1 = Selection.GetPortraitedUnit;
                 SyntiosEvents.UI_NewSelection?.Invoke(unit1);
             }
+
+            gameunitCached_singleUnit = unit;
         }
 
         void SelectAllUnitInScreenSpace(GameUnit singleUnit)
@@ -283,9 +290,205 @@ namespace ProtoRTS
             }
         }
 
+        private bool CheckAnyUnitInBox()
+        {
+            var everyUnit = SyntiosEngine.Instance.ListedGameUnits;
+            Rect rect = new Rect();
+            Vector3 pos1 = startPosition;
+            Vector3 pos2 = endPosition;
+            Vector3 centerPos = (startPosition + endPosition) / 2f;
+
+            Vector3 camPos1 = myCam.WorldToScreenPoint(pos1);
+            Vector3 camPos2 = myCam.WorldToScreenPoint(pos2);
+
+            {
+                //RECT!!!
+                if (camPos1.x > camPos2.x)
+                {
+                    float min = camPos2.x;
+                    float max = camPos1.x;
+
+                    camPos1.x = min;
+                    camPos2.x = max;
+                }
+                if (camPos1.y > camPos2.y)
+                {
+                    float min = camPos2.y;
+                    float max = camPos1.y;
+
+                    camPos1.y = min;
+                    camPos2.y = max;
+                }
+
+            }
+
+            rect.min = camPos1;
+            rect.max = camPos2;
+            bool allowBoxSelectOtherFaction = false;
+
+            if (rect.size.x < 999 && rect.size.y < 999)
+            {
+                allowBoxSelectOtherFaction = true;
+            }
+
+            var currentFaction = SyntiosEngine.CurrentFaction;
+
+            List<GameUnit> playerUnits = new List<GameUnit>();
+
+            playerUnits = everyUnit.ToList().FindAll(s => s.stat_faction == currentFaction);
+
+            //1st PASS: Player but only game unit
+            foreach (var unit in playerUnits)
+            {
+                if (unit.Class.AllUnitTags.Contains(Unit.Tag.Structure)) continue;
+
+                var upRad = unit.transform.position + Vector3.forward * unit.Class.Radius;
+                var downRad = unit.transform.position + -Vector3.forward * unit.Class.Radius;
+                var leftRad = unit.transform.position + -Vector3.right * unit.Class.Radius;
+                var rightRad = unit.transform.position + Vector3.right * unit.Class.Radius;
+
+                if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
+                {
+                    return true;
+
+                }
+                else if (rect.Contains(myCam.WorldToScreenPoint(upRad)))
+                {
+                    return true;
+
+                }
+                else if (rect.Contains(myCam.WorldToScreenPoint(downRad)))
+                {
+                    return true;
+
+                }
+                else if (rect.Contains(myCam.WorldToScreenPoint(leftRad)))
+                {
+                    return true;
+
+                }
+                else if (rect.Contains(myCam.WorldToScreenPoint(rightRad)))
+                {
+                    return true;
+
+                }
+
+            }
+
+            //2nd PASS: structure
+            {
+                foreach (var unit in playerUnits)
+                {
+                    if (!unit.Class.AllUnitTags.Contains(Unit.Tag.Structure)) continue;
+
+                    var upRad = unit.transform.position + Vector3.forward * unit.Class.Radius;
+                    var downRad = unit.transform.position + -Vector3.forward * unit.Class.Radius;
+                    var leftRad = unit.transform.position + -Vector3.right * unit.Class.Radius;
+                    var rightRad = unit.transform.position + Vector3.right * unit.Class.Radius;
+
+                    if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
+                    {
+                        return true;
+
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(upRad)))
+                    {
+                        return true;
+
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(downRad)))
+                    {
+                        return true;
+
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(leftRad)))
+                    {
+                        return true;
+
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(rightRad)))
+                    {
+                        return true;
+
+                    }
+
+                }
+            }
+
+
+            //3rd PASS: Neutral/Enemy
+            {
+                List<GameUnit> byClosestUnit = new List<GameUnit>();
+                byClosestUnit.AddRange(everyUnit.ToList());
+                byClosestUnit = byClosestUnit.OrderBy((d) => (d.transform.position - centerPos).sqrMagnitude).ToList();
+
+                foreach (var unit in byClosestUnit)
+                {
+       
+                    if (!FOWScript.IsCoordRevealed(unit.transform.position))
+                    {
+                        continue;
+                    }
+                    if (unit.Class.AllUnitTags.Contains(Unit.Tag.Structure)) continue;
+
+
+                    if (unit.stat_faction == currentFaction)
+                    {
+                        continue;
+                    }
+                    else if (unit.stat_faction != currentFaction)
+                    {
+                        if (allowBoxSelectOtherFaction)
+                        {
+
+                        }
+                        else if (allowBoxSelectOtherFaction == false)
+                        {
+                            continue;
+                        }
+                    }
+
+
+                    var upRad = unit.transform.position + Vector3.forward * unit.Class.Radius;
+                    var downRad = unit.transform.position + -Vector3.forward * unit.Class.Radius;
+                    var leftRad = unit.transform.position + -Vector3.right * unit.Class.Radius;
+                    var rightRad = unit.transform.position + Vector3.right * unit.Class.Radius;
+
+                    if (rect.Contains(myCam.WorldToScreenPoint(unit.transform.position)))
+                    {
+                        return true;
+
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(upRad)))
+                    {
+                        return true;
+
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(downRad)))
+                    {
+                        return true;
+
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(leftRad)))
+                    {
+                        return true;
+
+                    }
+                    else if (rect.Contains(myCam.WorldToScreenPoint(rightRad)))
+                    {
+                        return true;
+
+                    }
+
+                }
+            }
+
+            return false;
+        }
+
         void SelectUnits()
         {
-            var everyUnit = FindObjectsOfType<GameUnit>();
+            var everyUnit = SyntiosEngine.Instance.ListedGameUnits;
             Rect rect = new Rect();
             Vector3 pos1 = startPosition;
             Vector3 pos2 = endPosition;

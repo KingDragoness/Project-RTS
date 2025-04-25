@@ -56,6 +56,7 @@ namespace ProtoRTS.Game
 
         #region Wrapper events
 
+
         private void event_UI_NewSelection(GameUnit gameunit)
         {
             SwitchedIdlePortrait(gameunit);
@@ -325,7 +326,6 @@ namespace ProtoRTS.Game
         public void PlayTalkingPortrait(GameUnit gameUnit, bool isIdleQuote, bool noChecks = false)
         {
             VideoClip selectedPortrait = null;
-
 
             if (gameUnit == null)
             {
