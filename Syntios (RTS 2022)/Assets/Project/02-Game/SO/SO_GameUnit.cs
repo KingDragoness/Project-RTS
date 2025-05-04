@@ -131,6 +131,7 @@ namespace ProtoRTS
         #region Unit Properties
         [FoldoutGroup("Unit Properties")] public int MaxHP = 40;
         [FoldoutGroup("Unit Properties")] public bool IsFlyUnit = false;
+        [FoldoutGroup("Unit Properties")] public bool HasShield = false;
         [FoldoutGroup("Unit Properties")] public bool HasEnergy = false;
         [FoldoutGroup("Unit Properties")][Range(2, 16)] public int LineOfSight = 7;
         [FoldoutGroup("Unit Properties")] public bool IsUntouchable = false; //for scarab or missiles

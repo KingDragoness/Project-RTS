@@ -18,7 +18,6 @@ MonoBehaviour:
     type: 3}
   Rank: 
   Radius: 0.5
-  LineOfSight: 10
   spriteWireframe: {fileID: 21300000, guid: 07cfa059d1e011d4e8a1d2b63943e584, type: 3}
   MineralCost: 50
   EnergyCost: 25
@@ -26,7 +25,9 @@ MonoBehaviour:
   BuildTime: 24
   MaxHP: 40
   IsFlyUnit: 0
-  HasEnergy: 0
+  HasShield: 1
+  HasEnergy: 1
+  LineOfSight: 10
   IsUntouchable: 0
   AllUnitTags: 0100000005000000
   AI_b_AttackOnSight: 1
@@ -49,8 +50,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 0
       abilityType: 1
-      unitOrder:
-        rid: 1618176901921636352
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -59,8 +58,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 1
       abilityType: 2
-      unitOrder:
-        rid: 1618176901921636353
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -69,8 +66,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 2
       abilityType: 4
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -79,8 +74,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 3
       abilityType: 3
-      unitOrder:
-        rid: 1618176901921636354
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -89,8 +82,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 4
       abilityType: 5
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -99,8 +90,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 5
       abilityType: 10
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -109,8 +98,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 8
       abilityType: 0
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: build
@@ -119,8 +106,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 9
       abilityType: 0
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: build_advanced
@@ -131,8 +116,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 0
       abilityType: 7
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 11400000, guid: f532d0f78005bde49b6047787ffadd84, type: 2}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -141,8 +124,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 1
       abilityType: 7
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 11400000, guid: 0c4ba2f3b2fcfae43a21a8bf34a2aa75, type: 2}
       unitSO: {fileID: 0}
       cardToOpen: 
@@ -151,8 +132,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 11
       abilityType: 0
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: default
@@ -163,8 +142,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 11
       abilityType: 0
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: default
@@ -175,25 +152,6 @@ MonoBehaviour:
       gameUnit: {fileID: 11400000}
       position: 11
       abilityType: 0
-      unitOrder:
-        rid: -2
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
-  references:
-    version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 1618176901921636352
-      type: {class: Order_Move, ns: ProtoRTS.Game, asm: Assembly-CSharp}
-      data:
-        target: {fileID: 0}
-        positionTarget: {x: 0, y: 0, z: 0}
-    - rid: 1618176901921636353
-      type: {class: Order_Stop, ns: ProtoRTS.Game, asm: Assembly-CSharp}
-      data: 
-    - rid: 1618176901921636354
-      type: {class: Order_Attack, ns: ProtoRTS.Game, asm: Assembly-CSharp}
-      data:
-        enemyUnit: {fileID: 0}
