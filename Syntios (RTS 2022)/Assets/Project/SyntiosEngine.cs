@@ -70,6 +70,7 @@ namespace ProtoRTS
     public class SyntiosEngine : MonoBehaviour
 	{
 
+        [Tooltip("targets frame per second (Best played at 60 FPS)")] public int FPSTarget = 60;
 		public List<GameUnit> ListedGameUnits = new List<GameUnit>();
         public int UnitIncrementGUID = 0;
         public Gamemode CurrentGamemode;
@@ -96,7 +97,7 @@ namespace ProtoRTS
 
         private void Start()
         {
-
+            //Application.targetFrameRate = FPSTarget;
 
         }
 

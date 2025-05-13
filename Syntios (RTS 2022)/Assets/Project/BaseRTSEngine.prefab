@@ -5889,6 +5889,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df9dac01db63d274aad17c17acb46780, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FPSTarget: 70
   ListedGameUnits: []
   UnitIncrementGUID: 0
   CurrentGamemode: 0

@@ -27,7 +27,22 @@ namespace ProtoRTS.Game
 
             if (attachedGameUnit.Class.HasEnergy) slider_Energy.gameObject.SetActive(true); else slider_Energy.gameObject.SetActive(false);
             if (attachedGameUnit.Class.HasShield) slider_SP.gameObject.SetActive(true); else slider_SP.gameObject.SetActive(false);
+            ImmediateCalculatePosition();
 
+        }
+
+        public void ImmediateCalculatePosition()
+        {
+            var cam = RTSCamera.Instance.MainCamera;
+
+            Vector3 psuedoRealPos = attachedGameUnit.gameObject.transform.position;
+            psuedoRealPos.y += 3f;
+            if (attachedGameUnit.Class.IsFlyUnit) psuedoRealPos.y += 3f;
+            psuedoRealPos.z += attachedGameUnit.Class.Radius;
+
+            Vector3 screenPos = cam.WorldToScreenPoint(psuedoRealPos);
+            screenPos.z = 0;
+            mainElement.anchoredPosition = screenPos;
         }
 
         public int width_element(GameUnit gameunit)
@@ -44,7 +59,12 @@ namespace ProtoRTS.Game
 
         private void Update()
         {
-            if (attachedGameUnit == null) return;
+            if (attachedGameUnit == null)
+            {
+                gameObject.SetActive(false);
+                return;
+
+            }
 
             float hpPercent = (float)attachedGameUnit.stat_HP / (float)attachedGameUnit._class.MaxHP;
             Color gradientColor = UI.UnitSelection.gradientWireframeHP.Evaluate(hpPercent);

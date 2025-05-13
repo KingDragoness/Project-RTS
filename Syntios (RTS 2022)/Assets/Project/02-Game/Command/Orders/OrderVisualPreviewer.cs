@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Drawing;
 using static UnityEngine.UI.CanvasScaler;
+using System.Linq;
 
 namespace ProtoRTS.Game
 {
@@ -16,6 +17,7 @@ namespace ProtoRTS.Game
         public Wire prefab_Wire;
 
         [ReadOnly]
+        [ShowInInspector] private Dictionary<Vector3Int, OrderVisualPoint> dictionary_VisualPoints = new Dictionary<Vector3Int, OrderVisualPoint>();
         [ShowInInspector] private List<OrderVisualPoint> allVisualPoints = new List<OrderVisualPoint>();
         [ShowInInspector] private List<Transform> allEndCircles = new List<Transform>();
 
@@ -104,13 +106,31 @@ namespace ProtoRTS.Game
             visualPoint.attachedOrder = order;
             visualPoint.attachedUnit = unit;
             visualPoint.orderPosTarget = visualPoint.wire.posTarget.ToInt();
+
+            if (dictionary_VisualPoints.ContainsValue(visualPoint))
+            {
+                var similarKey = dictionary_VisualPoints.FirstOrDefault(x => x.Value == visualPoint).Key;
+                dictionary_VisualPoints.Remove(similarKey);
+                dictionary_VisualPoints.TryAdd(visualPoint.orderPosTarget, visualPoint);
+            }
+            else
+            {
+                dictionary_VisualPoints.TryAdd(visualPoint.orderPosTarget, visualPoint);
+            }
+
             visualPoint.wire.InstantUpdate();
             visualPoint.circle.transform.position = visualPoint.wire.posTarget;
         }
 
-        public bool AlreadyExistPoint(Vector3Int v3)
+        public bool AlreadyExistPoint(Vector3Int pos)
         {
-            return allVisualPoints.Find(x => x.orderPosTarget == v3);
+            if (dictionary_VisualPoints.ContainsKey(pos))
+                return true;
+
+            return false;
+            //return allVisualPoints.Find(x => x.orderPosTarget.x == pos_x &&
+            // x.orderPosTarget.y == pos_y &&
+            // x.orderPosTarget.z == pos_z);
         }
 
         private void Update()
@@ -122,7 +142,8 @@ namespace ProtoRTS.Game
 
                 Orders.UnitOrder order = unit.OrderHandler.GetCurrentOrder();
                 if (order == null) continue;
-                if (AlreadyExistPoint(order.TargetPosition().ToInt())) continue;
+                var targetPos = order.TargetPosition();
+                if (AlreadyExistPoint(targetPos.ToInt())) continue;
 
                 SpawnOrderVisual(unit);
 

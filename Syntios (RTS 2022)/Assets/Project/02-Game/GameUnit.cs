@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using Pathfinding;
 using Pathfinding.RVO;
 using Sirenix.OdinInspector;
 using System;
 using ProtoRTS.Game;
+using System.Linq;
+using UnityEngine.UIElements;
 
 namespace ProtoRTS
 {
@@ -16,7 +19,8 @@ namespace ProtoRTS
 		public Vector3 move_Target;
         public GameUnit move_TargetUnit;
         public float targetY = 0;
-		[FoldoutGroup("References")] public Renderer[] modelView;
+        [FoldoutGroup("Attack_Weapon Behaviors")][ValueDropdown("All_AttackLikeOrderEnum")] public string classOrderAttack = ""; //Must contain "Attack" in its class name
+        [FoldoutGroup("References")] public Renderer[] modelView;
 		[FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
 		[FoldoutGroup("References")] public RVOController rvoController; //change to modular
 		[FoldoutGroup("References")] public AIPath groundAIPath; //change to modular
@@ -25,7 +29,18 @@ namespace ProtoRTS
 		private bool _isVisibleFromFOW = false;
         private bool _isLoadedSaveFile = false;
 
+        IEnumerable<Orders.UnitOrder> GetAllAttackOrderClass()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => type.IsSubclassOf(typeof(Orders.UnitOrder)) && type.Name.Contains("Attack"))
+                .Select(type => Activator.CreateInstance(type) as Orders.UnitOrder);
+        }
 
+        private IEnumerable All_AttackLikeOrderEnum()
+        {
+            return GetAllAttackOrderClass().Select(x => new ValueDropdownItem(x.GetType().Name, x.GetType().Name));
+        }
 
         public float Radius
         {

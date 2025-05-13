@@ -679,7 +679,13 @@ namespace ProtoRTS
 
         public CirclePixels GetCirclePixel(int viewRange)
         {
-            return FixedPatternCircles.Find(x => x.LineOfSight == viewRange);
+            int index = viewRange - 2;
+            if (index <= 0) index = 0;
+            if (index >= 14) index = 14;
+
+            return FixedPatternCircles[index];
+
+            return FixedPatternCircles.Find(x => x.LineOfSight == viewRange); //GARBAGE
         }
 
         public int PixelPosToIndex(int x, int y)

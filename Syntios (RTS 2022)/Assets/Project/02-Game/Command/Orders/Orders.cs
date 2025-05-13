@@ -31,6 +31,11 @@ namespace ProtoRTS.Game
         {
             public bool isCompleted = false;
 
+            public UnitOrder()
+            {
+
+            }
+
             public abstract bool AllowAttack();
 
             /// <summary>
@@ -56,6 +61,8 @@ namespace ProtoRTS.Game
             [JsonIgnore] public GameUnit target;
             public string guidTarget;
             public Vector3 positionTarget;
+
+            public Order_Move() { }
 
             public Order_Move(GameUnit target, Vector3 positionTarget)
             {
@@ -128,6 +135,8 @@ namespace ProtoRTS.Game
         [System.Serializable]
         public class Order_Stop : UnitOrder
         {
+            public Order_Stop() { }
+
             public override bool AllowAttack()
             {
                 return false;
@@ -177,6 +186,8 @@ namespace ProtoRTS.Game
             [JsonIgnore] public GameUnit enemyUnit;
             public string guidTarget;
             public Vector3 attackPosition;
+
+            public Order_Attack() { }
 
             public override bool AllowAttack()
             {
@@ -230,12 +241,81 @@ namespace ProtoRTS.Game
             }
         }
 
+
+
+        [System.Serializable]
+        public class Order_Attack_Seaver : UnitOrder
+        {
+
+            [JsonIgnore] public GameUnit enemyUnit;
+            public string guidTarget;
+            public Vector3 attackPosition;
+
+            public Order_Attack_Seaver() { }
+
+            public override bool AllowAttack()
+            {
+                return true;
+            }
+            public override bool AllowBeDistracted_and_AttackNearby()
+            {
+                return true;
+            }
+
+            public override bool IsObjectiveAchieved(GameUnit myUnit)
+            {
+                if (enemyUnit == null)
+                {
+                    isCompleted = true;
+                    return true;
+                }
+
+                float distance = Vector3.Distance(myUnit.transform.position, enemyUnit.transform.position);
+
+                if (distance < myUnit.Class.Radius)
+                {
+                    isCompleted = true;
+                    return true;
+                }
+
+                return false;
+            }
+
+            public override void Run(GameUnit myUnit)
+            {
+                if (enemyUnit == null)
+                {
+                    //invalid run
+                    return;
+                }
+
+                myUnit.move_TargetUnit = enemyUnit;
+                myUnit.RVO_LockWhenNotMoving(false);
+
+            }
+
+            public override void Save()
+            {
+                if (enemyUnit != null) guidTarget = enemyUnit.guid;
+            }
+
+            public override Vector3 TargetPosition()
+            {
+                return enemyUnit.transform.position;
+            }
+        }
+
+
+
         [System.Serializable]
         public class Order_Patrol : UnitOrder
         {
             public Vector3 startPoint;
             public Vector3 endPoint;
             bool b = false;
+
+            public Order_Patrol() { }
+
 
             public override bool AllowAttack()
             {

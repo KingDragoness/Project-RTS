@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.Video;
 using ProtoRTS.Game;
-using System.Linq;
 using UnityEngine.UIElements;
 
 namespace ProtoRTS
@@ -73,7 +75,8 @@ namespace ProtoRTS
         [FoldoutGroup("$Combined_1")][ShowIf("abilityType", AbilityOrder.BuildBuilding)] public SO_GameUnit buildingSO;
         [FoldoutGroup("$Combined_1")][ShowIf("abilityType", AbilityOrder.TrainUnit)] public SO_GameUnit unitSO;
         [FoldoutGroup("$Combined_1")][ShowIf("commandType", Type.Submenu)][ValueDropdown("AllCommandCard")] public string cardToOpen = "";
-        //public Requirement
+        [FoldoutGroup("$Combined_1")][ValueDropdown("All_UnitOrderEnum")] public System.Type classUnitOrder;
+
 
         public string Combined_1 
         { 
@@ -101,7 +104,29 @@ namespace ProtoRTS
             return gameUnit.commandCards.Select(x => new ValueDropdownItem(x.cardName, x.cardName));
         }
 
-       
+        IEnumerable<Orders.UnitOrder> GetAllOrderClass()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => type.IsSubclassOf(typeof(Orders.UnitOrder)))
+                .Select(type => Activator.CreateInstance(type) as Orders.UnitOrder);
+        }
+
+        private IEnumerable All_UnitOrderEnum()
+        {
+            var ienumrables = GetAllOrderClass().Select(x => new ValueDropdownItem(x.GetType().Name, x.GetType()));
+            ienumrables = ienumrables.Append(new ValueDropdownItem("", null));
+            return ienumrables;
+        }
+
+        [FoldoutGroup("Test")]
+        [Button("Test_PrintClass")]
+        public void Test_PrintClass()
+        {
+
+            Debug.Log(System.Type.GetType($"{classUnitOrder}"));
+        }
+
     }
 
 

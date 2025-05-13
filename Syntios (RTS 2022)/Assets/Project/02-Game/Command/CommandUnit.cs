@@ -271,6 +271,10 @@ namespace ProtoRTS.Game
             {
                 foreach (var gunit in Selection.AllSelectedUnits) gunit.OrderHandler.GiveOrder(new Orders.Order_HoldPosition());
             }
+            if (commandOrder.abilityType == UnitButtonCommand.AbilityOrder.Attack)
+            {
+                //foreach (var gunit in Selection.AllSelectedUnits) gunit.OrderHandler.GiveOrder(unit);
+            }
         }
 
 
