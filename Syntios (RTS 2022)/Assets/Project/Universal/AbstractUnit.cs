@@ -16,6 +16,9 @@ namespace ProtoRTS
 		[FoldoutGroup("Game Stats")] [SerializeField] internal int stat_KillCount;
 		[FoldoutGroup("Game Stats")] [SerializeField] internal int stat_HP = 25;
 		[FoldoutGroup("Game Stats")] [SerializeField] internal int stat_Energy = 0;
+        [FoldoutGroup("Game Stats")] [SerializeField] internal int stat_Shield = 0;
+        [FoldoutGroup("Game Stats")] [SerializeField] internal bool stat_isHallucination = false;
+        [FoldoutGroup("Game Stats")] [SerializeField] internal bool stat_isCloaking = false; //IF unit is not permanently cloaked
         [FoldoutGroup("Game Stats")] [SerializeField] internal Unit.Player stat_faction;
 
 		public SO_GameUnit Class { get => _class; }

@@ -25,6 +25,7 @@ namespace ProtoRTS
         public int Energy = 0;
 
         private int _supplyCount = 0;
+        private int _supplyProvider = 0;
 
         public FactionSheet(Unit.Player faction)
         {
@@ -35,13 +36,34 @@ namespace ProtoRTS
         {
             get 
             {
-                _supplyCount = 0;
-                foreach (var unit in ListedGameUnits)
+                return _supplyCount; 
+            }
+        }
+
+        public int SupplyProvider
+        {
+            get
+            {
+                return _supplyProvider;
+            }
+        }
+
+        internal void CalcSupply()
+        {
+            _supplyCount = 0;
+            _supplyProvider = 0;
+
+            foreach (var unit in ListedGameUnits)
+            {
+                if (unit.CheckFlag(Unit.Tag.SupplyProvider) == false)
                 {
                     _supplyCount += unit.Class.SupplyCount;
-                }
 
-                return _supplyCount; 
+                } 
+                else
+                {
+                    _supplyProvider += unit.Class.SupplyProvide;
+                }
             }
         }
 
@@ -77,6 +99,7 @@ namespace ProtoRTS
         [SerializeField] private SaveData _saveDat;
         private List<FactionSheet> allFactions = new List<FactionSheet>();
         [SerializeField] private Unit.Player currentFaction;
+        [FoldoutGroup("Base Stats")] private float multiplierTrainingSpeed = 1f;
 
         public static SyntiosEngine Instance;
 
@@ -87,6 +110,8 @@ namespace ProtoRTS
         public static Unit.Player CurrentFaction { get => Instance.currentFaction; set => Instance.currentFaction = value; }
         public static Gamemode CurrentMode { get => Instance.CurrentGamemode; }
         public static SaveData SaveData { get => Instance._saveDat; set => Instance._saveDat = value; }
+        public static float MultiplierTrainingSpeed { get => Instance.multiplierTrainingSpeed; set => Instance.multiplierTrainingSpeed = value; }
+
         public static readonly string SavePath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments) + "/My Games/Syntios/Saves";
 
         private void Awake()
@@ -106,6 +131,7 @@ namespace ProtoRTS
             ListedGameUnits.Add(unit);
             var faction = GetFactionSheet(unit.stat_faction);
             faction.ListedGameUnits.Add(unit);
+            faction.CalcSupply();
             SyntiosEvents.UI_ReselectUpdate?.Invoke();
             unit.guid = UnitIncrementGUID.ToString();
             UnitIncrementGUID++;
@@ -116,6 +142,7 @@ namespace ProtoRTS
             ListedGameUnits.Remove(unit);
             var faction = GetFactionSheet(unit.stat_faction);
             faction.ListedGameUnits.Remove(unit);
+            faction.CalcSupply();
             Selection.AllSelectedUnits.Remove(unit);
             SyntiosEvents.UI_ReselectUpdate?.Invoke();
 

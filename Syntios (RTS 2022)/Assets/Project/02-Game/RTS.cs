@@ -42,7 +42,7 @@ namespace ProtoRTS.Game
 
                 //create game units
                 {
-                    var allGameUnitSOs = Resources.LoadAll<SO_GameUnit>("GameUnits").ToList();
+                    var allGameUnitSOs = DynamicAssetStorage.Instance.allGameUnits;
 
                     foreach (var unitDat in cachedLoadedSave.allUnits)
                     {
@@ -353,6 +353,12 @@ namespace ProtoRTS.Game
             {
                 foreach (var e in unit.OrderHandler.orders) e.Save();
                 unitData.allOrders = unit.OrderHandler.orders;
+            }
+
+            //training queue
+            {
+                foreach(var d in unit.trainingQueue) d.Save();
+                unitData.trainingQueue = unit.trainingQueue;
             }
 
             return unitData;

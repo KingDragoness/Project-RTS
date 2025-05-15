@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using UnityEngine.UIElements;
+using System.Linq;
 
 namespace ProtoRTS
 {
@@ -44,6 +45,7 @@ namespace ProtoRTS
 		public Shader gameUnitShader;
 		public List<string> registered_CustomMat_GameUnitIDs = new List<string>(); //Game unit's ID
 		public List<MaterialGameUnit> allMaterialGameUnit = new List<MaterialGameUnit>();
+        public List<SO_GameUnit> allGameUnits = new List<SO_GameUnit>();
 
         private static DynamicAssetStorage _instance;
 		public static DynamicAssetStorage Instance { get { return _instance; } }
@@ -51,6 +53,16 @@ namespace ProtoRTS
         private void Awake()
         {
             _instance = this;
+            SetUpLoadedAssets();
+        }
+
+        private void SetUpLoadedAssets()
+        {
+            {
+                var allGameUnitSOs = Resources.LoadAll<SO_GameUnit>("GameUnits").ToList();
+
+                allGameUnits = allGameUnitSOs;
+            }
         }
 
         private void Start()

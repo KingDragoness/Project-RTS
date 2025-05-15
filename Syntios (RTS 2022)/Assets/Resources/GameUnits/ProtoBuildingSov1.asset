@@ -22,13 +22,15 @@ MonoBehaviour:
   MineralCost: 200
   EnergyCost: 100
   SupplyCount: 0
+  SupplyProvide: 8
   BuildTime: 35
   MaxHP: 250
   IsFlyUnit: 0
+  HasShield: 0
   HasEnergy: 0
   LineOfSight: 8
   IsUntouchable: 0
-  AllUnitTags: 0b000000
+  AllUnitTags: 0b0000000f000000
   AI_b_AttackOnSight: 0
   AI_b_AttackOnProvoked: 0
   AI_b_FleeOnProvoked: 0
@@ -47,4 +49,12 @@ MonoBehaviour:
       abilityType: 8
       buildingSO: {fileID: 0}
       unitSO: {fileID: 11400000, guid: b89dd84ec59800f4684ff3534fc42f91, type: 2}
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: 393f91113d249534b826a8f7525a70a1, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 7
+      abilityType: 0
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
       cardToOpen: 

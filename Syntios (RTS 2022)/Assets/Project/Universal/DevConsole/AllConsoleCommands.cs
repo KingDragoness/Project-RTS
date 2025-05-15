@@ -243,6 +243,39 @@ namespace ProtoRTS
         }
     }
 
+    public class CC_FasterTrainingSpeed : CC_Base
+    {
+        public override string CommandName { get { return "operationsyn"; } }
+        public override string Description { get { return "cheat code for x10 training speed."; } }
+
+
+        public override void ExecuteCommand(string[] args)
+        {
+            try
+            {
+
+                if (SyntiosEngine.MultiplierTrainingSpeed <= 1)
+                {
+                    DevConsole.Instance.SendConsoleMessage($"Cheat activated.");
+                    SyntiosEngine.MultiplierTrainingSpeed = 10f;
+                }
+                else 
+                {
+                    DevConsole.Instance.SendConsoleMessage($"Cheat off.");
+                    SyntiosEngine.MultiplierTrainingSpeed = 1f;
+                } 
+
+
+            }
+            catch
+            {
+                DevConsole.Instance.SendConsoleMessage($"operationsyn");
+            }
+
+
+        }
+    }
+
 
     public class CC_Cheat_money : CC_Base
     {

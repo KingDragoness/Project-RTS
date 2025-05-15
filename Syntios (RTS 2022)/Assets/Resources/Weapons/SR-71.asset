@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfdf1fdec2695dc40ab84b8e50f24756, type: 3}
+  m_Name: SR-71
+  m_EditorClassIdentifier: 
+  ID: Sixtus_SR-71
+  NameDisplay: SR-71 Rifle
+  WeaponIcon: {fileID: 21300000, guid: 8c4ed5028971dd145b6cdeedf09f930f, type: 3}
+  BaseDamage: 7
+  WeaponSpeed: 0.6
+  groundAttack: 1
+  airAttack: 1
+  modifierDamage:
+  - tag: 0
+    modifierDamage: 0.9
+  - tag: 8
+    modifierDamage: 0.7

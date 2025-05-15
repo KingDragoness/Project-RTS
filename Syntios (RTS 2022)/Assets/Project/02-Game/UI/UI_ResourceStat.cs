@@ -38,9 +38,22 @@ namespace ProtoRTS.Game
             if (tick % 2 == 0) return;
 
             var myFactionSheet = SyntiosEngine.MyFactionSheet;
+            int supply = myFactionSheet.Supply;
+            int supplyProvide = myFactionSheet.SupplyProvider;
+
+            if (supplyProvide > 0)
+            {
+                label_Supply.text = $"{supply}/{supplyProvide}";
+            }
+            else label_Supply.text = $"{supply}";
 
 
-            label_Supply.text = myFactionSheet.Supply.ToString();
+
+            if (supply > supplyProvide && supplyProvide != 0)
+            {
+                label_Supply.color = Color.red;
+            }
+            else label_Supply.color = Color.white;
 
         }
 

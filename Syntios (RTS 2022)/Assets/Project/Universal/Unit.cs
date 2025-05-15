@@ -24,7 +24,8 @@ namespace ProtoRTS
 			Structure,
 			Factory,
 			Enterable,
-			Healer //if unit has repair or heal ability
+			Healer, //if unit has repair or heal ability
+			SupplyProvider
         }
 
 		public enum Race

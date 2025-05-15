@@ -20,9 +20,13 @@ namespace ProtoRTS
 
             public System.UInt32 stat_HP = 50;
             public System.UInt32 stat_Energy = 190;
+            public System.UInt32 stat_Shield = 190;
+            public bool stat_isHallucination = false;
+            public bool stat_isCloaked = false;
             public System.UInt16 stat_KillCount = 0;
 			public Unit.Player stat_Faction = Unit.Player.Player1;
             public List<Orders.UnitOrder> allOrders = new List<Orders.UnitOrder>();
+            public List<TrainingQueue> trainingQueue = new List<TrainingQueue>();
 
             public Vector3 move_TargetPos;
 			public System.UInt32 move_TargetUnit_guid; //when loading game, read from SaveData

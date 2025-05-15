@@ -74,6 +74,10 @@ namespace ProtoRTS.Game
 
             slider_HP.value = attachedGameUnit.stat_HP;
             slider_HP.maxValue = attachedGameUnit._class.MaxHP;
+            slider_SP.value = attachedGameUnit.stat_Shield;
+            slider_SP.maxValue = attachedGameUnit._class.MaxShield;
+            slider_Energy.value = attachedGameUnit.stat_Energy;
+            slider_Energy.maxValue = attachedGameUnit._class.MaxMana();
             image_HP.color = gradientColor;
 
             var cam = RTSCamera.Instance.MainCamera;

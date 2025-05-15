@@ -22,6 +22,7 @@ MonoBehaviour:
   MineralCost: 50
   EnergyCost: 25
   SupplyCount: 1
+  SupplyProvide: 8
   BuildTime: 24
   MaxHP: 40
   IsFlyUnit: 0
@@ -109,6 +110,22 @@ MonoBehaviour:
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: build_advanced
+    - button: {fileID: 11400000, guid: c44f8eaac58bcb746b49d815c0388588, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 6
+      abilityType: 9
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
+      cardToOpen: 
+    - button: {fileID: 11400000, guid: 16da891d170dddb4d81bace3633d4ec9, type: 2}
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 7
+      abilityType: 0
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 0}
+      cardToOpen: 
   - cardName: build
     commands:
     - button: {fileID: 11400000, guid: 5aa06e1f77e0c8341a31eb253bf4510b, type: 2}

@@ -28,6 +28,8 @@ namespace ProtoRTS
             }
         }
 
+        public static int TicksPerSecond { get => Instance.ticksPerSecond; }
+
         private void Awake()
         {
             Instance = this;

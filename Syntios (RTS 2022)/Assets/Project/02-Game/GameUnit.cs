@@ -9,6 +9,8 @@ using System;
 using ProtoRTS.Game;
 using System.Linq;
 using UnityEngine.UIElements;
+using System.Runtime.CompilerServices;
+using static UnityEngine.UI.CanvasScaler;
 
 namespace ProtoRTS
 {
@@ -18,7 +20,11 @@ namespace ProtoRTS
 		[ReadOnly] public string guid = "";
 		public Vector3 move_Target;
         public GameUnit move_TargetUnit;
+        public BehaviorTable behaviorTable;
         public float targetY = 0;
+        [FoldoutGroup("Training")] public List<TrainingQueue> trainingQueue = new List<TrainingQueue>();
+
+
         [FoldoutGroup("Attack_Weapon Behaviors")][ValueDropdown("All_AttackLikeOrderEnum")] public string classOrderAttack = ""; //Must contain "Attack" in its class name
         [FoldoutGroup("References")] public Renderer[] modelView;
 		[FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
@@ -58,6 +64,16 @@ namespace ProtoRTS
         public override void Awake()
         {
 			base.Awake();
+
+            //set up behavior table
+            {
+                var goBehaviorTable = new GameObject("Behaviors");
+                goBehaviorTable.transform.SetParent(transform);
+                goBehaviorTable.transform.position = transform.position;
+                behaviorTable = goBehaviorTable.AddComponent<BehaviorTable>();
+                behaviorTable.gameUnit = this;
+            }
+          
             _orderHandler = GetComponentInChildren<GameUnit_OrderController>();
         }
 
@@ -67,6 +83,7 @@ namespace ProtoRTS
             {
                 move_Target = transform.position;
 				move_Target.y = Map.instance.GetPositionY_cliffLevel(move_Target);
+
             }
 
             SyntiosEngine.Instance.AddNewUnit(this);
@@ -143,8 +160,9 @@ namespace ProtoRTS
 			{
 			}
             if (groundAIPath) groundAIPath.onSearchPath -= Update;
+            Tick.OnTick -= OnTickUnit;
 
-		}
+        }
 
         private void OnDestroy()
         {
@@ -162,12 +180,17 @@ namespace ProtoRTS
 			unit.stat_faction = unitData.stat_Faction;
 			unit.stat_HP = (int)unitData.stat_HP;
 			unit.stat_Energy = (int)unitData.stat_Energy;
-			unit.guid = unitData.guid;
+            unit.stat_Shield = (int)unitData.stat_Shield;
+            unit.stat_isHallucination = unitData.stat_isHallucination;
+            unit.stat_isCloaking = unitData.stat_isCloaked;
+            unit.guid = unitData.guid;
 			unit._isLoadedSaveFile = true;
 
 			{
 				unit.OrderHandler.orders.AddRange(unitData.allOrders);
-			}
+                unit.trainingQueue.AddRange(unitData.trainingQueue);
+
+            }
 
             return unit;
         }
@@ -223,6 +246,71 @@ namespace ProtoRTS
 
 				
             }
+            float deltaTime = 1f / (float)Tick.TicksPerSecond;
+
+            //if spellcaster
+            if (Class.HasEnergy)
+            {
+
+                if (stat_Energy < Class.MaxMana() && tick % 30 == 0)
+                {
+                    stat_Energy++;
+                }
+            }
+
+            if (Class.HasShield)
+            {
+
+                if (stat_Shield < Class.MaxShield && tick % 40 == 0)
+                {
+                    stat_Shield++;
+                }
+            }
+
+            //handle training here
+            Tick_TRAIN();
+       
+        }
+
+        private void Tick_TRAIN()
+        {
+            if (trainingQueue.Count == 0)
+            {
+                return;
+            }
+
+            float deltaTime = 1f / (float)Tick.TicksPerSecond;
+            var currentTrainQueue = trainingQueue[0];
+
+            if (currentTrainQueue.gameUnitClass == null)
+            {
+                trainingQueue.RemoveAt(0);
+                Debug.Log("EMPTY CLASS!");
+                return;
+            }
+
+            currentTrainQueue.timeTrained += deltaTime * SyntiosEngine.MultiplierTrainingSpeed;
+
+            if (currentTrainQueue.timeTrained > currentTrainQueue.gameUnitClass.BuildTime)
+            {
+                //Create unit
+                Vector3 spawnPos = transform.position;
+                if (spawnPos.z > Class.Radius + 1)
+                {
+                    spawnPos.z -= 1f + (Class.Radius * 1f);
+                }
+                else
+                {
+                    spawnPos.z += 1f + (Class.Radius * 1f);
+                }
+
+                spawnPos.x += UnityEngine.Random.Range(-1f, 1f);
+
+                var newUnit = currentTrainQueue.gameUnitClass.basePrefab.TrainSpawnUnit();
+                newUnit.transform.position = spawnPos;
+                trainingQueue.RemoveAt(0);
+            }
+
         }
 
 
@@ -264,6 +352,15 @@ namespace ProtoRTS
 		}
 
         #region Functions
+        public GameObject TrainSpawnUnit()
+        {
+
+
+            var newUnit = Instantiate(gameObject, transform.position, transform.rotation);
+            newUnit.gameObject.SetActive(true);
+
+            return newUnit;
+        }
 
 		public void RVO_LockWhenNotMoving(bool lockNotMoving)
 		{

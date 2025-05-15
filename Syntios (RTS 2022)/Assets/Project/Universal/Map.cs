@@ -86,6 +86,8 @@ namespace ProtoRTS
 
         [DisableInEditorMode] [SerializeField] private Material generatedTerrainMaterial;
         private Transform terrainParent;
+        private Transform combinedMeshParent;
+        private List<GameObject> combinedMeshObjects = new List<GameObject>();
         [SerializeField] [ReadOnly] private Texture2D generatedSplatmap;
         [SerializeField] [ReadOnly] private Texture2D generatedSplatmap2;
         private Color32[] color_splat1 = new Color32[0];
@@ -539,6 +541,8 @@ namespace ProtoRTS
 
         public void UpdateCliffMap(int startX = 0, int startY = 0, int width = 256, int height = 256)
         {
+            bool isMapEditor = SyntiosEngine.CurrentMode == Gamemode.MapEdit ? true : false;
+
             Vector2Int[] offsetCoords = new Vector2Int[4]
             {
                 new Vector2Int(0, 0),
@@ -590,6 +594,7 @@ namespace ProtoRTS
 
 
                 int indexDir = 0;
+               
 
                 //atlas coord
                 foreach (var coord in myPosArray)
@@ -669,6 +674,88 @@ namespace ProtoRTS
 
             }
 
+            foreach(var goCombined in combinedMeshObjects)
+            {
+                if (goCombined == null) continue;
+                Destroy(goCombined.gameObject);
+            }
+            combinedMeshObjects.Clear();
+
+            //Mesh optimization that combines every 8x8
+            //Literally duplicating mesh
+            if (isMapEditor == false)
+            {
+                int x_grid = Mathf.CeilToInt(_terrainData.size_x / 8);
+                int y_grid = Mathf.CeilToInt(_terrainData.size_y / 8);
+
+                for (int x = 0; x < x_grid; x++)
+                {
+                    for (int y = 0; y < y_grid; y++)
+                    {
+                        var cliffObjects = GetCliffObjectAtThisRegion(x,y);
+                        GameObject tempParent = new GameObject();
+                        List<MeshFilter> meshFilterList = new List<MeshFilter>();
+
+                        foreach (var cliffObject in cliffObjects)
+                        {
+                            foreach(var cGO in cliffObject.allCliffs)
+                            {
+                                if (cGO == null) continue;  
+                                meshFilterList.Add(cGO.GetComponentInChildren<MeshFilter>());
+                                cGO.transform.SetParent(tempParent.transform);
+                            }
+                        }
+
+                        MeshFilter[] meshFilters = meshFilterList.ToArray();//GetComponentsInChildren<MeshFilter>(); 
+                        MeshFilter mainMeshFilter = tempParent.MeshCombine();
+                        GameObject regionGO = mainMeshFilter.gameObject;
+
+                        regionGO.gameObject.name = $"TerrainMesh_({x}, {y})";
+                        //CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+
+                        //int i = 0;
+                        //while (i < meshFilters.Length)
+                        //{
+                        //    combine[i].mesh = meshFilters[i].mesh;
+                        //    combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+                        //    meshFilters[i].gameObject.SetActive(false);
+
+                        //    i++;
+                        //}
+
+                        //Mesh mesh = new Mesh();
+                        //mesh.CombineMeshes(combine);
+                        //regionGO.AddComponent<MeshFilter>().sharedMesh = mesh;
+
+                        //var mainMeshFilter = regionGO.GetComponent<MeshFilter>();
+                        //var meshRend = regionGO.AddComponent<MeshRenderer>();
+                        var collision = regionGO.AddComponent<MeshCollider>();
+
+                        //var newArrayMaterial = new Material[2];
+                        //newArrayMaterial[0] = generatedTerrainMaterial;
+                        //newArrayMaterial[1] = generatedTerrainMaterial; //INSERT CLIFF/ROCK MATERIAL HERE
+                        //meshRend.sharedMaterials = newArrayMaterial;
+
+
+                        collision.sharedMesh = mainMeshFilter.mesh;
+                        regionGO.gameObject.SetActive(true);
+                        regionGO.transform.SetParent(terrainParent);
+                        regionGO.gameObject.layer = LayerMask.NameToLayer("Terrain");
+                        combinedMeshObjects.Add(regionGO);
+                    }
+                }
+
+                foreach (var cliffObjData in allCliffObjectResultData)
+                {
+                    foreach (var go in cliffObjData.allCliffs)
+                    {
+                        if (go == null) continue;
+                        go.gameObject.SetActive(false);
+                    }
+                }
+            }
+
+           
 
             //removing hanging cliff objects
             //foreach (var cliffObj in vd3)
@@ -696,6 +783,44 @@ namespace ProtoRTS
 
             //vd3.RemoveAll(f => f.cliffGO == null);
         }
+
+        private CliffObjectDat[] GetCliffObjectAtThisRegion(int x, int y)
+        {
+            //if map size x is 70, now we check at 64 (8), 
+            //8+1 = 9 * 8 = 72, if 72 > 70, then use 70
+
+            //if check at 56 (8), 64
+            //64-56 = 8 * 8 in total_units_in_region
+
+            int actualMap_x = x * 8;
+            int actualMap_y = y * 8;
+            int headroom_x = (x + 1) * 8;
+            int headroom_y = (y + 1) * 8;
+
+            if (headroom_x > _terrainData.size_x) headroom_x = _terrainData.size_x;
+            if (headroom_y > _terrainData.size_y) headroom_y = _terrainData.size_y;
+
+            int total_units_in_region = (headroom_x - actualMap_x) * (headroom_y - actualMap_y);
+
+            CliffObjectDat[] allCOs = new CliffObjectDat[total_units_in_region];
+
+            int i = 0;
+
+            for(int x1 = actualMap_x; x1 < headroom_x; x1++)
+            {
+                for (int y1 = actualMap_y; y1 < headroom_y; y1++)
+                {
+                    int index = x1 + (y1 * _terrainData.size_x);
+                    int localIndex = i;
+                    allCOs[localIndex] = allCliffObjectResultData[index];
+
+                    i++;
+                }
+            }
+
+            return allCOs;
+        }
+
 
         private List<GameObject> debug_listAllNoNeighborObjs = new List<GameObject>();
 

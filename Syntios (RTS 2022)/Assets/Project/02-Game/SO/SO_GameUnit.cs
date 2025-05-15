@@ -119,13 +119,7 @@ namespace ProtoRTS
             return ienumrables;
         }
 
-        [FoldoutGroup("Test")]
-        [Button("Test_PrintClass")]
-        public void Test_PrintClass()
-        {
-
-            Debug.Log(System.Type.GetType($"{classUnitOrder}"));
-        }
+     
 
     }
 
@@ -150,11 +144,13 @@ namespace ProtoRTS
 
         [FoldoutGroup("Resources")] public int MineralCost = 50;
         [FoldoutGroup("Resources")] public int EnergyCost = 25;
-        [FoldoutGroup("Resources")][Range(0, 10)] public int SupplyCount = 1;
+        [FoldoutGroup("Resources")] [Range(0, 10)] public int SupplyCount = 1;
+        [FoldoutGroup("Resources")] [ShowIf("IsSupplyProviderUnit")] public int SupplyProvide = 8;
         [FoldoutGroup("Resources")] [Range(0, 500)] public int BuildTime = 24;
 
         #region Unit Properties
         [FoldoutGroup("Unit Properties")] public int MaxHP = 40;
+        [FoldoutGroup("Unit Properties")] public int MaxShield = 40;
         [FoldoutGroup("Unit Properties")] public bool IsFlyUnit = false;
         [FoldoutGroup("Unit Properties")] public bool HasShield = false;
         [FoldoutGroup("Unit Properties")] public bool HasEnergy = false;
@@ -206,5 +202,16 @@ namespace ProtoRTS
 				}
 			}
         }
+
+        public bool IsSupplyProviderUnit()
+        {
+            return AllUnitTags.Contains(Unit.Tag.SupplyProvider);
+        }
+
+        public int MaxMana()
+        {
+            return 200;
+        }
+
     }
 }

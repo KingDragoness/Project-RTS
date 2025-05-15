@@ -202,9 +202,11 @@ MonoBehaviour:
   stat_HP: 25
   stat_Energy: 0
   stat_faction: 1
+  guid: 
   move_Target: {x: 0, y: 0, z: 0}
   move_TargetUnit: {fileID: 0}
   targetY: 0
+  classOrderAttack: 
   modelView:
   - {fileID: 1585967104541339347}
   - {fileID: 1585967104541339343}
@@ -491,6 +493,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2402233671523264387, guid: 0b9c68ddd67ee5b9e8aeca86ac0fbc03,
+        type: 3}
+      propertyPath: m_CullingMode
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5229505226103294313, guid: 0b9c68ddd67ee5b9e8aeca86ac0fbc03,
         type: 3}
