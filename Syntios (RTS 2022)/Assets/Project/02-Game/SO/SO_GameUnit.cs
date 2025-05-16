@@ -13,7 +13,99 @@ namespace ProtoRTS
 {
 
 
-	[System.Serializable]
+    //CUSTOM EDITOR UPDATE:
+    //Later in custom editor, SO_GameUnit will only be used for vanilla unit.
+    //The class of "Data_GameUnit" will be generated at Awake in AssetDatabase.
+
+    [CreateAssetMenu(fileName = "Seaver", menuName = "Syntios/Game Unit (vanilla)", order = 1)]
+    public class SO_GameUnit : ScriptableObject
+    {
+
+        public string ID = "Seaver";
+        public string NameDisplay = "Seaver";
+        public GameUnit basePrefab;
+        public string Rank = "";
+        public float Radius = 2;
+        public Sprite spriteWireframe;
+
+
+
+        [FoldoutGroup("Resources")] public int MineralCost = 50;
+        [FoldoutGroup("Resources")] public int EnergyCost = 25;
+        [FoldoutGroup("Resources")][Range(0, 10)] public int SupplyCount = 1;
+        [FoldoutGroup("Resources")][ShowIf("IsSupplyProviderUnit")] public int SupplyProvide = 8;
+        [FoldoutGroup("Resources")][Range(0, 500)] public int BuildTime = 24;
+
+        #region Unit Properties
+        [FoldoutGroup("Unit Properties")] public int MaxHP = 40;
+        [FoldoutGroup("Unit Properties")] public int MaxShield = 40;
+        [FoldoutGroup("Unit Properties")] public bool IsFlyUnit = false;
+        [FoldoutGroup("Unit Properties")] public bool HasShield = false;
+        [FoldoutGroup("Unit Properties")] public bool HasEnergy = false;
+        [FoldoutGroup("Unit Properties")][Range(2, 16)] public int LineOfSight = 7;
+        [FoldoutGroup("Unit Properties")] public bool IsUntouchable = false; //for scarab or missiles
+        [FoldoutGroup("Unit Properties")] public List<Unit.Tag> AllUnitTags = new List<Unit.Tag>();
+        #endregion
+
+        #region AI behaviours
+        //[FoldoutGroup("AI Properties")] public List<GameUnitBehavior.Class> allBehaviorClasses = new List<GameUnitBehavior.Class>();
+        [FoldoutGroup("AI Properties")] public bool AI_b_AttackOnSight = false;
+        [FoldoutGroup("AI Properties")] public bool AI_b_AttackOnProvoked = false;
+        [FoldoutGroup("AI Properties")] public bool AI_b_FleeOnProvoked = false;
+        #endregion
+
+        #region Portraits
+        [FoldoutGroup("Portraits")]
+        [SerializeField]
+        [Tooltip("<= 0 for non-hero units. > 0 for hero units.")]
+        internal int port_Importance = -9000;
+
+        [FoldoutGroup("Portraits")][SerializeField] internal VideoClip[] port_Idles;
+        [FoldoutGroup("Portraits")][SerializeField] internal VideoClip[] port_Talkings;
+        [FoldoutGroup("Portraits")][SerializeField] internal AudioClip[] voiceline_Ready;
+        [FoldoutGroup("Portraits")][SerializeField] internal AudioClip[] voiceline_Move;
+
+        #endregion
+        //[ValueDropdown("DefaultCardCommands")] public string defaultRightClickAbility = "";
+        [InfoBox("Command card at [0] index is always default")] public List<CommandCard> commandCards = new List<CommandCard>();
+
+
+        private IEnumerable DefaultCardCommands()
+        {
+            if (commandCards.Count == 0) return null;
+            return commandCards[0].commands.Select(x => new ValueDropdownItem(x.abilityType.ToString(), x.abilityType.ToString()));
+        }
+
+        public CommandCard DefaultCard
+        {
+            get { return commandCards[0]; }
+        }
+
+        private void OnValidate()
+        {
+            foreach (var card in commandCards)
+            {
+                foreach (var order in card.commands)
+                {
+                    order.gameUnit = this;
+                }
+            }
+        }
+
+        public bool IsSupplyProviderUnit()
+        {
+            return AllUnitTags.Contains(Unit.Tag.SupplyProvider);
+        }
+
+        public int MaxMana()
+        {
+            return 200;
+        }
+
+    }
+
+
+    [System.Serializable]
 	public class CommandCard
 	{
 		public string cardName = "default";
@@ -75,7 +167,7 @@ namespace ProtoRTS
         [FoldoutGroup("$Combined_1")][ShowIf("abilityType", AbilityOrder.BuildBuilding)] public SO_GameUnit buildingSO;
         [FoldoutGroup("$Combined_1")][ShowIf("abilityType", AbilityOrder.TrainUnit)] public SO_GameUnit unitSO;
         [FoldoutGroup("$Combined_1")][ShowIf("commandType", Type.Submenu)][ValueDropdown("AllCommandCard")] public string cardToOpen = "";
-        [FoldoutGroup("$Combined_1")][ValueDropdown("All_UnitOrderEnum")] public System.Type classUnitOrder;
+        [FoldoutGroup("$Combined_1")] public GameUnitBehavior.Class behaviorClass;
 
 
         public string Combined_1 
@@ -125,93 +217,4 @@ namespace ProtoRTS
 
 
 
-    //CUSTOM EDITOR UPDATE:
-    //Later in custom editor, SO_GameUnit will only be used for vanilla unit.
-    //The class of "Data_GameUnit" will be generated at Awake in AssetDatabase.
-
-    [CreateAssetMenu(fileName = "Seaver", menuName = "Syntios/Game Unit (vanilla)", order = 1)]
-	public class SO_GameUnit : ScriptableObject
-	{
-
-		public string ID = "Seaver";
-		public string NameDisplay = "Seaver";
-		public GameUnit basePrefab;
-		public string Rank = "";
-		public float Radius = 2;
-		public Sprite spriteWireframe;
-
-
-
-        [FoldoutGroup("Resources")] public int MineralCost = 50;
-        [FoldoutGroup("Resources")] public int EnergyCost = 25;
-        [FoldoutGroup("Resources")] [Range(0, 10)] public int SupplyCount = 1;
-        [FoldoutGroup("Resources")] [ShowIf("IsSupplyProviderUnit")] public int SupplyProvide = 8;
-        [FoldoutGroup("Resources")] [Range(0, 500)] public int BuildTime = 24;
-
-        #region Unit Properties
-        [FoldoutGroup("Unit Properties")] public int MaxHP = 40;
-        [FoldoutGroup("Unit Properties")] public int MaxShield = 40;
-        [FoldoutGroup("Unit Properties")] public bool IsFlyUnit = false;
-        [FoldoutGroup("Unit Properties")] public bool HasShield = false;
-        [FoldoutGroup("Unit Properties")] public bool HasEnergy = false;
-        [FoldoutGroup("Unit Properties")][Range(2, 16)] public int LineOfSight = 7;
-        [FoldoutGroup("Unit Properties")] public bool IsUntouchable = false; //for scarab or missiles
-        [FoldoutGroup("Unit Properties")] public List<Unit.Tag> AllUnitTags = new List<Unit.Tag>();
-		#endregion
-
-		#region AI behaviours
-		[FoldoutGroup("AI Properties")] public bool AI_b_AttackOnSight = false;
-        [FoldoutGroup("AI Properties")] public bool AI_b_AttackOnProvoked = false;
-        [FoldoutGroup("AI Properties")] public bool AI_b_FleeOnProvoked = false;
-        #endregion
-
-        #region Portraits
-        [FoldoutGroup("Portraits")]
-		[SerializeField]
-		[Tooltip("<= 0 for non-hero units. > 0 for hero units.")]
-		internal int port_Importance = -9000;
-
-		[FoldoutGroup("Portraits")] [SerializeField] internal VideoClip[] port_Idles;
-		[FoldoutGroup("Portraits")] [SerializeField] internal VideoClip[] port_Talkings;
-		[FoldoutGroup("Portraits")] [SerializeField] internal AudioClip[] voiceline_Ready;
-		[FoldoutGroup("Portraits")] [SerializeField] internal AudioClip[] voiceline_Move;
-
-        #endregion
-        //[ValueDropdown("DefaultCardCommands")] public string defaultRightClickAbility = "";
-        [InfoBox("Command card at [0] index is always default")] public List<CommandCard> commandCards = new List<CommandCard>();
-
-
-        private IEnumerable DefaultCardCommands()
-        {
-            if (commandCards.Count == 0) return null;
-            return commandCards[0].commands.Select(x => new ValueDropdownItem(x.abilityType.ToString(), x.abilityType.ToString()));
-        }
-
-        public CommandCard DefaultCard
-        {
-            get { return commandCards[0]; }
-        }
-
-        private void OnValidate()
-        {
-            foreach(var card in commandCards)
-			{
-				foreach(var order in card.commands)
-				{
-					order.gameUnit = this;
-				}
-			}
-        }
-
-        public bool IsSupplyProviderUnit()
-        {
-            return AllUnitTags.Contains(Unit.Tag.SupplyProvider);
-        }
-
-        public int MaxMana()
-        {
-            return 200;
-        }
-
-    }
 }

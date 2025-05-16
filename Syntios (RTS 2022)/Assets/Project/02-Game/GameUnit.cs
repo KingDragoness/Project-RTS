@@ -252,7 +252,7 @@ namespace ProtoRTS
             if (Class.HasEnergy)
             {
 
-                if (stat_Energy < Class.MaxMana() && tick % 30 == 0)
+                if (stat_Energy < Class.MaxMana() && tick % 20 == 0)
                 {
                     stat_Energy++;
                 }

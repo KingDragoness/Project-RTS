@@ -25,6 +25,7 @@ MonoBehaviour:
   SupplyProvide: 8
   BuildTime: 35
   MaxHP: 250
+  MaxShield: 40
   IsFlyUnit: 0
   HasShield: 0
   HasEnergy: 0
@@ -50,6 +51,7 @@ MonoBehaviour:
       buildingSO: {fileID: 0}
       unitSO: {fileID: 11400000, guid: b89dd84ec59800f4684ff3534fc42f91, type: 2}
       cardToOpen: 
+      behaviorClass: 19
     - button: {fileID: 11400000, guid: 393f91113d249534b826a8f7525a70a1, type: 2}
       commandType: 0
       gameUnit: {fileID: 11400000}
@@ -58,3 +60,4 @@ MonoBehaviour:
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
       cardToOpen: 
+      behaviorClass: 0
