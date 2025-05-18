@@ -65,6 +65,11 @@ namespace ProtoRTS
             }
         }
 
+        public SO_GameUnit FindGameUnitClass(string ID)
+        {
+            return allGameUnits.Find(x => x.ID == ID);
+        }
+
         private void Start()
 		{
 			

@@ -11,17 +11,30 @@ namespace ProtoRTS.Game
 
 		public Text label_prompt;
 
+        private float timer = 0;
 
         private void Start()
         {
-            label_prompt.gameObject.SetActive(false);
+
         }
 
+        private void Update()
+        {
+            if (timer < 0)
+            {
+                ClosePrompt();
+            }
+            else
+            {
+                timer -= Time.deltaTime;
+            }
+        }
 
-        public void OpenPrompt(string prompt)
+        public void OpenPrompt(string prompt, float time = 9999)
 		{
 			label_prompt.gameObject.SetActive(true);
-			label_prompt.text = prompt;
+            timer = time;
+            label_prompt.text = prompt;
 		}
 
         public void ClosePrompt()

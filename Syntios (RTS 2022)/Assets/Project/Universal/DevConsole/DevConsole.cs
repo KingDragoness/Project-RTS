@@ -14,6 +14,7 @@ namespace ProtoRTS
 
 		public InputField inputField;
 		public Text consoleText;
+        public Text devStat;
         public GameObject consoleInputObject;
         public GameObject DevMenu;
 
@@ -89,6 +90,11 @@ namespace ProtoRTS
                 }
                 inputField.SetTextWithoutNotify(historyCommands[index]);
             }
+
+            string str = "";
+            str += $"Selected: {Selection.AllSelectedUnits.Count}\n";
+
+            devStat.text = str;
         }
 
         public void ToggleDevMenu()

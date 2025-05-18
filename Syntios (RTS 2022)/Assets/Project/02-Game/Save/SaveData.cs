@@ -25,11 +25,12 @@ namespace ProtoRTS
             public bool stat_isCloaked = false;
             public System.UInt16 stat_KillCount = 0;
 			public Unit.Player stat_Faction = Unit.Player.Player1;
-            public List<Orders.UnitOrder> allOrders = new List<Orders.UnitOrder>();
+            public List<OrderEntry> allOrders = new List<OrderEntry>();
             public List<TrainingQueue> trainingQueue = new List<TrainingQueue>();
 
             public Vector3 move_TargetPos;
-			public System.UInt32 move_TargetUnit_guid; //when loading game, read from SaveData
+            public Vector3 trainRallyPoint;
+            public System.UInt32 move_TargetUnit_guid; //when loading game, read from SaveData
 
         }
 
@@ -55,6 +56,7 @@ namespace ProtoRTS
         public Unit.Player playerFaction = Unit.Player.Player1;
         public int IncrementUnitGUID = 0;
         public List<UnitData> allUnits = new List<UnitData>();
+        public List<string> allSelectedUnits_guids = new List<string>();
         public List<FactionSheetData> allFactions = new List<FactionSheetData>();
 
         [FoldoutGroup("Terrain")] public SyntiosTerrainData terrain;

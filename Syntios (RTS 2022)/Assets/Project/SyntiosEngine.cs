@@ -93,9 +93,11 @@ namespace ProtoRTS
 	{
 
         [Tooltip("targets frame per second (Best played at 60 FPS)")] public int FPSTarget = 60;
+        public bool engine_PrintErrorMissingBehavior = false;
 		public List<GameUnit> ListedGameUnits = new List<GameUnit>();
         public int UnitIncrementGUID = 0;
         public Gamemode CurrentGamemode;
+
         [SerializeField] private SaveData _saveDat;
         private List<FactionSheet> allFactions = new List<FactionSheet>();
         [SerializeField] private Unit.Player currentFaction;
@@ -159,6 +161,14 @@ namespace ProtoRTS
             return allFactions.Find(x => x.Faction == factionId);
         }
 
+        public bool CheckMineralEnough(int mineralCost)
+        {
+            return MyFactionSheet.Mineral >= mineralCost;
+        }
+        public bool CheckEnergyEnough(int energyCost)
+        {
+            return MyFactionSheet.Energy >= energyCost;
+        }
 
         private void OnDisable()
         {

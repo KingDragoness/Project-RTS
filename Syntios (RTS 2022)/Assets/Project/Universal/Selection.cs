@@ -25,7 +25,7 @@ namespace ProtoRTS
 	public class Selection : MonoBehaviour
 	{
 
-		private List<GameUnit> allSelectedUnits = new List<GameUnit>();
+		[ShowInInspector] [ReadOnly] private List<GameUnit> allSelectedUnits = new List<GameUnit>();
 		public LayerMask layer_Terrain;
         [FoldoutGroup("Circle")] [SerializeField] private GameObject _selectedCirclePrefab;
         [FoldoutGroup("Circle")] public Material mat_selectedCircle_green;

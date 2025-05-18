@@ -12,7 +12,7 @@ namespace ProtoRTS.Game
         public class QuadNode
         {
             public int x, y;
-            public List<Transform> units = new List<Transform>();
+            public List<GameUnit> units = new List<GameUnit>();
 
             public QuadNode(int x, int y)
             {
@@ -33,6 +33,8 @@ namespace ProtoRTS.Game
         private float _cooldownCheck = 0.4f;
         private int _indexCheck = 0;
 
+        public static TargetSelector instance;
+
         private int length_X
         {
             get { return (int)max_x / quadLength; }
@@ -47,6 +49,11 @@ namespace ProtoRTS.Game
             {
                 return Mathf.CeilToInt((float)SyntiosEngine.Instance.ListedGameUnits.Count / (float)MaximumAgentPerCheck);
             }
+        }
+
+        private void Awake()
+        {
+            instance = this;
         }
 
         private void OnEnable()
@@ -88,7 +95,7 @@ namespace ProtoRTS.Game
             if (_cooldownCheck < 0f)
             {
                 QuadGrouping();
-                //DistanceChecking();
+                AssignEveryUnit_ClosestTarget();
                 _cooldownCheck = 1f / (float)ChecksPerSecond;
             }
 
@@ -139,11 +146,15 @@ namespace ProtoRTS.Game
 
                 if (quad == null) continue;
 
-                quad.units.Add(unit.transform);
+                quad.units.Add(unit);
             }
         }
 
-        private void DistanceChecking()
+        /// <summary>
+        /// It always check by WeaponHandler.CurrentWeapon's criteria
+        /// 
+        /// </summary>
+        private void AssignEveryUnit_ClosestTarget()
         {
             //Every distance check, every unit will be grouped into regions (either region03, region11, region63, etc...)
             List<QuadNode> allQuadNeighborsCheck = new List<QuadNode>();
@@ -151,25 +162,29 @@ namespace ProtoRTS.Game
             if (limit > SyntiosEngine.Instance.ListedGameUnits.Count) limit = SyntiosEngine.Instance.ListedGameUnits.Count;
 
             for (int currIndex = _indexCheck * MaximumAgentPerCheck; currIndex < limit; currIndex++)
-            //foreach (Unit_DistanceCheck unit in allUnits)
             {
                 var unit = SyntiosEngine.Instance.ListedGameUnits[currIndex];
+                if (unit == null) continue;
+                if (unit.weaponHandler == null)
+                {
+                    if (SyntiosEngine.Instance.engine_PrintErrorMissingBehavior)
+                    {
+                        Debug.LogError("Missing weaponHandler");
+                        continue;
+                    }
+                }
+                
                 allQuadNeighborsCheck.Clear();
                 float closest = float.MaxValue;
-                Transform closestUnit = null;
+                GameUnit closestUnit = null;
 
                 int unitPos_x = Mathf.FloorToInt(unit.transform.position.x / quadLength);
                 int unitPos_y = Mathf.FloorToInt(unit.transform.position.z / quadLength);
 
-                //brute force checking does not work (500k CALLS! for 500 units), we need to drastically reduce its call to under 10k
-                //Implement "Quad Regions" that's divided every 8 units
-                //In 64 x 64 map = 8 x 8 quads (64 quads)
-                //In 192 x 192 map = 24 x 24 quads (576 quads)
-
 
                 QuadNode currentQuadNode = GetQuadNode(unit.transform);
 
-               // int lengthQuad = Mathf.FloorToInt((float)unit.scanDistance / (float)quadLength);
+                //MAXIMUM closest check is within box of 8x2 = 16 units
                 int lengthQuad = 2;
 
                 int n = lengthQuad + lengthQuad;
@@ -200,21 +215,39 @@ namespace ProtoRTS.Game
                 {
                     var quad = allQuadNeighborsCheck[q];
 
-                    foreach (Transform unitToCompare in quad.units)
+                    foreach (GameUnit unitToCompare in quad.units)
                     {
                         if (unit == unitToCompare) { continue; }
+                        SO_Weapon usingWeapon = null;
+
+                        if (unit.IsAir())
+                        {
+                            if (unit.weaponHandler.AirWeapon() == null) continue;
+                            usingWeapon = unit.weaponHandler.AirWeapon();
+                        }
+                        else
+                        {
+                            if (unit.weaponHandler.GroundWeapon() == null) continue;
+                            usingWeapon = unit.weaponHandler.GroundWeapon();
+                        }
+
                         float dist = Vector3.Distance(unitToCompare.transform.position, unit.transform.position);
 
                         if (dist <= closest)
                         {
                             closest = dist;
+                            //begin checks
+
+                            //if (targetCriteria.Contains())
+                            
+
                             closestUnit = unitToCompare;
                         }
                     }
                 }
 
                 //if (closestUnit != null) unit.closestUnit = closestUnit.transform;
-                //unit.distance = closest;
+                unit.closest_attackableUnit = closestUnit;
             }
 
             _indexCheck++;

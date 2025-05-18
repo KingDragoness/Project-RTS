@@ -19,6 +19,7 @@ MonoBehaviour:
   Rank: 
   Radius: 5
   spriteWireframe: {fileID: 21300000, guid: 065d1bc8895249846954b18900526c4a, type: 3}
+  allWeapons: []
   MineralCost: 200
   EnergyCost: 100
   SupplyCount: 0
@@ -31,33 +32,43 @@ MonoBehaviour:
   HasEnergy: 0
   LineOfSight: 8
   IsUntouchable: 0
-  AllUnitTags: 0b0000000f000000
+  AllUnitTags: 0b0000000f0000000c000000
   AI_b_AttackOnSight: 0
   AI_b_AttackOnProvoked: 0
   AI_b_FleeOnProvoked: 0
   port_Importance: -100
   port_Idles: []
   port_Talkings: []
-  voiceline_Ready: []
+  voiceline_Ready:
+  - {fileID: 8300000, guid: d77097f57ef2300468ecfe4f67a0fc4f, type: 3}
   voiceline_Move: []
   commandCards:
   - cardName: default
     commands:
     - button: {fileID: 11400000, guid: b28942760061d8a428758b039529e5bb, type: 2}
+      buttonID: train minebot
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 0
-      abilityType: 8
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 11400000, guid: b89dd84ec59800f4684ff3534fc42f91, type: 2}
+      orderClass: 12
+    - button: {fileID: 11400000, guid: 235115f4c238fd04aa7a6e6d458d4d48, type: 2}
+      buttonID: train merc
+      commandType: 0
+      gameUnit: {fileID: 11400000}
+      position: 1
       cardToOpen: 
-      behaviorClass: 19
+      buildingSO: {fileID: 0}
+      unitSO: {fileID: 11400000, guid: 262ce60f6c0274f46bd0cba9ca68ea8c, type: 2}
+      orderClass: 12
     - button: {fileID: 11400000, guid: 393f91113d249534b826a8f7525a70a1, type: 2}
+      buttonID: order_setRallyPoint
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 7
-      abilityType: 0
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
-      behaviorClass: 0
+      orderClass: 105

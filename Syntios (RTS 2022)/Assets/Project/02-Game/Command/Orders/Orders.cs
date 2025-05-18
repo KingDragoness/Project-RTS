@@ -4,429 +4,256 @@ using UnityEngine;
 using Sirenix.OdinInspector;
 using Newtonsoft.Json;
 using UnityEditor;
+using System;
 
 namespace ProtoRTS.Game
 {
 
-    public class Orders
+    //TRAINING A UNIT IS NOT AN ORDER!
+    [System.Serializable]
+    public class TrainingQueue
+    {
+        [JsonIgnore] public SO_GameUnit gameUnitClass;
+        public string gameUnitID;
+        public float timeTrained = 0;
+
+        public TrainingQueue(SO_GameUnit gameUnitClass)
+        {
+            this.gameUnitClass = gameUnitClass;
+        }
+
+        public void Save()
+        {
+            gameUnitID = gameUnitClass.ID;
+        }
+
+        public void ResolveReference()
+        {
+            gameUnitClass = DynamicAssetStorage.Instance.FindGameUnitClass(gameUnitID);
+        }
+    }
+
+    [System.Serializable]
+    public class OrderEntry
+    {
+        [JsonIgnore] public GameUnit targetUnit;
+        [JsonIgnore] public bool isCompleted;
+        public OrderClass orderClass;
+        public string buttonID;
+        public string targetUnitID;
+        public Vector3 targetPosition;
+        public Vector3 targetPosition2;
+
+        //public static OrderEntry NewEntry(OrderClass orderClass, GameUnit targetUnit, Vector3 targetPosition)
+        //{
+        //    OrderEntry entry = new OrderEntry();
+        //    entry.orderClass = orderClass;
+        //    entry.targetUnit = targetUnit;
+        //    entry.targetPosition = targetPosition;
+        //    return entry;
+        //}
+
+        public virtual Vector3 TargetPosition()
+        {
+            if (targetUnit == null)
+            {
+                return targetPosition;
+            }
+            return targetUnit.transform.position;
+        }
+
+        public void PassData(OrderUnit order)
+        {
+            targetPosition = order.targetPos;
+            targetPosition2 = order.targetPos2;
+            orderClass = order.OrderClassType;
+            buttonID = order.buttonID;
+            if (targetUnit != null) targetUnitID = order.targetUnit.Class.ID;
+        }
+    }
+
+
+    [System.Serializable]
+    public abstract class OrderUnit : MonoBehaviour
     {
 
-        [System.Serializable]
-        public abstract class UnitOrder_SaveDat
+        public GameUnit gameUnit;
+        public string buttonID = "";
+        public OrderClass OrderClassType;
+
+        //RUNTIME
+        public int TickPassed = 0;
+        public Vector3 targetPos;
+        public Vector3 targetPos2;
+        public GameUnit targetUnit;
+        public bool isCompleted;
+        //
+
+
+        public abstract void Active();
+        public abstract void CheckBackground();
+        public abstract bool IsButtonAllowed();
+
+        public virtual OrderEntry Save()
+        {
+            OrderEntry saveDat = new OrderEntry();
+            saveDat.PassData(this);
+            return saveDat;
+        }
+        public virtual void LoadData(OrderEntry saveData)
         {
 
         }
-
-        //queueable orders:
-        //Move
-        //Attack
-        //Repair
-        //Constructing
-        //Gather resources
-        //Place building
-        //Transport unit
-
-        [System.Serializable]
-        public abstract class UnitOrder
+        public virtual bool IgnoreQueue()
         {
-            public bool isCompleted = false;
-
-            public UnitOrder()
-            {
-
-            }
-
-            public abstract bool AllowAttack();
-
-            /// <summary>
-            /// Allows units to attack any enemy in range/sight until
-            /// it move maybe 10 units from its original position
-            /// </summary>
-            /// <returns></returns>
-            /// 
-            public abstract bool AllowBeDistracted_and_AttackNearby();
-            public abstract bool IsObjectiveAchieved(GameUnit myUnit);
-            public abstract void Run(GameUnit myUnit);
-            public abstract Vector3 TargetPosition();
-            public virtual bool IsOrderExistsInUnit(GameUnit myUnit) { return myUnit.OrderHandler.orders.Contains(this); }
-            public abstract void Save();
-
+            return false;
         }
 
-        [System.Serializable]
-        public class Order_Move : UnitOrder
+     
+
+        public virtual OrderEntry NewOrder(OrderClass orderClass, string buttonID, GameUnit targetUnit, Vector3 targetPosition)
         {
-
-
-            [JsonIgnore] public GameUnit target;
-            public string guidTarget;
-            public Vector3 positionTarget;
-
-            public Order_Move() { }
-
-            public Order_Move(GameUnit target, Vector3 positionTarget)
-            {
-                this.target = target;
-                this.positionTarget = positionTarget;
-            }
-
-            public override bool AllowAttack()
-            {
-                return false;
-            }
-
-            public override bool AllowBeDistracted_and_AttackNearby()
-            {
-                return false;
-            }
-
-            public override bool IsObjectiveAchieved(GameUnit myUnit)
-            {
-                if (target == null)
-                {
-                    float distance1 = Vector3.Distance(myUnit.transform.position, positionTarget);
-
-                    if (distance1 < myUnit.Class.Radius + 0.5f)
-                    {
-                        isCompleted = true;
-                        return true;
-                    }
-
-                    return false;
-                }
-
-                float distance = Vector3.Distance(myUnit.transform.position, target.transform.position);
-
-                if (distance < myUnit.Class.Radius + 0.5f + target.Class.Radius)
-                {
-                    isCompleted = true;
-                    return true;
-                }
-
-                return false;
-            }
-
-            public override void Run(GameUnit myUnit)
-            {
-                myUnit.RVO_LockWhenNotMoving(false);
-
-                if (target != null)
-                {
-                    myUnit.move_TargetUnit = target;
-                }
-                else
-                {
-                    myUnit.move_Target = positionTarget;
-                    myUnit.move_TargetUnit = null;
-                }
-            }
-
-            public override void Save()
-            {
-                if (target != null) guidTarget = target.guid;
-            }
-
-            public override Vector3 TargetPosition()
-            {
-                return positionTarget + new Vector3(0,0.07f,0);
-            }
+            OrderEntry saveDat = new OrderEntry();
+            saveDat.targetPosition = targetPosition;
+            saveDat.targetUnit = targetUnit;
+            saveDat.orderClass = orderClass;
+            saveDat.buttonID = buttonID;
+            return saveDat;
         }
 
-        [System.Serializable]
-        public class Order_Stop : UnitOrder
+        public virtual void InitializeButton(UnitButtonCommand button)
         {
-            public Order_Stop() { }
-
-            public override bool AllowAttack()
-            {
-                return false;
-            }
-            public override bool AllowBeDistracted_and_AttackNearby()
-            {
-                return true;
-            }
-
-            public override bool IsObjectiveAchieved(GameUnit myUnit)
-            {
-                isCompleted = true;
-                return true;
-            }
-
-            public override void Run(GameUnit myUnit)
-            {
-                myUnit.move_Target = myUnit.transform.position;
-                myUnit.move_TargetUnit = null;
-                myUnit.RVO_LockWhenNotMoving(false);
-
-            }
-
-            public override void Save()
-            {
-
-            }
-
-            public override Vector3 TargetPosition()
-            {
-                return Vector3.zero;
-            }
+            buttonID = button.buttonID;
         }
+        public abstract Vector3 TargetPosition();
+        public abstract UnitAbility.TargetType[] TargetCriteria();
 
 
-        //In some units (Seaver, Carrier-interceptor units), it needs to have special scripts
-        //Order_Attack_Seaver
-
-        /// <summary>
-        /// In some units, need to pass through the GUOC first
-        /// Order_Attack_Seaver!
-        /// </summary>
-        [System.Serializable]
-        public class Order_Attack : UnitOrder
+        public OrderClass GetClassType()
         {
 
-            [JsonIgnore] public GameUnit enemyUnit;
-            public string guidTarget;
-            public Vector3 attackPosition;
-
-            public Order_Attack() { }
-
-            public override bool AllowAttack()
+            if (this is Order_move)
             {
-                return true;
+                return OrderClass.order_move;
             }
-            public override bool AllowBeDistracted_and_AttackNearby()
+            if (this is Order_stop)
             {
-                return true;
+                return OrderClass.order_stop;
             }
-
-            public override bool IsObjectiveAchieved(GameUnit myUnit)
+            if (this is Order_patrol)
             {
-                if (enemyUnit == null)
-                {
-                    isCompleted = true;
-                    return true;
-                }
-
-                float distance = Vector3.Distance(myUnit.transform.position, enemyUnit.transform.position);
-
-                if (distance < myUnit.Class.Radius)
-                {
-                    isCompleted = true;
-                    return true;
-                }
-
-                return false;
+                return OrderClass.order_patrol;
             }
-
-            public override void Run(GameUnit myUnit)
+            if (this is Order_holdPosition)
             {
-                if (enemyUnit == null)
-                {
-                    //invalid run
-                    return;
-                }
-
-                myUnit.move_TargetUnit = enemyUnit;
-                myUnit.RVO_LockWhenNotMoving(false);
-
+                return OrderClass.order_holdPosition;
             }
-
-            public override void Save()
+            if (this is Order_trainUnit)
             {
-                if (enemyUnit != null) guidTarget = enemyUnit.guid;
+                return OrderClass.order_train_unit;
             }
-
-            public override Vector3 TargetPosition()
+            if (this is Order_setRallyPoint)
             {
-                return enemyUnit.transform.position;
+                return OrderClass.order_setRallyPoint;
             }
+            return OrderClass.Null;
         }
-
-
-
-        [System.Serializable]
-        public class Order_Attack_Seaver : UnitOrder
+        public static OrderUnit NewClassUnit(OrderClass orderClass)
         {
 
-            [JsonIgnore] public GameUnit enemyUnit;
-            public string guidTarget;
-            public Vector3 attackPosition;
-
-            public Order_Attack_Seaver() { }
-
-            public override bool AllowAttack()
+            switch (orderClass)
             {
-                return true;
+                case OrderClass.Null:
+                    break;
+                case OrderClass.order_idle:
+                    break;
+                case OrderClass.order_move:
+                    return new GameObject().AddComponent<Order_move>();
+                case OrderClass.order_stop:
+                    return new GameObject().AddComponent<Order_stop>();
+                case OrderClass.order_attack:
+                    break;
+                case OrderClass.order_holdPosition:
+                    return new GameObject().AddComponent<Order_holdPosition>();
+                case OrderClass.order_patrol:
+                    return new GameObject().AddComponent<Order_patrol>();
+                case OrderClass.order_castGenericSpell:
+                    break;
+                case OrderClass.order_returnCargo:
+                    break;
+                case OrderClass.order_mineResources:
+                    break;
+                case OrderClass.order_switchState:
+                    break;
+                case OrderClass.order_repair:
+                    break;
+                case OrderClass.order_train_unit:
+                    return new GameObject().AddComponent<Order_trainUnit>();
+                case OrderClass.order_morph_unit:
+                    break;
+                case OrderClass.order_build_Dionarian:
+                    break;
+                case OrderClass.order_build_Soviet:
+                    break;
+                case OrderClass.order_build_Mobius:
+                    break;
+                case OrderClass.order_build_TitanSixtus:
+                    break;
+                case OrderClass.order_constructing:
+                    break;
+                case OrderClass.order_enter_building:
+                    break;
+                case OrderClass.order_exit_building:
+                    break;
+                case OrderClass.order_building_liftoff:
+                    break;
+                case OrderClass.order_building_land:
+                    break;
+                case OrderClass.order_transport_load:
+                    break;
+                case OrderClass.order_transport_exitOne:
+                    break;
+                case OrderClass.order_transport_exitAll:
+                    break;
+                case OrderClass.order_setRallyPoint:
+                    return new GameObject().AddComponent<Order_setRallyPoint>();
+
             }
-            public override bool AllowBeDistracted_and_AttackNearby()
-            {
-                return true;
-            }
 
-            public override bool IsObjectiveAchieved(GameUnit myUnit)
-            {
-                if (enemyUnit == null)
-                {
-                    isCompleted = true;
-                    return true;
-                }
-
-                float distance = Vector3.Distance(myUnit.transform.position, enemyUnit.transform.position);
-
-                if (distance < myUnit.Class.Radius)
-                {
-                    isCompleted = true;
-                    return true;
-                }
-
-                return false;
-            }
-
-            public override void Run(GameUnit myUnit)
-            {
-                if (enemyUnit == null)
-                {
-                    //invalid run
-                    return;
-                }
-
-                myUnit.move_TargetUnit = enemyUnit;
-                myUnit.RVO_LockWhenNotMoving(false);
-
-            }
-
-            public override void Save()
-            {
-                if (enemyUnit != null) guidTarget = enemyUnit.guid;
-            }
-
-            public override Vector3 TargetPosition()
-            {
-                return enemyUnit.transform.position;
-            }
+            if (SyntiosEngine.Instance.engine_PrintErrorMissingBehavior) Debug.LogError("BEHAVIOR NOT YET IMPLEMENTED");
+            return null;
         }
+    }
 
-
-
-        [System.Serializable]
-        public class Order_Patrol : UnitOrder
-        {
-            public Vector3 startPoint;
-            public Vector3 endPoint;
-            bool b = false;
-
-            public Order_Patrol() { }
-
-
-            public override bool AllowAttack()
-            {
-                return true;
-            }
-            public override bool AllowBeDistracted_and_AttackNearby()
-            {
-                return true;
-            }
-
-            public Order_Patrol(Vector3 _start, Vector3 _end)
-            {
-                this.startPoint = _start;
-                this.endPoint = _end;
-            }
-
-            public override bool IsObjectiveAchieved(GameUnit myUnit)
-            {
-                //never completes, Patrol will never stack
-                return false;
-            }
-
-            public override void Run(GameUnit myUnit)
-            {
-                myUnit.move_TargetUnit = null;
-
-                Vector3 targetPoint = startPoint;
-
-                if (b)
-                {
-                    targetPoint = startPoint;
-                }
-                else
-                {
-                    targetPoint = endPoint;
-                }
-
-                float distance = Vector3.Distance(myUnit.transform.position, targetPoint);
-
-                if (distance < myUnit.Class.Radius + 0.5f)
-                {
-                    b = !b;
-                }
-
-
-                myUnit.move_Target = targetPoint;
-                myUnit.RVO_LockWhenNotMoving(false);
-
-            }
-
-            public override Vector3 TargetPosition()
-            {
-                Vector3 targetPoint = startPoint;
-
-                if (b)
-                {
-                    targetPoint = startPoint;
-                }
-                else
-                {
-                    targetPoint = endPoint;
-                }
-
-                targetPoint += new Vector3(0, 0.07f, 0);
-
-                return targetPoint;
-            }
-
-            public override void Save()
-            {
-
-            }
-        }
-
-        [System.Serializable]
-        public class Order_HoldPosition : UnitOrder
-        {
-            public Order_HoldPosition()
-            {
-            }
-
-            public override bool AllowAttack()
-            {
-                return true;
-            }
-            public override bool AllowBeDistracted_and_AttackNearby()
-            {
-                return false;
-            }
-            public override bool IsObjectiveAchieved(GameUnit myUnit)
-            {
-                return false;
-            }
-
-            public override void Run(GameUnit myUnit)
-            {
-                myUnit.move_Target = myUnit.transform.position;
-                myUnit.move_TargetUnit = null;
-                myUnit.RVO_LockWhenNotMoving(true);
-            }
-
-            public override void Save()
-            {
-
-            }
-
-            public override Vector3 TargetPosition()
-            {
-                return Vector3.zero;
-            }
-        }
+    public enum OrderClass
+    {
+        Null,
+        order_idle,
+        order_move,
+        order_stop,
+        order_attack,
+        order_holdPosition,
+        order_patrol,
+        order_castGenericSpell,
+        order_returnCargo,
+        order_mineResources,
+        order_switchState,
+        order_repair,
+        order_train_unit,
+        order_morph_unit,
+        order_build_Dionarian = 100,
+        order_build_Soviet,
+        order_build_Mobius,
+        order_build_TitanSixtus,
+        order_constructing,
+        order_setRallyPoint,
+        order_enter_building = 150,
+        order_exit_building,
+        order_building_liftoff,
+        order_building_land,
+        order_transport_load,
+        order_transport_exitOne,
+        order_transport_exitAll,
     }
 
 

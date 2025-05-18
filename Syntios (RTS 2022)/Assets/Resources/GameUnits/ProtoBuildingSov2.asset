@@ -19,12 +19,16 @@ MonoBehaviour:
   Rank: 
   Radius: 5
   spriteWireframe: {fileID: 21300000, guid: 63df497243b7cb64ab838d7633e2dd5f, type: 3}
+  allWeapons: []
   MineralCost: 150
   EnergyCost: 150
   SupplyCount: 0
+  SupplyProvide: 8
   BuildTime: 45
   MaxHP: 250
+  MaxShield: 40
   IsFlyUnit: 0
+  HasShield: 0
   HasEnergy: 0
   LineOfSight: 8
   IsUntouchable: 0

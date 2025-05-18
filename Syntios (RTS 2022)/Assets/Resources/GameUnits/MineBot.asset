@@ -18,15 +18,19 @@ MonoBehaviour:
     type: 3}
   Rank: 
   Radius: 0.9
-  LineOfSight: 6
   spriteWireframe: {fileID: 21300000, guid: 6bc12da6eda2a0c43b57f0ee5dbf161e, type: 3}
+  allWeapons: []
   MineralCost: 50
   EnergyCost: 0
   SupplyCount: 1
+  SupplyProvide: 8
   BuildTime: 19
   MaxHP: 35
+  MaxShield: 40
   IsFlyUnit: 0
+  HasShield: 0
   HasEnergy: 0
+  LineOfSight: 6
   IsUntouchable: 0
   AllUnitTags: 02000000050000000a000000
   AI_b_AttackOnSight: 1
@@ -43,42 +47,47 @@ MonoBehaviour:
   - cardName: default
     commands:
     - button: {fileID: 11400000, guid: c62efbfe0e21d34479760900f1102f55, type: 2}
+      buttonID: order_move
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 0
-      abilityType: 1
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 2
     - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      buttonID: order_stop
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 1
-      abilityType: 2
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 3
     - button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
+      buttonID: order_holdPosition
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 2
-      abilityType: 4
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 5
     - button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
+      buttonID: order_attack
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 3
-      abilityType: 3
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 4
     - button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
+      buttonID: order_patrol
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 4
-      abilityType: 5
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 6

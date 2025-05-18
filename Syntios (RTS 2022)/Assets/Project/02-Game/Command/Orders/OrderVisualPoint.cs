@@ -8,11 +8,18 @@ namespace ProtoRTS.Game
 	public class OrderVisualPoint : MonoBehaviour
 	{
 
+		public enum PointType
+		{
+			OrderQueue,
+			RallyPoint
+		}
+
 		public Wire wire;
 		public Transform circle;
+		public PointType pointType;
 		[Space]
         public GameUnit attachedUnit;
-        public Orders.UnitOrder attachedOrder;
+        public OrderUnit attachedOrder;
 		public Vector3Int orderPosTarget;
 	
 	}

@@ -27,6 +27,7 @@ namespace ProtoRTS
         public string Rank = "";
         public float Radius = 2;
         public Sprite spriteWireframe;
+        public List<SO_Weapon> allWeapons = new List<SO_Weapon>();
 
 
 
@@ -70,11 +71,11 @@ namespace ProtoRTS
         [InfoBox("Command card at [0] index is always default")] public List<CommandCard> commandCards = new List<CommandCard>();
 
 
-        private IEnumerable DefaultCardCommands()
-        {
-            if (commandCards.Count == 0) return null;
-            return commandCards[0].commands.Select(x => new ValueDropdownItem(x.abilityType.ToString(), x.abilityType.ToString()));
-        }
+        //private IEnumerable DefaultCardCommands()
+        //{
+        //    if (commandCards.Count == 0) return null;
+        //    return commandCards[0].commands.Select(x => new ValueDropdownItem(x.abilityType.ToString(), x.abilityType.ToString()));
+        //}
 
         public CommandCard DefaultCard
         {
@@ -102,6 +103,54 @@ namespace ProtoRTS
             return 200;
         }
 
+        /// <summary>
+        /// First it checks for similar button class,
+        /// then checks for tags
+        /// If tags failed, then it will return null
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        internal string GetSimilarButton(string ID)
+        {
+            foreach (var cc in commandCards)
+            {
+                foreach(var button in cc.commands)
+                {
+                    if (button.buttonID.ToLower() == ID.ToLower())
+                        return button.buttonID;
+                }
+            }
+
+            return "";
+        }
+
+        [FoldoutGroup("HELPERS")]
+        [Button("Give IDs")]
+        public void GiveIDToButtons()
+        {
+            foreach (var cc in commandCards)
+            {
+                foreach (var button in cc.commands)
+                {
+                    bool dupe = false;
+
+                    foreach (var buttonToCompare in cc.commands)
+                    {
+                        if (buttonToCompare == button) continue;
+                        if (buttonToCompare.orderClass == button.orderClass)
+                        {
+                            dupe = true;
+                            break;
+                        }
+                    }
+
+                    if (!dupe) button.buttonID = button.orderClass.ToString();
+                }
+
+                
+            }
+        }
     }
 
 
@@ -132,22 +181,6 @@ namespace ProtoRTS
 	public class UnitButtonCommand
 	{
 
-        public enum AbilityOrder
-        {
-            None,
-            Move,
-            Stop,
-            Attack,
-            HoldPosition,
-            Patrol,
-            EnterExitUnit,
-            BuildBuilding,
-            TrainUnit,
-            GatherResources,
-            HealRepair,
-            ExecuteAbility
-
-        }
 
 
         public enum Type
@@ -160,14 +193,24 @@ namespace ProtoRTS
 		}
 
         public CommandButtonSO button;
+
+        //THIS IS THE BEST METHOD TO PAIR BUTTON, DON'T TRY TO CHANGE IT WITH OBJ REFERENCE OR DO ANY RETARDED PRETENTIOUS METHOD IN IT
+        //Follow naming convention in OrderClass (enum) UNLESS it is generic ability 
+        //Generic ability just write whatever ID you want (CHANCE OF COLLISION is LOW, FOR GOD SAKES)
+        //IN THE CASE DUPLICATE in different CCs... IT IS MEANT TO BE BECAUSE STOP in (State 1) IS LITERALLY THE SAME in (State 2).
+        //KEEP IT SIMPLE 4 FOR GOD SAKE, KEEP IT SIMPLE!!!
+        public string buttonID = "_"; 
+
+
+
+
         [FoldoutGroup("$Combined_1")] public Type commandType;
         [FoldoutGroup("$Combined_1")][ReadOnly] public SO_GameUnit gameUnit;
         [FoldoutGroup("$Combined_1")][Range(0, 11)] public int position;
-        [FoldoutGroup("$Combined_1")][ShowIf("commandType", Type.AbilityCommand)] public AbilityOrder abilityType;
-        [FoldoutGroup("$Combined_1")][ShowIf("abilityType", AbilityOrder.BuildBuilding)] public SO_GameUnit buildingSO;
-        [FoldoutGroup("$Combined_1")][ShowIf("abilityType", AbilityOrder.TrainUnit)] public SO_GameUnit unitSO;
         [FoldoutGroup("$Combined_1")][ShowIf("commandType", Type.Submenu)][ValueDropdown("AllCommandCard")] public string cardToOpen = "";
-        [FoldoutGroup("$Combined_1")] public GameUnitBehavior.Class behaviorClass;
+        [FoldoutGroup("$Combined_1")][ShowIf("IsBuildingLikeOrder")] public SO_GameUnit buildingSO;
+        [FoldoutGroup("$Combined_1")][ShowIf("orderClass", OrderClass.order_train_unit)] public SO_GameUnit unitSO;
+        [FoldoutGroup("$Combined_1")][ShowIf("commandType", Type.AbilityCommand)] public OrderClass orderClass;
 
 
         public string Combined_1 
@@ -178,15 +221,15 @@ namespace ProtoRTS
                 {
                     return this.commandType + $" {cardToOpen}";
                 }    
-                if (commandType == Type.AbilityCommand)
-                {
-                    if (abilityType == AbilityOrder.BuildBuilding) return $"Build {buildingSO}";
-                    if (abilityType == AbilityOrder.TrainUnit) return $"Train {unitSO}";
-                    return this.abilityType.ToString();
-                }
+
 
                 return this.commandType + ""; 
             } 
+        }
+
+        public bool IsBuildingLikeOrder()
+        {
+            return orderClass == OrderClass.order_build_Dionarian | orderClass == OrderClass.order_build_Mobius | orderClass == OrderClass.order_build_Soviet | orderClass == OrderClass.order_build_TitanSixtus;
         }
 
 
@@ -196,21 +239,7 @@ namespace ProtoRTS
             return gameUnit.commandCards.Select(x => new ValueDropdownItem(x.cardName, x.cardName));
         }
 
-        IEnumerable<Orders.UnitOrder> GetAllOrderClass()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => type.IsSubclassOf(typeof(Orders.UnitOrder)))
-                .Select(type => Activator.CreateInstance(type) as Orders.UnitOrder);
-        }
-
-        private IEnumerable All_UnitOrderEnum()
-        {
-            var ienumrables = GetAllOrderClass().Select(x => new ValueDropdownItem(x.GetType().Name, x.GetType()));
-            ienumrables = ienumrables.Append(new ValueDropdownItem("", null));
-            return ienumrables;
-        }
-
+   
      
 
     }

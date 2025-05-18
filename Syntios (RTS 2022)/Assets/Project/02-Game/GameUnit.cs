@@ -15,38 +15,43 @@ using static UnityEngine.UI.CanvasScaler;
 namespace ProtoRTS
 {
 
+    public enum UnitAnimationType
+    {
+        Idle,
+        Moving,
+        Attack,
+        CastSpell,
+        Building_DoingSomething,
+        Building_Upgrade,
+        Custom1 = 100,
+        Custom2,
+        Custom3,
+        Custom4,
+        Custom5
+    }
+
 	public class GameUnit : AbstractUnit
 	{
 		[ReadOnly] public string guid = "";
 		public Vector3 move_Target;
         public GameUnit move_TargetUnit;
+        public Vector3 trainRallyPoint;
+        public GameUnit closest_attackableUnit; //Assign by targetSelector (we delegate to system because this is heavy)
         public BehaviorTable behaviorTable;
         public float targetY = 0;
         [FoldoutGroup("Training")] public List<TrainingQueue> trainingQueue = new List<TrainingQueue>();
 
-
-        [FoldoutGroup("Attack_Weapon Behaviors")][ValueDropdown("All_AttackLikeOrderEnum")] public string classOrderAttack = ""; //Must contain "Attack" in its class name
+        [FoldoutGroup("References")] public Animator mainBodyAnimator;
+        [FoldoutGroup("References")] public Animator upperBodyAnimator;
+        [FoldoutGroup("References")] public UnitWeaponHandler weaponHandler;
         [FoldoutGroup("References")] public Renderer[] modelView;
 		[FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
 		[FoldoutGroup("References")] public RVOController rvoController; //change to modular
 		[FoldoutGroup("References")] public AIPath groundAIPath; //change to modular
 
-		private GameUnit_OrderController _orderHandler;
 		private bool _isVisibleFromFOW = false;
         private bool _isLoadedSaveFile = false;
 
-        IEnumerable<Orders.UnitOrder> GetAllAttackOrderClass()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => type.IsSubclassOf(typeof(Orders.UnitOrder)) && type.Name.Contains("Attack"))
-                .Select(type => Activator.CreateInstance(type) as Orders.UnitOrder);
-        }
-
-        private IEnumerable All_AttackLikeOrderEnum()
-        {
-            return GetAllAttackOrderClass().Select(x => new ValueDropdownItem(x.GetType().Name, x.GetType().Name));
-        }
 
         public float Radius
         {
@@ -58,7 +63,6 @@ namespace ProtoRTS
         }
 
         public bool IsVisibleFromFOW { get => _isVisibleFromFOW;  }
-        public GameUnit_OrderController OrderHandler { get => _orderHandler;  }
 
 
         public override void Awake()
@@ -67,35 +71,40 @@ namespace ProtoRTS
 
             //set up behavior table
             {
-                var goBehaviorTable = new GameObject("Behaviors");
-                goBehaviorTable.transform.SetParent(transform);
-                goBehaviorTable.transform.position = transform.position;
-                behaviorTable = goBehaviorTable.AddComponent<BehaviorTable>();
-                behaviorTable.gameUnit = this;
+                InitializeEverything();
+                
             }
-          
-            _orderHandler = GetComponentInChildren<GameUnit_OrderController>();
+            SyntiosEngine.Instance.AddNewUnit(this);
+
         }
 
-        private void Start()
+		public string ID
 		{
+			get
+			{
+				return Class.ID;
+			}
+		}
+
+        #region Initialization and Destroy
+        private void Start()
+        {
             if (_isLoadedSaveFile == false)
             {
                 move_Target = transform.position;
-				move_Target.y = Map.instance.GetPositionY_cliffLevel(move_Target);
-
+                move_Target.y = Map.instance.GetPositionY_cliffLevel(move_Target);
+                trainRallyPoint = transform.position;
             }
 
-            SyntiosEngine.Instance.AddNewUnit(this);
-			SetUnitStat();
+            SetUnitStat();
             DynamicAssetStorage.Instance.RegisterCustomMaterial_GameUnit(this);
-			DynamicAssetStorage.Instance.OverrideCustomMaterial_GameUnit(this);
+            DynamicAssetStorage.Instance.OverrideCustomMaterial_GameUnit(this);
 
-			if (rvoController != null)
-			{
-				if (false) 
-				{
-					int layerNeutralPlayer = 1 << 10;
+            if (rvoController != null)
+            {
+                if (false)
+                {
+                    int layerNeutralPlayer = 1 << 10;
                     int layerPlayer1 = 1 << 11;
                     int layerPlayer2 = 1 << 12;
                     int layerPlayer3 = 1 << 13;
@@ -122,9 +131,9 @@ namespace ProtoRTS
 
                     rvoController.collidesWith = (RVOLayer)finalMask;
                 }
-				
-				if (Class.IsFlyUnit)
-				{
+
+                if (Class.IsFlyUnit)
+                {
                     rvoController.layer = RVOLayer.Layer9;
                     rvoController.collidesWith = RVOLayer.Layer9;
 
@@ -133,14 +142,6 @@ namespace ProtoRTS
             }
         }
 
-  
-		public string ID
-		{
-			get
-			{
-				return Class.ID;
-			}
-		}
 
 
         void OnEnable()
@@ -169,36 +170,60 @@ namespace ProtoRTS
 			SyntiosEngine.Instance.RemoveUnit(this);
         }
 
-
         public static GameUnit CreateUnit(SaveData.UnitData unitData, SO_GameUnit gameunitSO)
         {
             var unit = Instantiate(gameunitSO.basePrefab);
-			if (unit == null) return null;
+            if (unit == null) return null;
 
             unit.transform.position = unitData.unitPosition;
-			unit.move_Target = unitData.move_TargetPos;
-			unit.stat_faction = unitData.stat_Faction;
-			unit.stat_HP = (int)unitData.stat_HP;
-			unit.stat_Energy = (int)unitData.stat_Energy;
+            unit.move_Target = unitData.move_TargetPos;
+            unit.trainRallyPoint = unitData.trainRallyPoint;
+            unit.stat_faction = unitData.stat_Faction;
+            unit.stat_HP = (int)unitData.stat_HP;
+            unit.stat_Energy = (int)unitData.stat_Energy;
             unit.stat_Shield = (int)unitData.stat_Shield;
             unit.stat_isHallucination = unitData.stat_isHallucination;
             unit.stat_isCloaking = unitData.stat_isCloaked;
             unit.guid = unitData.guid;
-			unit._isLoadedSaveFile = true;
-
-			{
-				unit.OrderHandler.orders.AddRange(unitData.allOrders);
-                unit.trainingQueue.AddRange(unitData.trainingQueue);
-
-            }
+            unit._isLoadedSaveFile = true;
+            unit.trainingQueue.AddRange(unitData.trainingQueue);
+            foreach (var queue in unit.trainingQueue) { queue.ResolveReference(); }
+            unit.behaviorTable.allQueuedOrders = unitData.allOrders;
+            unit.behaviorTable.LoadBehaviorData();
+            //unit.InitializeEverything();
 
             return unit;
         }
 
-		public bool CheckFlag(Unit.Tag tag)
-		{
-			return Class.AllUnitTags.Contains(tag);
-		}
+        public void SecondPass_LoadedUnit(SaveData.UnitData unitData, SO_GameUnit gameunitSO)
+        {
+            foreach (var orderDat in unitData.allOrders)
+            {
+                var orderinUnit = behaviorTable.allOrdersAvailable.Find(x => x.GetClassType() == orderDat.orderClass);
+                if (orderinUnit == null) continue;
+
+                var targetUnit = SyntiosEngine.GetUnit(orderDat.targetUnitID);
+
+                orderinUnit.targetUnit = targetUnit;
+                orderinUnit.targetPos = orderDat.targetPosition;
+            }
+
+            //behaviorTable.allQueuedOrders.AddRange(unitData.allOrders);
+        }
+
+        public void InitializeEverything()
+        {
+            var goBehaviorTable = new GameObject("Behaviors");
+            goBehaviorTable.transform.SetParent(transform);
+            goBehaviorTable.transform.position = transform.position;
+            goBehaviorTable.AddComponent<BehaviorTable>();
+            behaviorTable = goBehaviorTable.GetComponent<BehaviorTable>();
+            behaviorTable.enabled = true;
+            behaviorTable.gameUnit = this;
+        }
+
+        #endregion
+
 
         void Update()
 		{
@@ -229,7 +254,9 @@ namespace ProtoRTS
             }
         }
 
-		private void OnTickUnit(int tick)
+
+        #region TICKS
+        private void OnTickUnit(int tick)
 		{
 			if (groundAIPath != null)
 			{
@@ -308,13 +335,15 @@ namespace ProtoRTS
 
                 var newUnit = currentTrainQueue.gameUnitClass.basePrefab.TrainSpawnUnit();
                 newUnit.transform.position = spawnPos;
+                newUnit.behaviorTable.IssueOrder(OrderClass.order_move, buttonID: "order_move", targetPosition: trainRallyPoint, isQueueing: QueueOrder.Override);
                 trainingQueue.RemoveAt(0);
             }
 
         }
 
+        #endregion
 
-		public void SetUnitStat()
+        public void SetUnitStat()
         {
 			stat_HP = _class.MaxHP;
         }
@@ -327,53 +356,81 @@ namespace ProtoRTS
 			Destroy(gameObject);
         }
 
-		public void HideModel()
-        {
-			_isVisibleFromFOW = false;
-			foreach (var meshRrndr in modelView) meshRrndr.enabled = false;
-
-		}
-
-		public void ShowModel()
-        {
-			_isVisibleFromFOW = true;
-			foreach (var meshRrndr in modelView) meshRrndr.enabled = true;
-
-		}
-
-		[FoldoutGroup("DEBUG")]
-		[Button("Collect Mesh Renderers")]
-		public void DEBUG_CollectMeshRenderers()
-        {
-			var meshRenderers = gameObject.GetComponentsInChildren<MeshRenderer>();
-
-			modelView = meshRenderers;
-
-		}
-
         #region Functions
-        public GameObject TrainSpawnUnit()
+        
+
+        public void HideModel()
         {
+            _isVisibleFromFOW = false;
+            foreach (var meshRrndr in modelView) meshRrndr.enabled = false;
+
+        }
+
+        public void ShowModel()
+        {
+            _isVisibleFromFOW = true;
+            foreach (var meshRrndr in modelView) meshRrndr.enabled = true;
+
+        }
+
+        [FoldoutGroup("DEBUG")]
+        [Button("Collect Mesh Renderers")]
+        public void DEBUG_CollectMeshRenderers()
+        {
+            var meshRenderers = gameObject.GetComponentsInChildren<MeshRenderer>();
+
+            modelView = meshRenderers;
+
+        }
 
 
-            var newUnit = Instantiate(gameObject, transform.position, transform.rotation);
+        public GameUnit TrainSpawnUnit()
+        {
+            var newUnit = Instantiate(this, transform.position, transform.rotation);
             newUnit.gameObject.SetActive(true);
 
             return newUnit;
         }
 
-		public void RVO_LockWhenNotMoving(bool lockNotMoving)
+        public void RVO_LockWhenNotMoving(bool lockNotMoving)
 		{
 			if (rvoController == null) return;
 			rvoController.lockWhenNotMoving = lockNotMoving;
 			if (lockNotMoving == false) rvoController.locked = false;
 		}
 
-		//public bool IsUnitHasAbility(UnitButtonCommand.AbilityOrder abilityType)
-		//{
-		//	if ()
-		//}
+        public void AnimationPlay(UnitAnimationType animType)
+        {
+
+        }
+
+        //public bool IsUnitHasAbility(UnitButtonCommand.AbilityOrder abilityType)
+        //{
+        //	if ()
+        //}
 
         #endregion
+
+        #region Get Unit Properties/Datas
+
+
+        public FactionSheet Unit_FactionSheet()
+        {
+            return SyntiosEngine.Instance.GetFactionSheet(stat_faction);
+        }
+
+        public bool CheckFlag(Unit.Tag tag)
+        {
+            return Class.AllUnitTags.Contains(tag);
+        }
+
+        internal bool IsAir()
+        {
+            //Liftoff unit is in other state
+            return Class.IsFlyUnit;
+        }
+
+        #endregion
+
     }
 }

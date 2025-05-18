@@ -21,6 +21,7 @@ namespace ProtoRTS.Game
         [ShowInInspector] private List<OrderVisualPoint> allVisualPoints = new List<OrderVisualPoint>();
         [ShowInInspector] private List<Transform> allEndCircles = new List<Transform>();
 
+
         private void Awake()
         {
             SyntiosEvents.UI_OrderMove += event_OrderMove;
@@ -85,25 +86,31 @@ namespace ProtoRTS.Game
             foreach(var item in allVisualPoints) 
             { item.gameObject.SetActive(false); }
 
+
             foreach (var unit in Selection.AllSelectedUnits)
             {
-                Orders.UnitOrder order = unit.OrderHandler.GetCurrentOrder();
+                //LATER: need to be changed to defaultCommandCard.HasOrder
+                if (unit.CheckFlag(Unit.Tag.Factory) && unit.behaviorTable.HasOrder(OrderClass.order_setRallyPoint))
+                {
+                    var visual_p = SpawnOrderVisual_rallyPoint(unit);
+                    visual_p.pointType = OrderVisualPoint.PointType.RallyPoint;
+                    continue;
+                }
+
+                var order = unit.behaviorTable.GetCurrentOrder();
                 if (order == null) continue;
 
                 SpawnOrderVisual(unit);
             }
         }
 
-        public void SpawnOrderVisual(GameUnit unit)
+        public OrderVisualPoint SpawnOrderVisual_rallyPoint(GameUnit unit)
         {
-            Orders.UnitOrder order = unit.OrderHandler.GetCurrentOrder();
-            if (order == null) return;
 
             OrderVisualPoint visualPoint = GetVisualPoint();
 
             visualPoint.wire.origin = unit.transform;
-            visualPoint.wire.posTarget = order.TargetPosition();
-            visualPoint.attachedOrder = order;
+            visualPoint.wire.posTarget = unit.trainRallyPoint;
             visualPoint.attachedUnit = unit;
             visualPoint.orderPosTarget = visualPoint.wire.posTarget.ToInt();
 
@@ -120,6 +127,39 @@ namespace ProtoRTS.Game
 
             visualPoint.wire.InstantUpdate();
             visualPoint.circle.transform.position = visualPoint.wire.posTarget;
+
+            return visualPoint;
+        }
+
+        public OrderVisualPoint SpawnOrderVisual(GameUnit unit)
+        {
+            var order = unit.behaviorTable.GetCurrentBehavior();
+            if (order == null) return null;
+
+            OrderVisualPoint visualPoint = GetVisualPoint();
+
+            visualPoint.wire.origin = unit.transform;
+            visualPoint.wire.posTarget = order.TargetPosition();
+            visualPoint.attachedOrder = order;
+            visualPoint.attachedUnit = unit;
+            visualPoint.orderPosTarget = visualPoint.wire.posTarget.ToInt();
+            visualPoint.pointType = OrderVisualPoint.PointType.OrderQueue;
+
+            if (dictionary_VisualPoints.ContainsValue(visualPoint))
+            {
+                var similarKey = dictionary_VisualPoints.FirstOrDefault(x => x.Value == visualPoint).Key;
+                dictionary_VisualPoints.Remove(similarKey);
+                dictionary_VisualPoints.TryAdd(visualPoint.orderPosTarget, visualPoint);
+            }
+            else
+            {
+                dictionary_VisualPoints.TryAdd(visualPoint.orderPosTarget, visualPoint);
+            }
+
+            visualPoint.wire.InstantUpdate();
+            visualPoint.circle.transform.position = visualPoint.wire.posTarget;
+
+            return visualPoint;
         }
 
         public bool AlreadyExistPoint(Vector3Int pos)
@@ -140,7 +180,7 @@ namespace ProtoRTS.Game
             {
                 if (count_unit > limitWires) break; // no need to visualize so many!
 
-                Orders.UnitOrder order = unit.OrderHandler.GetCurrentOrder();
+                var order = unit.behaviorTable.GetCurrentOrder();
                 if (order == null) continue;
                 var targetPos = order.TargetPosition();
                 if (AlreadyExistPoint(targetPos.ToInt())) continue;
@@ -153,30 +193,56 @@ namespace ProtoRTS.Game
             int count_vp = 0;
             foreach (var item in allVisualPoints)
             {
+                if (!item.gameObject.activeInHierarchy) continue;
+
                 if (count_vp > limitWires) break; // no need to visualize so many!
 
-                if (item.attachedUnit == null)
+                if (item.pointType == OrderVisualPoint.PointType.OrderQueue)
                 {
-                    item.gameObject.SetActive(false); continue;
-                }
+                    if (item.attachedUnit == null)
+                    {
+                        item.gameObject.SetActive(false); continue;
+                    }
 
-                if (item.attachedOrder.isCompleted)
-                {
-                    item.gameObject.SetActive(false); continue;
-                }
+                    var bt = item.attachedUnit.behaviorTable;
 
-                if (!item.attachedOrder.IsOrderExistsInUnit(item.attachedUnit))
-                {
-                    item.gameObject.SetActive(false); continue;
-                }
+                    if (item.attachedOrder == null)
+                    {
+                        item.gameObject.SetActive(false); continue;
+                    }
 
-                //update target
+                    if (item.attachedOrder.isCompleted)
+                    {
+                        item.gameObject.SetActive(false); continue;
+                    }
+
+                    if (!item.attachedUnit.behaviorTable.IsOrderQueued(item.attachedOrder))
+                    {
+                        item.gameObject.SetActive(false); continue;
+                    }
+
+                    //update target
+                    {
+                        item.wire.posTarget = item.attachedOrder.TargetPosition();
+                        item.circle.transform.position = item.wire.posTarget;
+
+                    }
+                    count_vp++;
+                }
+                else
                 {
-                    item.wire.posTarget = item.attachedOrder.TargetPosition();
+                    if (item.attachedUnit == null)
+                    {
+                        item.gameObject.SetActive(false); continue;
+                    }
+
+                    item.wire.posTarget = item.attachedUnit.trainRallyPoint;
                     item.circle.transform.position = item.wire.posTarget;
 
+                    count_vp++;
+
                 }
-                count_vp++;
+
             }
         }
     }

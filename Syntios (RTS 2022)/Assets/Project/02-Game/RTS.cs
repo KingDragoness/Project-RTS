@@ -9,6 +9,7 @@ using Pathfinding;
 using System.Text;
 using System;
 using System.Linq;
+using static ProtoRTS.SaveData;
 
 namespace ProtoRTS.Game
 {
@@ -39,10 +40,12 @@ namespace ProtoRTS.Game
             {
                 fowScript.LaunchLoadedGame();
 
+               // var listAllCreatedUnit = new List<GameUnit>();
 
                 //create game units
                 {
                     var allGameUnitSOs = DynamicAssetStorage.Instance.allGameUnits;
+                    Dictionary<GameUnit, SaveData.UnitData> allGameUnitCreated = new Dictionary<GameUnit, SaveData.UnitData>();
 
                     foreach (var unitDat in cachedLoadedSave.allUnits)
                     {
@@ -52,8 +55,31 @@ namespace ProtoRTS.Game
                             continue;
                         }
                         var newUnit = GameUnit.CreateUnit(unitDat, gameUnitSO);
+                        //listAllCreatedUnit.Add(newUnit);
+                        allGameUnitCreated.TryAdd(newUnit, unitDat);
+                    }
+
+
+                    foreach(var pairK in allGameUnitCreated)
+                    {
+                        var gameUnitSO = allGameUnitSOs.Find(x => x.ID == pairK.Value.unitID);
+
+                        pairK.Key.SecondPass_LoadedUnit(pairK.Value, gameUnitSO);
                     }
                 }
+
+                //selected units
+                foreach (var guid in cachedLoadedSave.allSelectedUnits_guids)
+                {
+                    var unit = SyntiosEngine.GetUnit(guid);
+                    if (unit == null) continue;
+
+                    Selection.AllSelectedUnits.Add(unit);
+                    unit.SelectedUnit();
+
+                }
+
+                if (Selection.AllSelectedUnits.Count > 0) SyntiosEvents.UI_NewSelection?.Invoke(Selection.AllSelectedUnits[0]);
             }
 
             IsLoadFromSaveFile = false;
@@ -104,6 +130,8 @@ namespace ProtoRTS.Game
             rtsCamera.transform.position = cachedLoadedSave.cameraPosition;
             SyntiosEngine.CurrentFaction = cachedLoadedSave.playerFaction;
             SyntiosEngine.Instance.UnitIncrementGUID = cachedLoadedSave.IncrementUnitGUID;
+
+         
 
             //faction sheet
             {
@@ -327,6 +355,11 @@ namespace ProtoRTS.Game
                 saveDat.allUnits.Add(unitDat);
             }
 
+            foreach(var unit in Selection.AllSelectedUnits)
+            {
+                saveDat.allSelectedUnits_guids.Add(unit.guid);
+            }
+
             foreach (var faction in SyntiosEngine.AllFactions)
             {
                 var dat = faction.GetSaveData();
@@ -347,12 +380,14 @@ namespace ProtoRTS.Game
             unitData.stat_Energy = (System.UInt32)unit.stat_Energy;
             unitData.stat_KillCount = (System.UInt16)unit.stat_KillCount;
             unitData.move_TargetPos = unit.move_Target;
+            unitData.trainRallyPoint = unit.trainRallyPoint;
             unitData.guid = unit.guid;
 
             //orders
             {
-                foreach (var e in unit.OrderHandler.orders) e.Save();
-                unitData.allOrders = unit.OrderHandler.orders;
+                List<OrderEntry> allOrderSaveDatas = new List<OrderEntry>();
+                
+                unitData.allOrders = unit.behaviorTable.SaveAll();// unit.behaviorTable.allQueuedOrders;
             }
 
             //training queue

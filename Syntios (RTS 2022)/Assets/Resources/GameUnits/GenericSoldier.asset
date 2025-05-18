@@ -19,12 +19,14 @@ MonoBehaviour:
   Rank: 
   Radius: 0.5
   spriteWireframe: {fileID: 21300000, guid: 07cfa059d1e011d4e8a1d2b63943e584, type: 3}
+  allWeapons: []
   MineralCost: 50
   EnergyCost: 25
   SupplyCount: 1
   SupplyProvide: 8
   BuildTime: 24
   MaxHP: 40
+  MaxShield: 40
   IsFlyUnit: 0
   HasShield: 1
   HasEnergy: 1
@@ -35,8 +37,10 @@ MonoBehaviour:
   AI_b_AttackOnProvoked: 1
   AI_b_FleeOnProvoked: 0
   port_Importance: -150
-  port_Idles: []
-  port_Talkings: []
+  port_Idles:
+  - {fileID: 32900000, guid: 9c409dd949c6129419908226a156aa8d, type: 3}
+  port_Talkings:
+  - {fileID: 32900000, guid: a8af8be4d1960734abb4a626448deb52, type: 3}
   voiceline_Ready:
   - {fileID: 8300000, guid: 546257e6f3c6ae945944ee0096967a4d, type: 3}
   - {fileID: 8300000, guid: 592d4d4c5d18b7c43b9696f8fdffaac0, type: 3}
@@ -47,128 +51,143 @@ MonoBehaviour:
   - cardName: default
     commands:
     - button: {fileID: 11400000, guid: c62efbfe0e21d34479760900f1102f55, type: 2}
+      buttonID: order_move
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 0
-      abilityType: 1
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 2
     - button: {fileID: 11400000, guid: aa24b6e573d4c114183b80482ad02ff4, type: 2}
+      buttonID: order_stop
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 1
-      abilityType: 2
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 3
     - button: {fileID: 11400000, guid: 165210e1ae2f0ca46b0ee19fcc8fe252, type: 2}
+      buttonID: order_holdPosition
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 2
-      abilityType: 4
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 5
     - button: {fileID: 11400000, guid: 7ac7b13af1238cb49ad1d9d46bfaee04, type: 2}
+      buttonID: order_attack
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 3
-      abilityType: 3
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 4
     - button: {fileID: 11400000, guid: a11483db184ec744481b9ace3f08963f, type: 2}
+      buttonID: order_patrol
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 4
-      abilityType: 5
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 6
     - button: {fileID: 11400000, guid: 949957a4f8eba134a8b1accc7fe5e8c7, type: 2}
+      buttonID: order_repair
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 5
-      abilityType: 10
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 11
     - button: {fileID: 11400000, guid: 003d80d474a462b4986fec07d73bc76e, type: 2}
+      buttonID: _
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 8
-      abilityType: 0
+      cardToOpen: build
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: build
+      orderClass: 0
     - button: {fileID: 11400000, guid: 0a92df97b13ffd3448179b7aaa740d77, type: 2}
+      buttonID: order_move
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 9
-      abilityType: 0
+      cardToOpen: build_advanced
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: build_advanced
+      orderClass: 0
     - button: {fileID: 11400000, guid: c44f8eaac58bcb746b49d815c0388588, type: 2}
+      buttonID: order_mineResources
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 6
-      abilityType: 9
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 9
     - button: {fileID: 11400000, guid: 16da891d170dddb4d81bace3633d4ec9, type: 2}
+      buttonID: order_returnCargo
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 7
-      abilityType: 0
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 8
   - cardName: build
     commands:
     - button: {fileID: 11400000, guid: 5aa06e1f77e0c8341a31eb253bf4510b, type: 2}
+      buttonID: order_move
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 0
-      abilityType: 7
+      cardToOpen: 
       buildingSO: {fileID: 11400000, guid: f532d0f78005bde49b6047787ffadd84, type: 2}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 101
     - button: {fileID: 11400000, guid: 1ca4947bee3fae94483b537a28c5eeed, type: 2}
+      buttonID: order_move
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 1
-      abilityType: 7
+      cardToOpen: 
       buildingSO: {fileID: 11400000, guid: 0c4ba2f3b2fcfae43a21a8bf34a2aa75, type: 2}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 101
     - button: {fileID: 11400000, guid: 1e4b0d6fede76cf448ef65aaac1c2c2a, type: 2}
+      buttonID: Null
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 11
-      abilityType: 0
+      cardToOpen: default
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: default
+      orderClass: 0
   - cardName: build_advanced
     commands:
     - button: {fileID: 11400000, guid: 1e4b0d6fede76cf448ef65aaac1c2c2a, type: 2}
+      buttonID: Null
       commandType: 4
       gameUnit: {fileID: 11400000}
       position: 11
-      abilityType: 0
+      cardToOpen: default
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: default
+      orderClass: 0
   - cardName: construction
     commands:
     - button: {fileID: 11400000, guid: 1e4b0d6fede76cf448ef65aaac1c2c2a, type: 2}
+      buttonID: order_constructing
       commandType: 0
       gameUnit: {fileID: 11400000}
       position: 11
-      abilityType: 0
+      cardToOpen: 
       buildingSO: {fileID: 0}
       unitSO: {fileID: 0}
-      cardToOpen: 
+      orderClass: 104

@@ -12,10 +12,12 @@ namespace ProtoRTS.Game
 		public UI_AbilityCommand UI_RTSCommands;
 		public Animator buttonAnim;
 		public Image buttonIcon;
-		public Text label_Hotkey;
+		public Image buttonActiveGlow;
+        public Text label_Hotkey;
 		public bool emptyButton = false;
 		public UnitButtonCommand.Type type;
 		public CommandButtonSO CommandButtonSO;
+		public string buttonID = "";
         public int index = 0;
 
 		public void OnClick()
@@ -32,6 +34,18 @@ namespace ProtoRTS.Game
         public void Dehighlight()
         {
             UI_RTSCommands.DehighlightButton(this);
+
+        }
+
+		public void CommandRunning()
+		{
+            buttonActiveGlow.gameObject.SetActive(true);
+
+        }
+
+		public void NotRunning()
+		{
+            buttonActiveGlow.gameObject.SetActive(false);
 
         }
     }

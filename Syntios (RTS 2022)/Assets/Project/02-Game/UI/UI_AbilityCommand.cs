@@ -24,6 +24,17 @@ namespace ProtoRTS.Game
             SyntiosEvents.UI_DeselectAll += event_UI_DeselectAll;
             Tick.OnTick += event_OnTick;
 
+            int _i = 0;
+            foreach (var button in buttons)
+            {
+                button.gameObject.SetActive(false);
+                button.emptyButton = true;
+                button.NotRunning();
+                button.index = _i;
+                _i++;
+            }
+
+
         }
 
         private void OnDestroy()
@@ -99,7 +110,29 @@ namespace ProtoRTS.Game
 
         private void event_OnTick(int tick)
         {
+            if (currentGameUnit != null)
+            {
+                if (currentCommandCard != null)
+                {
+                    foreach (var button in currentCommandCard.commands)
+                    {
+                        if (button.commandType != UnitButtonCommand.Type.AbilityCommand) continue;
 
+                        var actualButton = buttons.Find(x => x.buttonID == button.buttonID);
+                        bool isCommandRunning = currentGameUnit.behaviorTable.IsRunning(button);
+
+
+                        if (isCommandRunning)
+                        {
+                            actualButton.CommandRunning();
+                        }
+                        else
+                        {
+                            actualButton.NotRunning();
+                        }
+                    }
+                }
+            }
         }
 
 
@@ -113,15 +146,17 @@ namespace ProtoRTS.Game
             currentCommandCard = commandCard;
             currentGameUnit = unit;
 
-
             foreach (var command in commandCard.commands)
 			{
                 var button = buttons[command.position];
                 button.gameObject.SetActive(true);
-				button.buttonIcon.sprite = command.button.sprite;
+                button.buttonIcon.sprite = command.button.sprite; button.buttonActiveGlow.sprite = command.button.sprite;
                 button.label_Hotkey.text = Key(command.position);
                 button.type = command.commandType;
+                button.buttonID = command.buttonID;
                 button.CommandButtonSO = command.button;
+                button.NotRunning();
+
 
                 if (command.button.allowTint)
                 {
@@ -142,10 +177,12 @@ namespace ProtoRTS.Game
             {
                 var button = buttons[command.position];
                 button.gameObject.SetActive(true);
-                button.buttonIcon.sprite = command.button.sprite;
+                button.buttonIcon.sprite = command.button.sprite; button.buttonActiveGlow.sprite = command.button.sprite;
                 button.label_Hotkey.text = Key(command.position);
                 button.type = command.commandType;
+                button.buttonID = command.buttonID;
                 button.CommandButtonSO = command.button;
+                button.NotRunning();
 
                 if (command.button.allowTint)
                 {
@@ -182,16 +219,9 @@ namespace ProtoRTS.Game
             return "NULL";
 		}
 
+
         private void Start()
 		{
-            int _i = 0;
-            foreach (var button in buttons) 
-            { 
-                button.gameObject.SetActive(false);
-                button.emptyButton = true;
-                button.index = _i;
-                _i++;
-            }
 
         }
 
@@ -219,6 +249,36 @@ namespace ProtoRTS.Game
 
             if (command.commandType == UnitButtonCommand.Type.AbilityCommand)
             {
+                //bool validExecution = true;
+
+                //if (command.orderClass == OrderClass.order_train_unit)
+                //{
+                //    if (!SyntiosEngine.Instance.CheckMineralEnough(command.unitSO.MineralCost))
+                //    {
+                //        UI.PromptHelp.OpenPrompt("You are required to mine more minerals.", 7f);
+                //        validExecution = false;
+                //    }
+                //    else if (!SyntiosEngine.Instance.CheckEnergyEnough(command.unitSO.EnergyCost))
+                //    {
+                //        UI.PromptHelp.OpenPrompt("You are required to gain more energy.", 7f);
+                //        validExecution = false;
+                //    }
+                //}
+                //else if (command.IsBuildingLikeOrder())
+                //{
+                //    if (!SyntiosEngine.Instance.CheckMineralEnough(command.buildingSO.MineralCost))
+                //    {
+                //        UI.PromptHelp.OpenPrompt("You are required to mine more minerals.", 7f);
+                //        validExecution = false;
+                //    }
+                //    else if (!SyntiosEngine.Instance.CheckEnergyEnough(command.buildingSO.EnergyCost))
+                //    {
+                //        UI.PromptHelp.OpenPrompt("You are required to gain more energy.", 7f);
+                //        validExecution = false;
+                //    }
+                //}
+
+                //if (validExecution)
                 CommandUnit.Instance.CommandUI_ExecuteCommand(currentGameUnit, command);
             }
 
@@ -246,7 +306,8 @@ namespace ProtoRTS.Game
             if (command != null) 
             {               
 
-                if (command.abilityType == UnitButtonCommand.AbilityOrder.BuildBuilding)
+                if (command.orderClass == OrderClass.order_build_Dionarian | command.orderClass == OrderClass.order_build_Mobius |
+                    command.orderClass == OrderClass.order_build_Soviet | command.orderClass == OrderClass.order_build_TitanSixtus)
                 {
                     var buildingSO = command.buildingSO;
                     if (buildingSO != null) 
@@ -258,7 +319,7 @@ namespace ProtoRTS.Game
                     }
                 }
 
-                if (command.abilityType == UnitButtonCommand.AbilityOrder.TrainUnit)
+                if (command.orderClass == OrderClass.order_train_unit)
                 {
                     var unitSO = command.unitSO;
                     if (unitSO != null)

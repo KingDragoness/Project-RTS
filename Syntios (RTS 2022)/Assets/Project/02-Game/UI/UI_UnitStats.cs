@@ -182,6 +182,7 @@ namespace ProtoRTS.Game
 		public void CancelTrain(int index)
 		{
             var unit = Selection.AllSelectedUnits[0]; if (unit == null) return;
+            if (index >= unit.trainingQueue.Count) return;
             var trainedUnit = unit.trainingQueue[index];
 
             unit.trainingQueue.RemoveAt(index);

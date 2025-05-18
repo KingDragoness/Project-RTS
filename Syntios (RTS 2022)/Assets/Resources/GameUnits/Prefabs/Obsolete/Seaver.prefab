@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8323987392500808955}
   - component: {fileID: 6615940647404512330}
-  - component: {fileID: 5373973661724574065}
+  - component: {fileID: 938771886624332457}
   - component: {fileID: 6770347998595007424}
   - component: {fileID: 1200757550945678507}
   - component: {fileID: 9316905121958954}
@@ -137,11 +137,20 @@ MonoBehaviour:
   stat_KillCount: 0
   stat_HP: 25
   stat_Energy: 0
+  stat_Shield: 0
+  stat_isHallucination: 0
+  stat_isCloaking: 0
   stat_faction: 1
   guid: 
   move_Target: {x: 0, y: 0, z: 0}
   move_TargetUnit: {fileID: 0}
+  closest_attackableUnit: {fileID: 0}
+  behaviorTable: {fileID: 0}
   targetY: 0
+  trainingQueue: []
+  mainBodyAnimator: {fileID: 0}
+  upperBodyAnimator: {fileID: 0}
+  weaponHandler: {fileID: 938771886624332457}
   modelView:
   - {fileID: 1611024955082765526}
   - {fileID: 3567368761789770449}
@@ -151,7 +160,7 @@ MonoBehaviour:
   followerEntity: {fileID: 0}
   rvoController: {fileID: 5150341600365639356}
   groundAIPath: {fileID: 1200757550945678507}
---- !u!114 &5373973661724574065
+--- !u!114 &938771886624332457
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -160,14 +169,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5681835518158564857}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 856903df09c65ee42b036a8e42c3974e, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a0e8531eac3d1e41b494d8ccfe3d30c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unit: {fileID: 6615940647404512330}
-  orders: []
-  references:
-    version: 2
-    RefIds: []
+  gameUnit: {fileID: 6615940647404512330}
 --- !u!114 &6770347998595007424
 MonoBehaviour:
   m_ObjectHideFlags: 0
