@@ -566,6 +566,56 @@ namespace ProtoRTS
 			return 0;
 		}
 
+		public int GetDominantTerrainLayer(int pos_x, int pos_y)
+		{
+			int layerIndex = 0; //0-9 (ground, terrain_layer1, layer2, ... layer8)
+			var index = GetSplatmapIndex(pos_x * 4, pos_y * 4);
+			float strength = 0;
+
+			if (terrain_layer1[index] > strength)
+			{
+                strength = terrain_layer1[index];
+                layerIndex = 1;
+            }
+            if (terrain_layer2[index] > strength)
+            {
+                strength = terrain_layer2[index];
+                layerIndex = 1;
+            }
+            if (terrain_layer3[index] > strength)
+            {
+                strength = terrain_layer3[index];
+                layerIndex = 3;
+            }
+            if (terrain_layer4[index] > strength)
+            {
+                strength = terrain_layer4[index];
+                layerIndex = 4;
+            }
+            if (terrain_layer5[index] > strength)
+            {
+                strength = terrain_layer5[index];
+                layerIndex = 5;
+            }
+            if (terrain_layer6[index] > strength)
+            {
+                strength = terrain_layer6[index];
+                layerIndex = 6;
+            }
+            if (terrain_layer7[index] > strength)
+            {
+                strength = terrain_layer7[index];
+                layerIndex = 7;
+            }
+            if (terrain_layer8[index] > strength)
+            {
+                strength = terrain_layer8[index];
+                layerIndex = 8;
+            }
+
+            return layerIndex;
+		}
+
 
 
 		public void SaveMapData()

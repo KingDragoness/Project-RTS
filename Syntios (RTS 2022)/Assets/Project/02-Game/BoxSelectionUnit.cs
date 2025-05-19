@@ -246,7 +246,7 @@ namespace ProtoRTS
         void SelectOneUnit(GameUnit unit)
         {
             //if (Selection.AllSelectedUnits.Count > 0 && unit.IsPlayerUnit() == false) return;
-            if (!FOWScript.IsCoordRevealed(unit.transform.position) && unit.IsPlayerUnit() == false) return;
+            if (!FOWScript.IsCoordRevealed(unit.transform.position, SyntiosEngine.CurrentFaction) && unit.IsPlayerUnit() == false) return;
 
             Selection.DeselectAllExcept(unit);
             Selection.SelectUnit(unit);
@@ -425,7 +425,7 @@ namespace ProtoRTS
                 foreach (var unit in byClosestUnit)
                 {
        
-                    if (!FOWScript.IsCoordRevealed(unit.transform.position))
+                    if (!FOWScript.IsCoordRevealed(unit.transform.position, SyntiosEngine.CurrentFaction))
                     {
                         continue;
                     }
@@ -626,7 +626,7 @@ namespace ProtoRTS
                     {
                         break;
                     }
-                    if (!FOWScript.IsCoordRevealed(unit.transform.position))
+                    if (!FOWScript.IsCoordRevealed(unit.transform.position, SyntiosEngine.CurrentFaction))
                     {
                         continue;
                     }

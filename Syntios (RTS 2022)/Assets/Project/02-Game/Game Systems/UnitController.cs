@@ -46,7 +46,7 @@ namespace ProtoRTS.Game
 
                 if (unit.stat_faction != SyntiosEngine.CurrentFaction)
                 {
-                    if (FOWScript.IsCoordRevealed(unit.transform.position))
+                    if (FOWScript.IsCoordRevealed(unit.transform.position, SyntiosEngine.CurrentFaction))
                     {
                         unit.ShowModel();
                     }

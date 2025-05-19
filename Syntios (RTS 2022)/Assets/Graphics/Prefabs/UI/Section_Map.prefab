@@ -561,7 +561,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1818760570483986249}
   - component: {fileID: 1282859282190201059}
-  - component: {fileID: 1639962103692001358}
+  - component: {fileID: 6375533376833902149}
   - component: {fileID: 6311413221188408219}
   m_Layer: 5
   m_Name: Map [pixel 255x255]
@@ -606,7 +606,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4693563104054730332}
   m_CullTransparentMesh: 1
---- !u!114 &1639962103692001358
+--- !u!114 &6375533376833902149
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -615,27 +615,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 4693563104054730332}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7075472, g: 0.7075472, b: 0.7075472, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: aa8f6c51f5143cc4e96f63f364e14f43, type: 3}
-  m_Type: 2
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 4
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!114 &6311413221188408219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1026,7 +1023,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 79eed97be41aafa4b9405abab0d8e74d, type: 3}
+  m_Texture: {fileID: 2800000, guid: c4b1fcea430d4244f8bfd72aafd937da, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -1329,12 +1326,13 @@ MonoBehaviour:
   MinimapRefreshRate: 1
   line_Viewport: {fileID: 542487250158233010}
   mapTexture_Unit: {fileID: 8494126977402838887}
+  mapTexture_Terrain: {fileID: 6375533376833902149}
   mapTexture_FOW: {fileID: 3134140914465027493}
-  image_SplatHeight: {fileID: 1639962103692001358}
   testImg_LD: {fileID: 4910085427212642875}
   testImg_RD: {fileID: 931109528894436238}
   testImg_LU: {fileID: 4251342909564651333}
   testImg_RU: {fileID: 4668352201740367708}
+  DisableInput: 0
 --- !u!1 &8577951069691324251
 GameObject:
   m_ObjectHideFlags: 0

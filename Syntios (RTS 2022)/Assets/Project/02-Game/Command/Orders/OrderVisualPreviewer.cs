@@ -74,6 +74,7 @@ namespace ProtoRTS.Game
                 return availablePoint;
             }
 
+
             availablePoint = Instantiate(prefab_point, transform);
             availablePoint.gameObject.SetActive(true);
             allVisualPoints.Add(availablePoint);
@@ -86,9 +87,13 @@ namespace ProtoRTS.Game
             foreach(var item in allVisualPoints) 
             { item.gameObject.SetActive(false); }
 
+            int c = allVisualPoints.Count(x => x.gameObject.activeInHierarchy == true);
 
             foreach (var unit in Selection.AllSelectedUnits)
             {
+                c = allVisualPoints.Count(x => x.gameObject.activeInHierarchy == true);
+                if (c > limitWires) break;
+
                 //LATER: need to be changed to defaultCommandCard.HasOrder
                 if (unit.CheckFlag(Unit.Tag.Factory) && unit.behaviorTable.HasOrder(OrderClass.order_setRallyPoint))
                 {
@@ -102,6 +107,7 @@ namespace ProtoRTS.Game
 
                 SpawnOrderVisual(unit);
             }
+
         }
 
         public OrderVisualPoint SpawnOrderVisual_rallyPoint(GameUnit unit)
@@ -175,7 +181,7 @@ namespace ProtoRTS.Game
 
         private void Update()
         {
-            int count_unit = 0;
+            int count_unit = allVisualPoints.Count(x => x.gameObject.activeInHierarchy == true); ;
             foreach (var unit in Selection.AllSelectedUnits)
             {
                 if (count_unit > limitWires) break; // no need to visualize so many!
@@ -190,12 +196,11 @@ namespace ProtoRTS.Game
                 count_unit++;
             }
 
-            int count_vp = 0;
             foreach (var item in allVisualPoints)
             {
                 if (!item.gameObject.activeInHierarchy) continue;
 
-                if (count_vp > limitWires) break; // no need to visualize so many!
+                //if (count_vp > limitWires) break; // no need to visualize so many!
 
                 if (item.pointType == OrderVisualPoint.PointType.OrderQueue)
                 {
@@ -227,7 +232,7 @@ namespace ProtoRTS.Game
                         item.circle.transform.position = item.wire.posTarget;
 
                     }
-                    count_vp++;
+                    //count_vp++;
                 }
                 else
                 {
@@ -239,7 +244,7 @@ namespace ProtoRTS.Game
                     item.wire.posTarget = item.attachedUnit.trainRallyPoint;
                     item.circle.transform.position = item.wire.posTarget;
 
-                    count_vp++;
+                    //count_vp++;
 
                 }
 

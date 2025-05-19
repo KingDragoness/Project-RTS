@@ -76,7 +76,11 @@ namespace ProtoRTS
 		[FoldoutGroup("Layer")] public string layer8_name = "Layer 8";
 		[FoldoutGroup("Layer")] public Texture2D layer8;
 
-		[FoldoutGroup("Cliff Models")] public List<GameObject> manmadeCliffs;
+
+        //minimap terrain, sample 16 pixels of the terrain's texture ()
+        [FoldoutGroup("Layer")] public Color[] terrain_colors = new Color[9]; //ground, t1, t2... t8
+
+        [FoldoutGroup("Cliff Models")] public List<GameObject> manmadeCliffs;
 		[FoldoutGroup("Cliff Models")] public List<GameObject> naturalCliffs;
 
 
@@ -334,5 +338,56 @@ namespace ProtoRTS
 			//corner
 			return null;
 		}
-	}
+
+		[FoldoutGroup("DEBUG")]
+		[Button("Recalculate  Terrain Colors")]
+
+		public void CalculateTerrainColor()
+		{
+			 terrain_colors = new Color[9];
+            terrain_colors[0] = AverageOutColorOfTexture(ground);
+            terrain_colors[1] = AverageOutColorOfTexture(layer1);
+            terrain_colors[2] = AverageOutColorOfTexture(layer2);
+            terrain_colors[3] = AverageOutColorOfTexture(layer3);
+            terrain_colors[4] = AverageOutColorOfTexture(layer4);
+            terrain_colors[5] = AverageOutColorOfTexture(layer5);
+            terrain_colors[6] = AverageOutColorOfTexture(layer6);
+            terrain_colors[7] = AverageOutColorOfTexture(layer7);
+            terrain_colors[8] = AverageOutColorOfTexture(layer8);
+
+        }
+
+
+        public Color AverageOutColorOfTexture(Texture2D texture, int samples = 4)
+        {
+            Color averageCol = new Color();
+            int size_per_x = texture.width - 1 / samples;
+            int size_per_y = texture.height - 1 / samples;
+            if (size_per_x < 0) size_per_x = 0;
+            if (size_per_y < 0) size_per_y = 0;
+            Vector3 totalColor = new Vector3();
+
+            for (int x = 0; x < samples; x++)
+            {
+                for (int y = 0; y < samples; y++)
+                {
+                    int pos_x = size_per_x * x;
+                    int pos_y = size_per_y * y;
+
+                    var col1 = texture.GetPixel(pos_x, pos_y);
+                    totalColor.x += col1.r;
+                    totalColor.y += col1.g;
+                    totalColor.z += col1.b;
+                }
+            }
+
+            averageCol.r = totalColor.x / (float)(samples * samples);
+            averageCol.g = totalColor.y / (float)(samples * samples);
+            averageCol.b = totalColor.z / (float)(samples * samples);
+            averageCol.a = 1f;
+
+            return averageCol;
+        }
+
+    }
 }

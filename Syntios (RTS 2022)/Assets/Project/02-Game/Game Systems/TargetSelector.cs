@@ -218,6 +218,7 @@ namespace ProtoRTS.Game
                     foreach (GameUnit unitToCompare in quad.units)
                     {
                         if (unit == unitToCompare) { continue; }
+                        if (!FOWScript.IsCoordRevealed(unit.transform.position, unit.stat_faction)) continue;
                         SO_Weapon usingWeapon = null;
 
                         if (unit.IsAir())

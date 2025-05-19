@@ -99,6 +99,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: a4414ab975e6f5d41bded65f82390a5d, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _NormalTexture:
+        m_Texture: {fileID: 2800000, guid: c3e4f7a52434efe44acd4b11f2a06753, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -159,7 +163,7 @@ Material:
     - _BumpScale: 1
     - _ContrastCloud: 0.35
     - _Cutoff: 0.5
-    - _Depth: 0.57
+    - _Depth: 0.7
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _FOWSampleRadiusBlur: 0.0008
@@ -178,7 +182,7 @@ Material:
     - _PrioE: 0.1
     - _PrioF: 1
     - _PrioG: 1
-    - _PrioGround: 0.25
+    - _PrioGround: 0.4
     - _PrioH: 1
     - _RimPower: 5
     - _Shininess: 15

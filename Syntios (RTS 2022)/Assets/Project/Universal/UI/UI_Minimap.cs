@@ -19,8 +19,9 @@ namespace ProtoRTS
 
         public LineRenderer line_Viewport;
         public RawImage mapTexture_Unit;
+        public RawImage mapTexture_Terrain;
         public RawImage mapTexture_FOW;
-        public Image image_SplatHeight;
+        //public Image image_SplatHeight;
         public Image testImg_LD;
         public Image testImg_RD;
         public Image testImg_LU;
@@ -28,10 +29,13 @@ namespace ProtoRTS
 
         private bool allowDrag = false;
         private Canvas myCanvas;
-        private Texture minimap_Terrain;
+        private Texture2D texture_minimap_Terrain;
         private Texture2D texture_minimap_Units;
 
+
         private float cooldown_MinimapRefresh = 2f;
+        Rect uvRect_MapFOW = new Rect();
+        Rect uvRect_Terrain = new Rect();
 
 
         private void Start()
@@ -76,9 +80,38 @@ namespace ProtoRTS
                 ui_Map.sizeDelta = v2;
             }
 
+            
             texture_minimap_Units = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
 
+            //draw terrain texture
+            {
+                texture_minimap_Terrain = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
+                texture_minimap_Terrain.filterMode = FilterMode.Point;
+
+                for (int x = 0; x < Map.TerrainData.size_x; x++)
+                {
+                    for(int y = 0; y < Map.TerrainData.size_y; y++)
+                    {
+                        int indexTerrainColor = Map.TerrainData.GetDominantTerrainLayer(x, y);
+
+                        Color c = Map.instance.MyPreset.terrain_colors[indexTerrainColor];
+
+                        texture_minimap_Terrain.SetPixel(x, y, c);
+                    }
+                }
+
+                texture_minimap_Terrain.Apply();
+                mapTexture_Terrain.texture = texture_minimap_Terrain;
+
+                Update_RectUV();
+                mapTexture_Terrain.uvRect = uvRect_Terrain;
+                mapTexture_FOW.uvRect = uvRect_MapFOW;
+
+                cooldown_MinimapRefresh = 0.5f;
+            }
         }
+
+
 
         private void OnDrawGizmosSelected()
         {
@@ -138,21 +171,34 @@ namespace ProtoRTS
             {
                 Update_Minimap();
                 Update_FOW();
+                Update_RectUV();
                 cooldown_MinimapRefresh = MinimapRefreshRate;
             }
         }
 
-        Rect uvRect_MapFOW = new Rect();
+
+        private void Update_RectUV()
+        {
+            float scale = 1;//defaultMinimapLength / 256f;
+            float ppi = (scale * Map.TerrainData.size_x / 256f);
+
+            if (ppi < (scale * Map.TerrainData.size_y / 256f))
+                ppi = (scale * Map.TerrainData.size_y / 256f);
+
+            uvRect_MapFOW.width = (float)ui_Map.sizeDelta.x / defaultMinimapLength * ppi; //ppi * (Map.TerrainData.size_x / 256f);
+            uvRect_MapFOW.height = (float)ui_Map.sizeDelta.y / defaultMinimapLength * ppi;//ppi * (Map.TerrainData.size_y / 256f);
+            uvRect_Terrain.width = (float)Map.TerrainData.size_x / defaultMinimapLength;
+            uvRect_Terrain.height = (float)Map.TerrainData.size_y / defaultMinimapLength;
+
+            mapTexture_Terrain.uvRect = uvRect_Terrain;
+            mapTexture_FOW.uvRect = uvRect_MapFOW;
+        }
 
         private void Update_FOW()
         {
             var currentFOW = FOWScript.GetFOW(SyntiosEngine.CurrentFaction);
             if (currentFOW == null) return;
 
-            uvRect_MapFOW.width = Map.TerrainData.size_x / 256f;
-            uvRect_MapFOW.height = Map.TerrainData.size_y / 256f;
-
-            mapTexture_FOW.uvRect = uvRect_MapFOW;
             mapTexture_FOW.texture = currentFOW.rawDataTexture;
         }
 
@@ -331,8 +377,10 @@ namespace ProtoRTS
 
             texture_minimap_Units.Apply();
             mapTexture_Unit.texture = texture_minimap_Units;
-            image_SplatHeight.pixelsPerUnitMultiplier = pixelsPerUnit;
-          
+            mapTexture_Terrain.texture = texture_minimap_Terrain;
+
+            //image_SplatHeight.pixelsPerUnitMultiplier = pixelsPerUnit;
+
         }
 
 

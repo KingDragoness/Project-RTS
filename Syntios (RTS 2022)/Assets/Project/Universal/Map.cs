@@ -909,6 +909,8 @@ namespace ProtoRTS
             return offsetPos1;
         }
 
+        
+
         public enum Direction_TileCheck
         {
             Southwest,

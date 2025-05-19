@@ -430,6 +430,7 @@ namespace ProtoRTS
         [Space]
         [Header("References")]
         public List<FOWMap> allFOWMaps = new List<FOWMap>();
+        internal Dictionary<int, FOWMap> fowMapDictionary = new Dictionary<int, FOWMap>();
         public Texture2D texture2d_WhiteFOW;
         public int UpdateTexturePerSecond = 30;
         public int UpdateFOWPerSecond = 10;
@@ -459,7 +460,8 @@ namespace ProtoRTS
 
         public static FOWMap GetFOW(Unit.Player faction)
         {
-            var fowMap = Instance.allFOWMaps.Find(x => x.faction == faction);
+
+            var fowMap = Instance.fowMapDictionary[(int)faction];
             return fowMap;
         }
 
@@ -478,6 +480,10 @@ namespace ProtoRTS
             allFOWMaps.Add(new FOWMap(Unit.Player.Player7, new bool[256, 256], new bool[256, 256]));
             allFOWMaps.Add(new FOWMap(Unit.Player.Player8, new bool[256, 256], new bool[256, 256]));
 
+            foreach(var map in allFOWMaps)
+            {
+                fowMapDictionary.TryAdd((int)map.faction, map);
+            }
 
         }
 
@@ -693,7 +699,7 @@ namespace ProtoRTS
             return x + (y * 256);
         }
 
-        public static bool IsCoordRevealed(Vector3 pos)
+        public static bool IsCoordRevealed(Vector3 pos, Unit.Player faction)
         {
             var pixelPos = Instance.WorldPosToMapPixel(pos);
 
@@ -708,7 +714,7 @@ namespace ProtoRTS
                 return false;
             }
 
-            var fowFaction = GetFOW(SyntiosEngine.CurrentFaction);
+            var fowFaction = GetFOW(faction);
             bool activePoint = fowFaction.activePoints[pixelPos.x, pixelPos.y];
             return activePoint;
         }

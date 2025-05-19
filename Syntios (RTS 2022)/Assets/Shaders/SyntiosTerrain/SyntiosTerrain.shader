@@ -9,6 +9,8 @@ Shader "Syntios/SyntiosTerrain"
 
         //_FOWMap("Fog of War (Ever Explored)", 2D) = "black" {}
         _GroundTexture("Ground Texture", 2D) = "white" {}
+        _NormalTexture("Main Normal Texture", 2D) = "white" {}
+
         _CloudFog("Cloud Fog Pattern", 2D) = "black" {}
         _UnexploredFog("Unexplored Fog Color", Color) = (0.1,0.1,0.1,1)
         _BumpDepth("Bump Depth", Range(-2.0, 2.0)) = 1
@@ -107,6 +109,7 @@ Shader "Syntios/SyntiosTerrain"
         sampler2D _TextureG;
         sampler2D _TextureH;
 
+        Texture2D _NormalTexture;
         Texture2D _NormalMapA;
         Texture2D _NormalMapB;
         Texture2D _NormalMapC;
@@ -439,6 +442,7 @@ Shader "Syntios/SyntiosTerrain"
                 //float4 texN = tex2DStochastic(_NormalMapA, IN.uvMaterial);
 
                 float4 texN = (
+                    tex2DStochastic(_NormalTexture, IN.uvMaterial, sampler_NormalMapA) * b0 +
                     tex2DStochastic(_NormalMapA, IN.uvMaterial, sampler_NormalMapA) * b1 +
                     tex2DStochastic(_NormalMapB, IN.uvMaterial, sampler_NormalMapA) * b2 +
                     tex2DStochastic(_NormalMapC, IN.uvMaterial, sampler_NormalMapA) * b3 +
