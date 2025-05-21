@@ -116,6 +116,7 @@ namespace ProtoRTS.MapEditor
             if (Input.GetMouseButtonUp(0))
             {
                 Map.UpdateTerrainMap();
+                UI_Minimap.Instance.UpdateTerrainTexture();
             }
 
             if (isMaskByDistance)

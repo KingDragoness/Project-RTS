@@ -61,15 +61,6 @@ namespace ProtoRTS
 			Neutral		
 		}
 
-		public static Color GetColor(Player player)
-        {
-			if (player == Player.Player1)
-            {
-				return Player1_Color;
-            }
-
-			return Neutral_Color;
-        }
 
 		public static Color Neutral_Color = new Color(0.301f, 0.941f, 0.856f, 1f);
 		public static Color Player1_Color = new Color(1f, 0f, 0f, 1f);

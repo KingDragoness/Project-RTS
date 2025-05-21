@@ -37,6 +37,19 @@ namespace ProtoRTS
         Rect uvRect_MapFOW = new Rect();
         Rect uvRect_Terrain = new Rect();
 
+        private static UI_Minimap _instance;
+        public static UI_Minimap Instance
+        {
+            get
+            {
+                //for editor mode
+                if (_instance == null)
+                {
+                    _instance = FindObjectOfType<UI_Minimap>();
+                }
+                return _instance;
+            }
+        }
 
         private void Start()
         {
@@ -109,6 +122,28 @@ namespace ProtoRTS
 
                 cooldown_MinimapRefresh = 0.5f;
             }
+        }
+
+        //only in editor
+        public void UpdateTerrainTexture()
+        {
+            texture_minimap_Terrain = new Texture2D(ui_Map.sizeDelta.x.ToInt(), ui_Map.sizeDelta.y.ToInt());
+            texture_minimap_Terrain.filterMode = FilterMode.Point;
+
+            for (int x = 0; x < Map.TerrainData.size_x; x++)
+            {
+                for (int y = 0; y < Map.TerrainData.size_y; y++)
+                {
+                    int indexTerrainColor = Map.TerrainData.GetDominantTerrainLayer(x, y);
+
+                    Color c = Map.instance.MyPreset.terrain_colors[indexTerrainColor];
+
+                    texture_minimap_Terrain.SetPixel(x, y, c);
+                }
+            }
+
+            texture_minimap_Terrain.Apply();
+
         }
 
 
@@ -347,9 +382,10 @@ namespace ProtoRTS
                 if (gameUnit.IsVisibleFromFOW == false) continue;
 
                 Vector2Int posCenter = ConvertWorldPosToMinimapPos(gameUnit.transform.position);
-                Color c = Unit.GetColor(gameUnit.stat_faction);
+                Color c = Map.instance.GetColorFaction(gameUnit.stat_faction);
                 int radius = RadiusUnitInMiniMap(gameUnit.Class.Radius);
                 if (radius <= 2) radius = 2;
+                if (gameUnit.Class.IsFlyUnit | gameUnit.CheckFlag(Unit.Tag.Structure)) radius++;
                 int r2 = radius * radius;
 
                 for(int x = 0; x < r2; x++)

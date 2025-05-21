@@ -92,13 +92,18 @@ PrefabInstance:
     - target: {fileID: 8127373176595696534, guid: 8daea61ec8550634db5f53d8c8564150,
         type: 3}
       propertyPath: modelView.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8127373176595696534, guid: 8daea61ec8550634db5f53d8c8564150,
         type: 3}
       propertyPath: modelView.Array.data[0]
       value: 
       objectReference: {fileID: 6926341168782074306}
+    - target: {fileID: 8127373176595696534, guid: 8daea61ec8550634db5f53d8c8564150,
+        type: 3}
+      propertyPath: modelView.Array.data[1]
+      value: 
+      objectReference: {fileID: 5077833916979173580}
     - target: {fileID: 9109924655286209173, guid: 8daea61ec8550634db5f53d8c8564150,
         type: 3}
       propertyPath: m_Enabled
@@ -242,6 +247,12 @@ MeshCollider:
 --- !u!4 &4581676685440116580 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7069421670741621554, guid: 19907e6d13cf21a418d64219fff52c7d,
+    type: 3}
+  m_PrefabInstance: {fileID: 6741540262131555414}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5077833916979173580 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2015031173882905754, guid: 19907e6d13cf21a418d64219fff52c7d,
     type: 3}
   m_PrefabInstance: {fileID: 6741540262131555414}
   m_PrefabAsset: {fileID: 0}

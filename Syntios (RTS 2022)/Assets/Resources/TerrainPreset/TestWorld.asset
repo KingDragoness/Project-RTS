@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TestWorld
   m_EditorClassIdentifier: 
   PresetID: Earth
-  ground: {fileID: 2800000, guid: 6ec76ac714077a24c82031ab94fd72f6, type: 3}
+  ground: {fileID: 2800000, guid: 208fb05c10eaef34782185f04783334b, type: 3}
   layer1_name: Earth Grass
   layer1: {fileID: 2800000, guid: aa5b6799afb1cea4e96edb378a0fe66e, type: 3}
   layer2_name: Black Soil
@@ -37,7 +37,7 @@ MonoBehaviour:
   - {r: 0.4941177, g: 0.40392157, b: 0.36470592, a: 1}
   - {r: 0.5882353, g: 0.5411765, b: 0.4666667, a: 1}
   - {r: 0, g: 0, b: 0, a: 1}
-  - {r: 0.41176474, g: 0.41176474, b: 0.3921569, a: 1}
+  - {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}
   - {r: 0.16862749, g: 0.14901963, b: 0.13725492, a: 1}
   - {r: 0.41176474, g: 0.36862746, b: 0.34901962, a: 1}
   manmadeCliffs:

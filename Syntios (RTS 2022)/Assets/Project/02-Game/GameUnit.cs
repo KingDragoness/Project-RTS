@@ -45,11 +45,12 @@ namespace ProtoRTS
         [FoldoutGroup("References")] public Animator upperBodyAnimator;
         [FoldoutGroup("References")] public UnitWeaponHandler weaponHandler;
         [FoldoutGroup("References")] public Renderer[] modelView;
-		[FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
+        [FoldoutGroup("References")] public FollowerEntity followerEntity; //change to modular
 		[FoldoutGroup("References")] public RVOController rvoController; //change to modular
 		[FoldoutGroup("References")] public AIPath groundAIPath; //change to modular
 
 		private bool _isVisibleFromFOW = false;
+        private bool _isVisible_1TickAgo = false;
         private bool _isLoadedSaveFile = false;
 
 
@@ -63,6 +64,7 @@ namespace ProtoRTS
         }
 
         public bool IsVisibleFromFOW { get => _isVisibleFromFOW;  }
+        public bool IsVisible_1_Tick_ago { get => _isVisible_1TickAgo; }
 
 
         public override void Awake()
@@ -362,6 +364,7 @@ namespace ProtoRTS
         public void HideModel()
         {
             _isVisibleFromFOW = false;
+            _isVisible_1TickAgo = false;
             foreach (var meshRrndr in modelView) meshRrndr.enabled = false;
 
         }
@@ -369,6 +372,7 @@ namespace ProtoRTS
         public void ShowModel()
         {
             _isVisibleFromFOW = true;
+            _isVisible_1TickAgo = true;
             foreach (var meshRrndr in modelView) meshRrndr.enabled = true;
 
         }

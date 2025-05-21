@@ -24,6 +24,7 @@ namespace ProtoRTS
         public string ID = "Seaver";
         public string NameDisplay = "Seaver";
         public GameUnit basePrefab;
+        public Ghost3dModel ghost3dModelPrefab;
         public string Rank = "";
         public float Radius = 2;
         public Sprite spriteWireframe;

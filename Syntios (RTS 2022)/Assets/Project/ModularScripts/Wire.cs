@@ -11,6 +11,7 @@ public class Wire : MonoBehaviour
     public Transform target;
     public Vector3 posOrigin;
     public Vector3 posTarget;
+    public Vector3 offset;
 
     void Update()
     {
@@ -24,6 +25,6 @@ public class Wire : MonoBehaviour
         if (linerenderer == null) return;
 
         if (origin != null) linerenderer.SetPosition(0, origin.transform.position); else linerenderer.SetPosition(0, posOrigin);
-        if (target != null) linerenderer.SetPosition(1, target.transform.position); else linerenderer.SetPosition(1, posTarget);
+        if (target != null) linerenderer.SetPosition(1, target.transform.position + offset); else linerenderer.SetPosition(1, posTarget + offset);
     }
 }

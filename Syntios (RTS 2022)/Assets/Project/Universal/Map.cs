@@ -300,7 +300,7 @@ namespace ProtoRTS
                 center.x += 0;
                 center.z += 0; 
 
-                recastGraph.cellSize = 1;
+                //recastGraph.cellSize = recastGraph.cellSize;
                 recastGraph.forcedBoundsSize = new Vector3(width, 100, depth);
                 recastGraph.forcedBoundsCenter = center;
                 //gridGraph.SetDimensions(width, depth, 1);

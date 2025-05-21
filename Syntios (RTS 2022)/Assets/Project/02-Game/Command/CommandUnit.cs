@@ -159,7 +159,8 @@ namespace ProtoRTS.Game
 
             if (hittedUnit != null)
             {
-                hittedUnit.HighlightUnit();
+                if (hittedUnit.IsVisibleFromFOW)
+                    hittedUnit.HighlightUnit();
             }
 
             if (_previewedGameUnit != hittedUnit && _previewedGameUnit != null)

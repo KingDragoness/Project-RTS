@@ -173,7 +173,7 @@ namespace ProtoRTS
                         //
                         else if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                         {
-                            SelectOneUnit(singleSelectUnit);
+                            SelectOneUnit(singleSelectUnit, addUnit);
                         }
                     }
                     else if (doubleClickDetected == true)
@@ -192,7 +192,10 @@ namespace ProtoRTS
 
                 if (singleSelectUnit != null && MainUI.GetEventSystemRaycastResults().Count <= 0)
                 {
-                    singleSelectUnit.HighlightUnit();
+                    if (singleSelectUnit.IsVisibleFromFOW)
+                    {
+                        singleSelectUnit.HighlightUnit();
+                    }
                 }
             }
 
@@ -243,12 +246,12 @@ namespace ProtoRTS
         }
 
 
-        void SelectOneUnit(GameUnit unit)
+        void SelectOneUnit(GameUnit unit, bool additive = false)
         {
             //if (Selection.AllSelectedUnits.Count > 0 && unit.IsPlayerUnit() == false) return;
             if (!FOWScript.IsCoordRevealed(unit.transform.position, SyntiosEngine.CurrentFaction) && unit.IsPlayerUnit() == false) return;
 
-            Selection.DeselectAllExcept(unit);
+            if (!additive) Selection.DeselectAllExcept(unit);
             Selection.SelectUnit(unit);
             unit.SelectedUnit();
 

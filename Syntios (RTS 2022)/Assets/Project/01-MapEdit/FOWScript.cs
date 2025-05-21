@@ -609,7 +609,14 @@ namespace ProtoRTS
 
             //Debug.Log($"Rect: ({points_rect[0]} < {points_rect[3]} | {points_rect[1]} < {points_rect[2]}) = Draw: ({xDrawLength}, {yDrawLength}) | Origin pattern: ({startDrawCircle_x}, {startDrawCircle_y})");
 
-            fowMap.WriteBuffer(originPos, new Vector2Int(startDrawCircle_x, startDrawCircle_y), new Vector2Int(xDrawLength, yDrawLength), myCirclePattern, unit.transform.position.y);
+            float pseudoHeight = unit.transform.position.y;
+
+            if (unit.Class.IsFlyUnit)
+            {
+                pseudoHeight = 99f;
+            }
+
+            fowMap.WriteBuffer(originPos, new Vector2Int(startDrawCircle_x, startDrawCircle_y), new Vector2Int(xDrawLength, yDrawLength), myCirclePattern, pseudoHeight);
 
 
             //foreach (var pxToDraw in indexesToDraw)

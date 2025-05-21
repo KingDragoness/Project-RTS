@@ -7249,7 +7249,7 @@ MonoBehaviour:
     type: 2}
   mat_highlightCircle_green_tier3: {fileID: 2100000, guid: d07c49d4f44169b42b2a38c0387bbc45,
     type: 2}
-  mat_highlightCircle_yellow_tier3: {fileID: 2100000, guid: e21cbf357be3f37409e0040575cb1260,
+  mat_highlightCircle_yellow_tier3: {fileID: 2100000, guid: 6437f41446cf9994290c1afd6f746d8c,
     type: 2}
   mat_highlightCircle_red_tier3: {fileID: 2100000, guid: 7a44697ec04e45b4ebe3eada0968e394,
     type: 2}

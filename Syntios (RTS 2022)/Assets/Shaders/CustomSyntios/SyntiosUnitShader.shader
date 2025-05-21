@@ -8,22 +8,27 @@ Shader "Syntios/SyntiosUnitShader"
         _FactionMask("Mask for Faction Color", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,2)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
+        _Cutoff("Alpha cutoff", Range(0,1)) = 0.5
         _BumpMap("Bumpmap", 2D) = "bump" {}
 
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+            Tags {"Queue"="AlphaTest" "IgnoreProjector"="True" "RenderType"="TransparentCutout"}
+
+
 
         CGPROGRAM
         // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
         #pragma exclude_renderers gles
         // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard Lambert vertex:vert fullforwardshadows
+        #pragma surface surf Standard vertex:vert fullforwardshadows alphatest:_Cutoff
+
+
 
         // Use shader model 3.0 target, to get nicer looking lighting
         #pragma target 3.0
-         #include "UnityCG.cginc"
+        #include "UnityCG.cginc"
 
         sampler2D _MainTex;
         sampler2D _FactionMask;
@@ -133,10 +138,10 @@ Shader "Syntios/SyntiosUnitShader"
                 fogFOW_1.y += _Time * -0.9;
 
                 sum.r += tex2DStochastic(_CloudFog, fogFOW).r;
-                sum.r += tex2DStochastic(_CloudFog, fogFOW_1).r;
+                //sum.r += tex2DStochastic(_CloudFog, fogFOW_1).r;
 
-                c *= sum.r * 1.3;
-                fowPow = sum.r * 1.3;
+                c.rgb *= sum.r * 1.1;
+                //fowPow = sum.r * 1.2;
 
             }
 
@@ -220,11 +225,11 @@ Shader "Syntios/SyntiosUnitShader"
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness * fowPow;
-            o.Alpha = c.a;
+            o.Alpha = tex2D (_MainTex, IN.uv_MainTex).a;
 
 
         }
         ENDCG
     }
-    FallBack "Diffuse"
+    Fallback "Legacy Shaders/Transparent/Cutout/VertexLit"
 }
